@@ -1461,19 +1461,27 @@ keys.
 ### 11.3 CI Workflow
 
 ```yaml
-# .github/workflows/ci.yml
+# CI Workflow
+#
+# Runs on all pull requests to develop and main branches
+# Validates code quality, runs tests, and checks coverage
+
 name: CI
 
 on:
   pull_request:
     branches: [develop, main, "release/**"]
+  push:
+    branches: [develop, main]
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -1487,24 +1495,31 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Type check
+      - name: Format Check
+        run: npm run format:check
+
+      - name: Type Check
         run: npm run type-check
 
-      - name: Test (with coverage)
+      - name: Build
+        run: npm run build
+
+      - name: Run tests with coverage
         run: npm run test:coverage
 
       - name: Check coverage is 100%
         run: |
-          if npx --yes nyc@latest report --reporter=text-summary | grep -q '100%'; then
-            echo "100% coverage detected!"
+          # Extract coverage percentages from Jest output
+          COVERAGE_OUTPUT=$(npm run test:coverage 2>&1 | grep "All files" | head -1)
+
+          # Check if all coverage metrics are 100%
+          if echo "$COVERAGE_OUTPUT" | grep -E "100\s*\|\s*100\s*\|\s*100\s*\|\s*100" > /dev/null; then
+            echo "Coverage check passed - 100% coverage achieved"
           else
-            echo "::error::Test coverage is not 100%. Please increase test coverage to 100%."
-            npx nyc report --reporter=text-summary
+            echo "Coverage check failed - coverage is not at 100%"
+            echo "$COVERAGE_OUTPUT"
             exit 1
           fi
-
-      - name: Build
-        run: npm run build
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
@@ -1889,7 +1904,11 @@ jobs:
 ### 11.7 Deployment Workflow (Preview - PR Environments)
 
 ```yaml
-# .github/workflows/deploy-preview.yml
+# Deploy Preview Workflow
+#
+# Deploys ephemeral preview environments for Pull Requests
+# Each PR gets its own Cloud Run service with HTTP Basic Auth
+
 name: Deploy to Preview
 
 on:
@@ -1902,11 +1921,6 @@ env:
   DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
   IMAGE_NAME: sentient-archive-web
 
-permissions:
-  contents: read
-  id-token: write # Required for Workload Identity Federation
-  pull-requests: write
-
 jobs:
   deploy-preview:
     runs-on: ubuntu-latest
@@ -1914,6 +1928,10 @@ jobs:
     environment:
       name: preview
       url: ${{ steps.preview-url.outputs.url }}
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
 
     steps:
       - name: Checkout code
@@ -1994,32 +2012,12 @@ jobs:
 
             ### 🔗 [**View Preview Deployment →**](${previewUrl})
 
-            <table>
-              <tr>
-                <td><strong>Environment</strong></td>
-                <td>Preview (Ephemeral)</td>
-              </tr>
-              <tr>
-                <td><strong>Service</strong></td>
-                <td><code>${serviceName}</code></td>
-              </tr>
-              <tr>
-                <td><strong>URL</strong></td>
-                <td><a href="${previewUrl}">${previewUrl}</a></td>
-              </tr>
-              <tr>
-                <td><strong>Commit</strong></td>
-                <td><code>${context.sha.substring(0, 7)}</code></td>
-              </tr>
-              <tr>
-                <td><strong>🔒 Username</strong></td>
-                <td><code>${{ secrets.AUTH_USERNAME }}</code></td>
-              </tr>
-              <tr>
-                <td><strong>🔒 Password</strong></td>
-                <td><code>${{ secrets.AUTH_PASSWORD }}</code></td>
-              </tr>
-            </table>
+            | Property | Value |
+            | --- | --- |
+            | **Environment** | Preview (Ephemeral) |
+            | **Service** | \`${serviceName}\` |
+            | **URL** | ${previewUrl} |
+            | **Commit** | \`${context.sha.substring(0, 7)}\` |
 
             ---
 
@@ -2029,7 +2027,7 @@ jobs:
             - **Security Level:** Medium (HTTP Basic Auth)
             - **Who Uses It:** Devs, QA, Product
 
-            > 💡 **Note:** This preview environment will be automatically cleaned up when the PR is closed or merged.
+            > 💡 **Note:** This preview environment will be automatically cleaned up when the PR is closed or merged. Credentials are available in the GitHub Environment secrets.
             `;
 
             github.rest.issues.createComment({
@@ -2043,7 +2041,11 @@ jobs:
 ### 11.8 Cleanup Workflow (Preview Environments)
 
 ```yaml
-# .github/workflows/cleanup-preview.yml
+# Cleanup Preview Workflow
+#
+# Cleans up ephemeral preview environments when PRs are closed
+# Deletes the Cloud Run service and comments on the PR
+
 name: Cleanup Preview Environment
 
 on:
@@ -2054,16 +2056,15 @@ on:
 env:
   REGION: us-central1
 
-permissions:
-  contents: read
-  id-token: write # Required for Workload Identity Federation
-  pull-requests: write
-
 jobs:
   cleanup:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: preview
+    permissions:
+      pull-requests: write
+      contents: read
+      id-token: write
 
     steps:
       - name: Generate preview service name
