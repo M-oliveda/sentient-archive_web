@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://sentientarchive.moliveda.dev/sitemap.xml
