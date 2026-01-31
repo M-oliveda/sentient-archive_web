@@ -889,12 +889,13 @@ function App() {
 import { initializeApp } from "firebase/app";
 import { getAuth, connectAuthEmulator } from "firebase/auth";
 import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
+import { getStorage, connectStorageEmulator } from "firebase/storage";
+import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
@@ -902,14 +903,18 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
+const functions = getFunctions(app);
 
-// Connect to emulators in development
+// Connect to emulators in development (enabled by default for local development)
 if (import.meta.env.VITE_USE_EMULATOR === "true") {
   connectAuthEmulator(auth, "http://localhost:9099");
-  connectFirestoreEmulator(db, "localhost", 8080);
+  connectFirestoreEmulator(db, "localhost", 8081);
+  connectStorageEmulator(storage, "localhost", 9199);
+  connectFunctionsEmulator(functions, "localhost", 5001);
 }
 
-export { auth, db };
+export { app, auth, db, storage, functions };
 ```
 
 ### 8.2 Protected Routes
@@ -1138,10 +1143,10 @@ module.exports = {
   ],
   coverageThreshold: {
     global: {
-      branches: 80,
-      functions: 80,
-      lines: 80,
-      statements: 80,
+      branches: 100,
+      functions: 100,
+      lines: 100,
+      statements: 100,
     },
   },
   transform: {
@@ -1419,7 +1424,7 @@ describe("useSummarize", () => {
 .github/workflows/
 ├── ci.yml                    # Run on all PRs
 ├── deploy-dev.yml            # Auto-deploy on develop
-├── deploy-staging.yml        # Auto-deploy on release/*
+├── deploy-stg.yml        # Auto-deploy on release/*
 ├── deploy-prod.yml           # Manual deploy on main
 ├── deploy-preview.yml        # Deploy PR preview environments
 └── cleanup-preview.yml       # Cleanup PR preview on close
@@ -1456,19 +1461,27 @@ keys.
 ### 11.3 CI Workflow
 
 ```yaml
-# .github/workflows/ci.yml
+# CI Workflow
+#
+# Runs on all pull requests to develop and main branches
+# Validates code quality, runs tests, and checks coverage
+
 name: CI
 
 on:
   pull_request:
     branches: [develop, main, "release/**"]
+  push:
+    branches: [develop, main]
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -1482,24 +1495,31 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Type check
+      - name: Format Check
+        run: npm run format:check
+
+      - name: Type Check
         run: npm run type-check
 
-      - name: Test (with coverage)
+      - name: Build
+        run: npm run build
+
+      - name: Run tests with coverage
         run: npm run test:coverage
 
       - name: Check coverage is 100%
         run: |
-          if npx --yes nyc@latest report --reporter=text-summary | grep -q '100%'; then
-            echo "100% coverage detected!"
+          # Extract coverage percentages from Jest output
+          COVERAGE_OUTPUT=$(npm run test:coverage 2>&1 | grep "All files" | head -1)
+
+          # Check if all coverage metrics are 100%
+          if echo "$COVERAGE_OUTPUT" | grep -E "100\s*\|\s*100\s*\|\s*100\s*\|\s*100" > /dev/null; then
+            echo "Coverage check passed - 100% coverage achieved"
           else
-            echo "::error::Test coverage is not 100%. Please increase test coverage to 100%."
-            npx nyc report --reporter=text-summary
+            echo "Coverage check failed - coverage is not at 100%"
+            echo "$COVERAGE_OUTPUT"
             exit 1
           fi
-
-      - name: Build
-        run: npm run build
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
@@ -1554,7 +1574,6 @@ jobs:
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
           VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
-          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
           VITE_FIREBASE_MESSAGING_SENDER_ID:
             ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
@@ -1675,7 +1694,6 @@ jobs:
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
           VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
-          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
           VITE_FIREBASE_MESSAGING_SENDER_ID:
             ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
@@ -1758,7 +1776,7 @@ jobs:
 ### 11.6 Deployment Workflow (Staging)
 
 ```yaml
-# .github/workflows/deploy-staging.yml
+# .github/workflows/deploy-stg.yml
 name: Deploy to Staging
 
 on:
@@ -1804,7 +1822,6 @@ jobs:
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
           VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
-          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
           VITE_FIREBASE_MESSAGING_SENDER_ID:
             ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
@@ -1887,7 +1904,11 @@ jobs:
 ### 11.7 Deployment Workflow (Preview - PR Environments)
 
 ```yaml
-# .github/workflows/deploy-preview.yml
+# Deploy Preview Workflow
+#
+# Deploys ephemeral preview environments for Pull Requests
+# Each PR gets its own Cloud Run service with HTTP Basic Auth
+
 name: Deploy to Preview
 
 on:
@@ -1900,11 +1921,6 @@ env:
   DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
   IMAGE_NAME: sentient-archive-web
 
-permissions:
-  contents: read
-  id-token: write # Required for Workload Identity Federation
-  pull-requests: write
-
 jobs:
   deploy-preview:
     runs-on: ubuntu-latest
@@ -1912,6 +1928,10 @@ jobs:
     environment:
       name: preview
       url: ${{ steps.preview-url.outputs.url }}
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
 
     steps:
       - name: Checkout code
@@ -1992,32 +2012,12 @@ jobs:
 
             ### 🔗 [**View Preview Deployment →**](${previewUrl})
 
-            <table>
-              <tr>
-                <td><strong>Environment</strong></td>
-                <td>Preview (Ephemeral)</td>
-              </tr>
-              <tr>
-                <td><strong>Service</strong></td>
-                <td><code>${serviceName}</code></td>
-              </tr>
-              <tr>
-                <td><strong>URL</strong></td>
-                <td><a href="${previewUrl}">${previewUrl}</a></td>
-              </tr>
-              <tr>
-                <td><strong>Commit</strong></td>
-                <td><code>${context.sha.substring(0, 7)}</code></td>
-              </tr>
-              <tr>
-                <td><strong>🔒 Username</strong></td>
-                <td><code>${{ secrets.AUTH_USERNAME }}</code></td>
-              </tr>
-              <tr>
-                <td><strong>🔒 Password</strong></td>
-                <td><code>${{ secrets.AUTH_PASSWORD }}</code></td>
-              </tr>
-            </table>
+            | Property | Value |
+            | --- | --- |
+            | **Environment** | Preview (Ephemeral) |
+            | **Service** | \`${serviceName}\` |
+            | **URL** | ${previewUrl} |
+            | **Commit** | \`${context.sha.substring(0, 7)}\` |
 
             ---
 
@@ -2027,7 +2027,7 @@ jobs:
             - **Security Level:** Medium (HTTP Basic Auth)
             - **Who Uses It:** Devs, QA, Product
 
-            > 💡 **Note:** This preview environment will be automatically cleaned up when the PR is closed or merged.
+            > 💡 **Note:** This preview environment will be automatically cleaned up when the PR is closed or merged. Credentials are available in the GitHub Environment secrets.
             `;
 
             github.rest.issues.createComment({
@@ -2041,7 +2041,11 @@ jobs:
 ### 11.8 Cleanup Workflow (Preview Environments)
 
 ```yaml
-# .github/workflows/cleanup-preview.yml
+# Cleanup Preview Workflow
+#
+# Cleans up ephemeral preview environments when PRs are closed
+# Deletes the Cloud Run service and comments on the PR
+
 name: Cleanup Preview Environment
 
 on:
@@ -2052,16 +2056,15 @@ on:
 env:
   REGION: us-central1
 
-permissions:
-  contents: read
-  id-token: write # Required for Workload Identity Federation
-  pull-requests: write
-
 jobs:
   cleanup:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: preview
+    permissions:
+      pull-requests: write
+      contents: read
+      id-token: write
 
     steps:
       - name: Generate preview service name
@@ -2275,13 +2278,15 @@ server {
 
 ```yaml
 # docker-compose.yml
+name: sentient-archive-web_local
+
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
       target: builder
-    container_name: sentient-archive-web-dev
+    container_name: frontend
     ports:
       - "5173:5173"
     volumes:
@@ -2296,7 +2301,6 @@ services:
       - VITE_FIREBASE_API_KEY=${VITE_FIREBASE_API_KEY}
       - VITE_FIREBASE_AUTH_DOMAIN=${VITE_FIREBASE_AUTH_DOMAIN}
       - VITE_FIREBASE_PROJECT_ID=${VITE_FIREBASE_PROJECT_ID}
-      - VITE_FIREBASE_STORAGE_BUCKET=${VITE_FIREBASE_STORAGE_BUCKET}
       - VITE_FIREBASE_MESSAGING_SENDER_ID=${VITE_FIREBASE_MESSAGING_SENDER_ID}
       - VITE_FIREBASE_APP_ID=${VITE_FIREBASE_APP_ID}
       - VITE_USE_EMULATOR=true
@@ -2351,23 +2355,23 @@ secrets.
 
 ### Phase 1: Project Initialization (Week 1)
 
-- [ ] Create GitHub repository
-- [ ] Set up GitFlow branching
-- [ ] Configure Vite + React 19 + TypeScript
-- [ ] Install and configure TailwindCSS + ShadCN
-- [ ] Set up ESLint + Prettier
-- [ ] Install and configure Husky (pre-commit + commit-msg hooks)
-- [ ] Set up Gitmoji commit message validation
-- [ ] Create Dockerfile with multi-stage build (production + protected targets)
-- [ ] Create docker-compose.yml for local development
-- [ ] Create nginx.conf for production (public)
-- [ ] Create nginx.protected.conf for dev/staging/preview (with auth)
-- [ ] Create .dockerignore
-- [ ] Configure GitHub Actions workflows (CI, deploy-dev, deploy-staging, deploy-prod,
+- [x] Create GitHub repository
+- [x] Set up GitFlow branching
+- [x] Configure Vite + React 19 + TypeScript
+- [x] Install and configure TailwindCSS + ShadCN
+- [x] Set up ESLint + Prettier
+- [x] Install and configure Husky (pre-commit + commit-msg hooks)
+- [x] Set up Gitmoji commit message validation
+- [x] Create Dockerfile with multi-stage build (production + protected targets)
+- [x] Create docker-compose.yml for local development
+- [x] Create nginx.conf for production (public)
+- [x] Create nginx.protected.conf for dev/staging/preview (with auth)
+- [x] Create .dockerignore
+- [x] Configure GitHub Actions workflows (CI, deploy-dev, deploy-staging, deploy-prod,
       deploy-preview, cleanup-preview)
-- [ ] Create initial folder structure (.husky directory)
-- [ ] Set up Firebase SDK
-- [ ] Configure Jest for testing
+- [x] Create initial folder structure (.husky directory)
+- [x] Set up Firebase SDK
+- [x] Configure Jest for testing
 
 ### Phase 2: Authentication UI (Week 2)
 
@@ -2485,13 +2489,12 @@ secrets.
 # Firebase Configuration
 VITE_FIREBASE_API_KEY=your-api-key
 VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=your-project-id
-VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+VITE_FIREBASE_PROJECT_ID=demo-sentient-archive
 VITE_FIREBASE_MESSAGING_SENDER_ID=123456789
 VITE_FIREBASE_APP_ID=1:123456789:web:abcdef
 
 # Development Settings (only for local Docker)
-VITE_USE_EMULATOR=false
+VITE_USE_EMULATOR=true
 VITE_FUNCTIONS_EMULATOR_URL=http://localhost:5001
 ```
 
@@ -2504,7 +2507,6 @@ For local development with Docker Compose, create a `.env` file:
 VITE_FIREBASE_PROJECT_ID=sentient-archive-dev
 VITE_FIREBASE_API_KEY=your-dev-api-key
 VITE_FIREBASE_AUTH_DOMAIN=sentient-archive-dev.firebaseapp.com
-VITE_FIREBASE_STORAGE_BUCKET=sentient-archive-dev.appspot.com
 VITE_FIREBASE_MESSAGING_SENDER_ID=123456789
 VITE_FIREBASE_APP_ID=1:123456789:web:abcdef
 
@@ -2536,7 +2538,6 @@ Each GitHub Environment contains the following secrets:
 | `VITE_FIREBASE_API_KEY`             | Firebase API key                               |
 | `VITE_FIREBASE_AUTH_DOMAIN`         | Firebase auth domain                           |
 | `VITE_FIREBASE_PROJECT_ID`          | Firebase project ID                            |
-| `VITE_FIREBASE_STORAGE_BUCKET`      | Firebase storage bucket                        |
 | `VITE_FIREBASE_MESSAGING_SENDER_ID` | Firebase messaging sender ID                   |
 | `VITE_FIREBASE_APP_ID`              | Firebase app ID                                |
 | `AUTH_USERNAME`                     | HTTP Basic Auth username (dev/staging/preview) |

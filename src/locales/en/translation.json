@@ -1,0 +1,35 @@
+{
+  "common": {
+    "appName": "SentientArchive",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "back": "Back"
+  },
+  "auth": {
+    "login": "Log In",
+    "logout": "Log Out",
+    "signup": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "continueWithGoogle": "Continue with Google"
+  },
+  "dashboard": {
+    "welcome": "Welcome back",
+    "recentNotes": "Recent Notes",
+    "quickActions": "Quick Actions",
+    "tokenBalance": "Token Balance"
+  },
+  "notes": {
+    "newNote": "New Note",
+    "allNotes": "All Notes",
+    "noNotes": "No notes yet",
+    "untitled": "Untitled Note"
+  }
+}
