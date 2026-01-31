@@ -1,6 +1,5 @@
 /** @type {import('jest').Config} */
 export default {
-    preset: "ts-jest",
     testEnvironment: "jsdom",
     roots: ["<rootDir>/src", "<rootDir>/tests"],
     testMatch: ["**/__tests__/**/*.ts?(x)", "**/?(*.)+(spec|test).ts?(x)"],
@@ -15,25 +14,18 @@ export default {
         "!src/**/*.d.ts",
         "!src/main.tsx",
         "!src/vite-env.d.ts",
+        "!src/lib/env.ts",
     ],
     coverageThreshold: {
         global: {
-            branches: 80,
-            functions: 80,
-            lines: 80,
-            statements: 80,
+            branches: 100,
+            functions: 100,
+            lines: 100,
+            statements: 100,
         },
     },
     transform: {
-        "^.+\\.tsx?$": [
-            "ts-jest",
-            {
-                tsconfig: {
-                    jsx: "react-jsx",
-                },
-            },
-        ],
+        "^.+\\.(ts|tsx)$": "babel-jest",
     },
-    extensionsToTreatAsEsm: [".ts", ".tsx"],
     moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
 };
