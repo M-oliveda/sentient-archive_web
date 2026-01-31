@@ -889,12 +889,13 @@ function App() {
 import { initializeApp } from "firebase/app";
 import { getAuth, connectAuthEmulator } from "firebase/auth";
 import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
+import { getStorage, connectStorageEmulator } from "firebase/storage";
+import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
@@ -902,14 +903,18 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
+const functions = getFunctions(app);
 
-// Connect to emulators in development
+// Connect to emulators in development (enabled by default for local development)
 if (import.meta.env.VITE_USE_EMULATOR === "true") {
   connectAuthEmulator(auth, "http://localhost:9099");
-  connectFirestoreEmulator(db, "localhost", 8080);
+  connectFirestoreEmulator(db, "localhost", 8081);
+  connectStorageEmulator(storage, "localhost", 9199);
+  connectFunctionsEmulator(functions, "localhost", 5001);
 }
 
-export { auth, db };
+export { app, auth, db, storage, functions };
 ```
 
 ### 8.2 Protected Routes
@@ -1419,7 +1424,7 @@ describe("useSummarize", () => {
 .github/workflows/
 ├── ci.yml                    # Run on all PRs
 ├── deploy-dev.yml            # Auto-deploy on develop
-├── deploy-staging.yml        # Auto-deploy on release/*
+├── deploy-stg.yml        # Auto-deploy on release/*
 ├── deploy-prod.yml           # Manual deploy on main
 ├── deploy-preview.yml        # Deploy PR preview environments
 └── cleanup-preview.yml       # Cleanup PR preview on close
@@ -1554,7 +1559,6 @@ jobs:
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
           VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
-          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
           VITE_FIREBASE_MESSAGING_SENDER_ID:
             ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
@@ -1675,7 +1679,6 @@ jobs:
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
           VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
-          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
           VITE_FIREBASE_MESSAGING_SENDER_ID:
             ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
@@ -1758,7 +1761,7 @@ jobs:
 ### 11.6 Deployment Workflow (Staging)
 
 ```yaml
-# .github/workflows/deploy-staging.yml
+# .github/workflows/deploy-stg.yml
 name: Deploy to Staging
 
 on:
@@ -1804,7 +1807,6 @@ jobs:
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
           VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
-          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
           VITE_FIREBASE_MESSAGING_SENDER_ID:
             ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
@@ -2275,13 +2277,15 @@ server {
 
 ```yaml
 # docker-compose.yml
+name: sentient-archive-web_local
+
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
       target: builder
-    container_name: sentient-archive-web-dev
+    container_name: frontend
     ports:
       - "5173:5173"
     volumes:
@@ -2296,7 +2300,6 @@ services:
       - VITE_FIREBASE_API_KEY=${VITE_FIREBASE_API_KEY}
       - VITE_FIREBASE_AUTH_DOMAIN=${VITE_FIREBASE_AUTH_DOMAIN}
       - VITE_FIREBASE_PROJECT_ID=${VITE_FIREBASE_PROJECT_ID}
-      - VITE_FIREBASE_STORAGE_BUCKET=${VITE_FIREBASE_STORAGE_BUCKET}
       - VITE_FIREBASE_MESSAGING_SENDER_ID=${VITE_FIREBASE_MESSAGING_SENDER_ID}
       - VITE_FIREBASE_APP_ID=${VITE_FIREBASE_APP_ID}
       - VITE_USE_EMULATOR=true
@@ -2351,23 +2354,23 @@ secrets.
 
 ### Phase 1: Project Initialization (Week 1)
 
-- [ ] Create GitHub repository
-- [ ] Set up GitFlow branching
-- [ ] Configure Vite + React 19 + TypeScript
-- [ ] Install and configure TailwindCSS + ShadCN
-- [ ] Set up ESLint + Prettier
-- [ ] Install and configure Husky (pre-commit + commit-msg hooks)
-- [ ] Set up Gitmoji commit message validation
-- [ ] Create Dockerfile with multi-stage build (production + protected targets)
-- [ ] Create docker-compose.yml for local development
-- [ ] Create nginx.conf for production (public)
-- [ ] Create nginx.protected.conf for dev/staging/preview (with auth)
-- [ ] Create .dockerignore
-- [ ] Configure GitHub Actions workflows (CI, deploy-dev, deploy-staging, deploy-prod,
+- [x] Create GitHub repository
+- [x] Set up GitFlow branching
+- [x] Configure Vite + React 19 + TypeScript
+- [x] Install and configure TailwindCSS + ShadCN
+- [x] Set up ESLint + Prettier
+- [x] Install and configure Husky (pre-commit + commit-msg hooks)
+- [x] Set up Gitmoji commit message validation
+- [x] Create Dockerfile with multi-stage build (production + protected targets)
+- [x] Create docker-compose.yml for local development
+- [x] Create nginx.conf for production (public)
+- [x] Create nginx.protected.conf for dev/staging/preview (with auth)
+- [x] Create .dockerignore
+- [x] Configure GitHub Actions workflows (CI, deploy-dev, deploy-staging, deploy-prod,
       deploy-preview, cleanup-preview)
-- [ ] Create initial folder structure (.husky directory)
-- [ ] Set up Firebase SDK
-- [ ] Configure Jest for testing
+- [x] Create initial folder structure (.husky directory)
+- [x] Set up Firebase SDK
+- [x] Configure Jest for testing
 
 ### Phase 2: Authentication UI (Week 2)
 
@@ -2485,13 +2488,12 @@ secrets.
 # Firebase Configuration
 VITE_FIREBASE_API_KEY=your-api-key
 VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=your-project-id
-VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+VITE_FIREBASE_PROJECT_ID=demo-sentient-archive
 VITE_FIREBASE_MESSAGING_SENDER_ID=123456789
 VITE_FIREBASE_APP_ID=1:123456789:web:abcdef
 
 # Development Settings (only for local Docker)
-VITE_USE_EMULATOR=false
+VITE_USE_EMULATOR=true
 VITE_FUNCTIONS_EMULATOR_URL=http://localhost:5001
 ```
 
@@ -2504,7 +2506,6 @@ For local development with Docker Compose, create a `.env` file:
 VITE_FIREBASE_PROJECT_ID=sentient-archive-dev
 VITE_FIREBASE_API_KEY=your-dev-api-key
 VITE_FIREBASE_AUTH_DOMAIN=sentient-archive-dev.firebaseapp.com
-VITE_FIREBASE_STORAGE_BUCKET=sentient-archive-dev.appspot.com
 VITE_FIREBASE_MESSAGING_SENDER_ID=123456789
 VITE_FIREBASE_APP_ID=1:123456789:web:abcdef
 
@@ -2536,7 +2537,6 @@ Each GitHub Environment contains the following secrets:
 | `VITE_FIREBASE_API_KEY`             | Firebase API key                               |
 | `VITE_FIREBASE_AUTH_DOMAIN`         | Firebase auth domain                           |
 | `VITE_FIREBASE_PROJECT_ID`          | Firebase project ID                            |
-| `VITE_FIREBASE_STORAGE_BUCKET`      | Firebase storage bucket                        |
 | `VITE_FIREBASE_MESSAGING_SENDER_ID` | Firebase messaging sender ID                   |
 | `VITE_FIREBASE_APP_ID`              | Firebase app ID                                |
 | `AUTH_USERNAME`                     | HTTP Basic Auth username (dev/staging/preview) |
