@@ -1,0 +1,35 @@
+{
+  "common": {
+    "appName": "SentientArchive",
+    "loading": "Cargando...",
+    "error": "Ocurrió un error",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "search": "Buscar",
+    "back": "Volver"
+  },
+  "auth": {
+    "login": "Iniciar Sesión",
+    "logout": "Cerrar Sesión",
+    "signup": "Registrarse",
+    "email": "Correo Electrónico",
+    "password": "Contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "continueWithGoogle": "Continuar con Google"
+  },
+  "dashboard": {
+    "welcome": "Bienvenido de nuevo",
+    "recentNotes": "Notas Recientes",
+    "quickActions": "Acciones Rápidas",
+    "tokenBalance": "Balance de Tokens"
+  },
+  "notes": {
+    "newNote": "Nueva Nota",
+    "allNotes": "Todas las Notas",
+    "noNotes": "Aún no hay notas",
+    "untitled": "Nota sin título"
+  }
+}
