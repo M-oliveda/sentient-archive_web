@@ -1,9 +1,9 @@
 import { getAuth } from "firebase/auth";
+import { env, isEmulatorEnabled } from "./env";
 
-const API_BASE_URL =
-    import.meta.env.VITE_USE_EMULATOR === "true"
-        ? "http://localhost:5001/demo-sentient-archive/us-central1"
-        : `https://us-central1-${import.meta.env.VITE_FIREBASE_PROJECT_ID}.cloudfunctions.net`;
+const API_BASE_URL = isEmulatorEnabled()
+    ? "http://localhost:5001/demo-sentient-archive/us-central1"
+    : `https://us-central1-${env.VITE_FIREBASE_PROJECT_ID}.cloudfunctions.net`;
 
 async function getAuthToken(): Promise<string> {
     const auth = getAuth();
