@@ -1,15 +1,13 @@
 # CI Workflow
 #
-# Runs on all pull requests to develop and main branches
+# Runs on all pull requests to develop, release/** and main branches
 # Validates code quality, runs tests, and checks coverage
 
 name: CI
 
 on:
   pull_request:
-    branches: [develop, main, "release/**"]
-  push:
-    branches: [develop, main]
+    branches: [develop, "release/**", main]
 
 jobs:
   test:
