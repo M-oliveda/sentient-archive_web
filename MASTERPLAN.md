@@ -1461,18 +1461,17 @@ keys.
 ### 11.3 CI Workflow
 
 ```yaml
+# .github/works/ci.yml
 # CI Workflow
 #
-# Runs on all pull requests to develop and main branches
+# Runs on all pull requests to develop, release/** and main branches
 # Validates code quality, runs tests, and checks coverage
 
 name: CI
 
 on:
   pull_request:
-    branches: [develop, main, "release/**"]
-  push:
-    branches: [develop, main]
+    branches: [develop, "release/**", main]
 
 jobs:
   test:
@@ -1533,7 +1532,6 @@ name: Deploy to Production
 
 on:
   workflow_dispatch:
-    branches: [main]
 
 env:
   SERVICE_NAME: sentient-archive-web
@@ -1543,7 +1541,7 @@ env:
 
 permissions:
   contents: read
-  id-token: write # Required for Workload Identity Federation
+  id-token: write
 
 jobs:
   deploy:
@@ -1577,7 +1575,7 @@ jobs:
           VITE_FIREBASE_MESSAGING_SENDER_ID:
             ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
-          VITE_USE_EMULATOR: false
+          VITE_USE_EMULATOR: "false"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -1615,11 +1613,11 @@ jobs:
 
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy ${{ env.SERVICE_NAME }} \
-            --image=docker.io/${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+          gcloud run deploy "${{ env.SERVICE_NAME }}" \
+            --image="docker.io/${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}" \
             --platform=managed \
-            --region=${{ env.REGION }} \
-            --project=${{ secrets.GCP_PROJECT_ID }} \
+            --region="${{ env.REGION }}" \
+            --project="${{ secrets.GCP_PROJECT_ID }}" \
             --allow-unauthenticated \
             --memory=512Mi \
             --cpu=1 \
@@ -1631,21 +1629,23 @@ jobs:
       - name: Get Cloud Run URL
         id: deploy-url
         run: |
-          URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
-            --region=${{ env.REGION }} \
-            --project=${{ secrets.GCP_PROJECT_ID }} \
+          URL=$(gcloud run services describe "${{ env.SERVICE_NAME }}" \
+            --region="${{ env.REGION }}" \
+            --project="${{ secrets.GCP_PROJECT_ID }}" \
             --format='value(status.url)')
-          echo "url=$URL" >> $GITHUB_OUTPUT
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
 
       - name: Deployment Summary
         run: |
-          echo "### 🚀 Production Deployment Successful!" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Service URL:** ${{ steps.deploy-url.outputs.url }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Image:** docker.io/${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Project:** ${{ secrets.GCP_PROJECT_ID }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Region:** ${{ env.REGION }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Access:** Public (No authentication)" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "### 🚀 Production Deployment Successful!"
+            echo ""
+            echo "**Service URL:** ${{ steps.deploy-url.outputs.url }}"
+            echo "**Image:** docker.io/${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+            echo "**Project:** ${{ secrets.GCP_PROJECT_ID }}"
+            echo "**Region:** ${{ env.REGION }}"
+            echo "**Access:** Public (No authentication)"
+          } >> "$GITHUB_STEP_SUMMARY"
 ```
 
 ### 11.5 Deployment Workflow (Development)
@@ -1666,7 +1666,7 @@ env:
 
 permissions:
   contents: read
-  id-token: write # Required for Workload Identity Federation
+  id-token: write
 
 jobs:
   deploy:
@@ -1697,7 +1697,7 @@ jobs:
           VITE_FIREBASE_MESSAGING_SENDER_ID:
             ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
-          VITE_USE_EMULATOR: false
+          VITE_USE_EMULATOR: "false"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -1738,11 +1738,11 @@ jobs:
 
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy ${{ env.SERVICE_NAME }} \
-            --image=docker.io/${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:dev-${{ github.sha }} \
+          gcloud run deploy "${{ env.SERVICE_NAME }}" \
+            --image="docker.io/${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:dev-${{ github.sha }}" \
             --platform=managed \
-            --region=${{ env.REGION }} \
-            --project=${{ secrets.GCP_PROJECT_ID }} \
+            --region="${{ env.REGION }}" \
+            --project="${{ secrets.GCP_PROJECT_ID }}" \
             --allow-unauthenticated \
             --memory=512Mi \
             --cpu=1 \
@@ -1754,23 +1754,23 @@ jobs:
       - name: Get Cloud Run URL
         id: deploy-url
         run: |
-          URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
-            --region=${{ env.REGION }} \
-            --project=${{ secrets.GCP_PROJECT_ID }} \
+          URL=$(gcloud run services describe "${{ env.SERVICE_NAME }}" \
+            --region="${{ env.REGION }}" \
+            --project="${{ secrets.GCP_PROJECT_ID }}" \
             --format='value(status.url)')
-          echo "url=$URL" >> $GITHUB_OUTPUT
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
 
       - name: Deployment Summary
         run: |
-          echo "### 🚀 Development Deployment Successful!" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Service URL:** ${{ steps.deploy-url.outputs.url }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Image:** docker.io/${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:dev-${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Project:** ${{ secrets.GCP_PROJECT_ID }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Region:** ${{ env.REGION }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Access:** Protected (HTTP Basic Auth)" >> $GITHUB_STEP_SUMMARY
-          echo "**Username:** \`${{ secrets.AUTH_USERNAME }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "**Password:** \`${{ secrets.AUTH_PASSWORD }}\`" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "### 🚀 Development Deployment Successful!"
+            echo ""
+            echo "**Service URL:** ${{ steps.deploy-url.outputs.url }}"
+            echo "**Image:** docker.io/${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:dev-${{ github.sha }}"
+            echo "**Project:** ${{ secrets.GCP_PROJECT_ID }}"
+            echo "**Region:** ${{ env.REGION }}"
+            echo "**Access:** Protected (HTTP Basic Auth)"
+          } >> "$GITHUB_STEP_SUMMARY"
 ```
 
 ### 11.6 Deployment Workflow (Staging)
@@ -1791,7 +1791,7 @@ env:
 
 permissions:
   contents: read
-  id-token: write # Required for Workload Identity Federation
+  id-token: write
 
 jobs:
   deploy:
@@ -1825,7 +1825,7 @@ jobs:
           VITE_FIREBASE_MESSAGING_SENDER_ID:
             ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
-          VITE_USE_EMULATOR: false
+          VITE_USE_EMULATOR: "false"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -1866,11 +1866,11 @@ jobs:
 
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy ${{ env.SERVICE_NAME }} \
-            --image=docker.io/${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:staging-${{ github.sha }} \
+          gcloud run deploy "${{ env.SERVICE_NAME }}" \
+            --image="docker.io/${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:staging-${{ github.sha }}" \
             --platform=managed \
-            --region=${{ env.REGION }} \
-            --project=${{ secrets.GCP_PROJECT_ID }} \
+            --region="${{ env.REGION }}" \
+            --project="${{ secrets.GCP_PROJECT_ID }}" \
             --allow-unauthenticated \
             --memory=512Mi \
             --cpu=1 \
@@ -1882,28 +1882,29 @@ jobs:
       - name: Get Cloud Run URL
         id: deploy-url
         run: |
-          URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
-            --region=${{ env.REGION }} \
-            --project=${{ secrets.GCP_PROJECT_ID }} \
+          URL=$(gcloud run services describe "${{ env.SERVICE_NAME }}" \
+            --region="${{ env.REGION }}" \
+            --project="${{ secrets.GCP_PROJECT_ID }}" \
             --format='value(status.url)')
-          echo "url=$URL" >> $GITHUB_OUTPUT
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
 
       - name: Deployment Summary
         run: |
-          echo "### 🚀 Staging Deployment Successful!" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Service URL:** ${{ steps.deploy-url.outputs.url }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Image:** docker.io/${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:staging-${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Project:** ${{ secrets.GCP_PROJECT_ID }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Region:** ${{ env.REGION }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Access:** Protected (HTTP Basic Auth)" >> $GITHUB_STEP_SUMMARY
-          echo "**Username:** \`${{ secrets.AUTH_USERNAME }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "**Password:** \`${{ secrets.AUTH_PASSWORD }}\`" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "### 🚀 Staging Deployment Successful!"
+            echo ""
+            echo "**Service URL:** ${{ steps.deploy-url.outputs.url }}"
+            echo "**Image:** docker.io/${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:staging-${{ github.sha }}"
+            echo "**Project:** ${{ secrets.GCP_PROJECT_ID }}"
+            echo "**Region:** ${{ env.REGION }}"
+            echo "**Access:** Protected (HTTP Basic Auth)"
+          } >> "$GITHUB_STEP_SUMMARY"
 ```
 
 ### 11.7 Deployment Workflow (Preview - PR Environments)
 
 ```yaml
+# .github/workflows/deploy-preview.yml
 # Deploy Preview Workflow
 #
 # Deploys ephemeral preview environments for Pull Requests
@@ -2041,6 +2042,7 @@ jobs:
 ### 11.8 Cleanup Workflow (Preview Environments)
 
 ```yaml
+# .github/workflows/cleanup-preview.yml
 # Cleanup Preview Workflow
 #
 # Cleans up ephemeral preview environments when PRs are closed

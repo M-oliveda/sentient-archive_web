@@ -12,7 +12,7 @@ env:
 
 permissions:
   contents: read
-  id-token: write # Required for Workload Identity Federation
+  id-token: write
 
 jobs:
   deploy:
@@ -114,6 +114,4 @@ jobs:
             echo "**Project:** ${{ secrets.GCP_PROJECT_ID }}"
             echo "**Region:** ${{ env.REGION }}"
             echo "**Access:** Protected (HTTP Basic Auth)"
-            echo "**Username:** \`${{ secrets.AUTH_USERNAME }}\`"
-            echo "**Password:** \`${{ secrets.AUTH_PASSWORD }}\`"
           } >> "$GITHUB_STEP_SUMMARY"
