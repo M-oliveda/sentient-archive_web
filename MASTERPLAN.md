@@ -2377,15 +2377,15 @@ secrets.
 
 ### Phase 2: Authentication UI (Week 2)
 
-- [ ] Create LoginPage component
-- [ ] Create SignupPage component
-- [ ] Implement Google OAuth button
-- [ ] Implement Email/Password forms
-- [ ] Set up Firebase Auth integration
-- [ ] Create auth hooks (useAuth)
-- [ ] Set up auth store (Zustand)
-- [ ] Implement protected routes
-- [ ] Test authentication flows
+- [x] Create LoginPage component
+- [x] Create SignupPage component
+- [x] Implement Google OAuth button
+- [x] Implement Email/Password forms
+- [x] Set up Firebase Auth integration
+- [x] Create auth hooks (useAuth)
+- [x] Set up auth store (Zustand)
+- [x] Implement protected routes
+- [x] Test authentication flows
 
 ### Phase 3: Dashboard Layout (Week 2)
 
