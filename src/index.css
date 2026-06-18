@@ -1,51 +1,121 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-/* Custom color palette theme configuration */
-@theme {
-    /* Neutral colors */
-    --color-neutral-50: #ffffff;
-    --color-neutral-100: #eae0d5;
-    --color-neutral-200: #d8ccbd;
-    --color-neutral-300: #c6ac8f;
-    --color-neutral-400: #a08b6f;
-    --color-neutral-500: #7f6e57;
-    --color-neutral-600: #5e503f;
-    --color-neutral-700: #40392d;
-    --color-neutral-800: #22333b;
-    --color-neutral-900: #161e22;
-    --color-neutral-950: #0a0908;
+@custom-variant dark (&:is(.dark *));
 
-    /* Brand colors (same as neutral for this palette) */
-    --color-brand-50: #ffffff;
-    --color-brand-100: #eae0d5;
-    --color-brand-200: #d8ccbd;
-    --color-brand-300: #c6ac8f;
-    --color-brand-400: #a08b6f;
-    --color-brand-500: #7f6e57;
-    --color-brand-600: #5e503f;
-    --color-brand-700: #40392d;
-    --color-brand-800: #22333b;
-    --color-brand-900: #161e22;
-    --color-brand-950: #0a0908;
+/* ============================================================
+   1. CSS Variable Definitions (SentientArchive Brand Palette)
+   ============================================================ */
 
-    /* Semantic colors */
-    --color-success: #10b981;
-    --color-success-light: #34d399;
-    --color-success-dark: #059669;
+:root {
+    /* --- Brand Palette (HSL) - SentientArchive Colors --- */
+    --brand-50: 0 0% 100%;
+    --brand-100: 34 29% 88%;
+    --brand-200: 32 28% 85%;
+    --brand-300: 30 30% 73%;
+    --brand-400: 28 26% 56%;
+    --brand-500: 26 23% 43%;
+    --brand-600: 26 20% 31%;
+    --brand-700: 25 18% 24%;
+    --brand-800: 195 28% 22%;
+    --brand-900: 210 15% 11%;
+    --brand-950: 30 11% 4%;
 
-    --color-warning: #f59e0b;
-    --color-warning-light: #fbbf24;
-    --color-warning-dark: #d97706;
+    /* --- Semantic Status Colors (HSL) --- */
+    --success: 160 84% 39%;
+    --warning: 38 92% 50%;
+    --error: 0 84% 60%;
+    --info: 26 20% 31%;
 
-    --color-error: #ef4444;
-    --color-error-light: #f87171;
-    --color-error-dark: #dc2626;
+    /* --- Shadcn Semantic Mapping (Light) --- */
+    --background: var(--brand-50);
+    --foreground: var(--brand-950);
+    --card: var(--brand-50);
+    --card-foreground: var(--brand-950);
+    --popover: var(--brand-50);
+    --popover-foreground: var(--brand-950);
+    --primary: var(--brand-800);
+    --primary-foreground: var(--brand-100);
+    --secondary: var(--brand-100);
+    --secondary-foreground: var(--brand-950);
+    --muted: var(--brand-100);
+    --muted-foreground: var(--brand-600);
+    --accent: var(--brand-300);
+    --accent-foreground: var(--brand-950);
+    --destructive: var(--error);
+    --destructive-foreground: 0 0% 100%;
+    --border: var(--brand-100);
+    --input: var(--brand-100);
+    --ring: var(--brand-800);
 
-    --color-info: #5e503f;
-    --color-info-light: #7f6e57;
-    --color-info-dark: #40392d;
+    /* --- Chart Colors --- */
+    --chart-1: var(--brand-800);
+    --chart-2: var(--brand-600);
+    --chart-3: var(--brand-400);
+    --chart-4: var(--brand-300);
+    --chart-5: var(--brand-900);
 
-    /* ShadCN compatible colors */
+    /* --- Sidebar --- */
+    --sidebar: var(--brand-50);
+    --sidebar-foreground: var(--brand-950);
+    --sidebar-primary: var(--brand-800);
+    --sidebar-primary-foreground: var(--brand-50);
+    --sidebar-accent: var(--brand-100);
+    --sidebar-accent-foreground: var(--brand-950);
+    --sidebar-border: var(--brand-100);
+    --sidebar-ring: var(--brand-800);
+
+    /* --- Base Radius --- */
+    --radius: 0.625rem;
+}
+
+.dark {
+    /* --- Shadcn Semantic Mapping (Dark) --- */
+    --background: var(--brand-950);
+    --foreground: var(--brand-100);
+    --card: 195 28% 18%;
+    --card-foreground: var(--brand-100);
+    --popover: 195 28% 18%;
+    --popover-foreground: var(--brand-100);
+    --primary: var(--brand-100);
+    --primary-foreground: var(--brand-950);
+    --secondary: 195 24% 16%;
+    --secondary-foreground: var(--brand-100);
+    --muted: 195 24% 16%;
+    --muted-foreground: var(--brand-300);
+    --accent: var(--brand-300);
+    --accent-foreground: var(--brand-950);
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 195 20% 20%;
+    --input: 195 20% 24%;
+    --ring: var(--brand-100);
+
+    /* --- Chart Colors (Dark) --- */
+    --chart-1: var(--brand-300);
+    --chart-2: var(--brand-400);
+    --chart-3: var(--brand-600);
+    --chart-4: var(--brand-800);
+    --chart-5: var(--brand-200);
+
+    /* --- Sidebar (Dark) --- */
+    --sidebar: var(--brand-950);
+    --sidebar-foreground: var(--brand-100);
+    --sidebar-primary: var(--brand-300);
+    --sidebar-primary-foreground: var(--brand-950);
+    --sidebar-accent: 195 24% 16%;
+    --sidebar-accent-foreground: var(--brand-100);
+    --sidebar-border: 195 20% 20%;
+    --sidebar-ring: var(--brand-300);
+}
+
+/* ============================================================
+   2. @theme inline — Tailwind V4 Utility Mapping
+   ============================================================ */
+
+@theme inline {
+    /* --- Shadcn Semantic Colors --- */
     --color-background: hsl(var(--background));
     --color-foreground: hsl(var(--foreground));
     --color-card: hsl(var(--card));
@@ -66,128 +136,143 @@
     --color-input: hsl(var(--input));
     --color-ring: hsl(var(--ring));
 
-    /* Font families */
+    /* --- Sidebar Colors --- */
+    --color-sidebar: hsl(var(--sidebar));
+    --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+    --color-sidebar-primary: hsl(var(--sidebar-primary));
+    --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+    --color-sidebar-accent: hsl(var(--sidebar-accent));
+    --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+    --color-sidebar-border: hsl(var(--sidebar-border));
+    --color-sidebar-ring: hsl(var(--sidebar-ring));
+
+    /* --- Chart Colors --- */
+    --color-chart-1: hsl(var(--chart-1));
+    --color-chart-2: hsl(var(--chart-2));
+    --color-chart-3: hsl(var(--chart-3));
+    --color-chart-4: hsl(var(--chart-4));
+    --color-chart-5: hsl(var(--chart-5));
+
+    /* --- Brand Palette Direct Access --- */
+    --color-brand-50: hsl(0 0% 100%);
+    --color-brand-100: hsl(34 29% 88%);
+    --color-brand-200: hsl(32 28% 85%);
+    --color-brand-300: hsl(30 30% 73%);
+    --color-brand-400: hsl(28 26% 56%);
+    --color-brand-500: hsl(26 23% 43%);
+    --color-brand-600: hsl(26 20% 31%);
+    --color-brand-700: hsl(25 18% 24%);
+    --color-brand-800: hsl(195 28% 22%);
+    --color-brand-900: hsl(210 15% 11%);
+    --color-brand-950: hsl(30 11% 4%);
+
+    /* --- Semantic Status Colors --- */
+    --color-success: hsl(160 84% 39%);
+    --color-warning: hsl(38 92% 50%);
+    --color-error: hsl(0 84% 60%);
+    --color-info: hsl(26 20% 31%);
+
+    /* --- Font Families (aligned with originui.moliveda.dev) --- */
     --font-sans:
-        ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
-        "Segoe UI Symbol", "Noto Color Emoji";
+        "Space Grotesk Variable", ui-sans-serif, system-ui, sans-serif,
+        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --font-serif: Georgia, "Times New Roman", serif;
     --font-mono:
         ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono",
         monospace;
+    --font-heading: var(--font-sans);
 
-    /* Border radius */
-    --radius-sm: 0.25rem;
-    --radius-md: 0.375rem;
-    --radius-lg: 0.5rem;
-    --radius-xl: 0.75rem;
-    --radius-2xl: 1rem;
-    --radius-full: 9999px;
+    /* --- Border Radius --- */
+    --radius-xs: calc(var(--radius) * 0.4);
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-3xl: calc(var(--radius) * 2.2);
+    --radius-4xl: calc(var(--radius) * 2.6);
+
+    /* --- Letter Spacing --- */
+    --tracking-tighter: -0.05em;
+    --tracking-tight: -0.025em;
+    --tracking-normal: 0em;
+    --tracking-wide: 0.025em;
+    --tracking-wider: 0.05em;
+    --tracking-widest: 0.1em;
+
+    /* --- Line Height --- */
+    --leading-none: 1;
+    --leading-tight: 1.25;
+    --leading-snug: 1.375;
+    --leading-normal: 1.5;
+    --leading-relaxed: 1.625;
+    --leading-loose: 2;
 }
 
-/* CSS Variables for ShadCN compatibility */
-@layer base {
-    :root {
-        --background: 0 0% 100%;
-        --foreground: 24 8% 4%;
-        --card: 0 0% 100%;
-        --card-foreground: 24 8% 4%;
-        --popover: 0 0% 100%;
-        --popover-foreground: 24 8% 4%;
-        --primary: 195 28% 22%;
-        --primary-foreground: 34 29% 88%;
-        --secondary: 34 29% 88%;
-        --secondary-foreground: 195 28% 22%;
-        --muted: 34 29% 88%;
-        --muted-foreground: 26 20% 31%;
-        --accent: 30 30% 73%;
-        --accent-foreground: 24 8% 4%;
-        --destructive: 0 84% 60%;
-        --destructive-foreground: 0 0% 100%;
-        --border: 34 29% 88%;
-        --input: 34 29% 88%;
-        --ring: 195 28% 22%;
-        --radius: 0.5rem;
+/* ============================================================
+   3. Base Styles
+   ============================================================ */
 
-        /* Semantic colors as CSS variables */
-        --success: 160 84% 39%;
-        --success-foreground: 0 0% 100%;
-        --warning: 38 92% 50%;
-        --warning-foreground: 24 8% 4%;
-        --error: 0 84% 60%;
-        --error-foreground: 0 0% 100%;
-        --info: 26 20% 31%;
-        --info-foreground: 0 0% 100%;
-    }
-
-    .dark {
-        --background: 24 8% 4%;
-        --foreground: 34 29% 88%;
-        --card: 195 28% 22%;
-        --card-foreground: 34 29% 88%;
-        --popover: 195 28% 22%;
-        --popover-foreground: 34 29% 88%;
-        --primary: 34 29% 88%;
-        --primary-foreground: 195 28% 22%;
-        --secondary: 26 20% 31%;
-        --secondary-foreground: 34 29% 88%;
-        --muted: 26 20% 31%;
-        --muted-foreground: 30 30% 73%;
-        --accent: 30 30% 73%;
-        --accent-foreground: 24 8% 4%;
-        --destructive: 0 84% 60%;
-        --destructive-foreground: 0 0% 100%;
-        --border: 26 20% 31%;
-        --input: 26 20% 31%;
-        --ring: 34 29% 88%;
-
-        /* Semantic colors for dark mode */
-        --success: 160 84% 39%;
-        --success-foreground: 0 0% 100%;
-        --warning: 38 92% 50%;
-        --warning-foreground: 24 8% 4%;
-        --error: 0 84% 60%;
-        --error-foreground: 0 0% 100%;
-        --info: 30 30% 73%;
-        --info-foreground: 24 8% 4%;
-    }
-}
-
-/* Base styles */
 @layer base {
     * {
-        border-color: hsl(var(--border));
+        @apply border-border outline-ring/50;
     }
-
     body {
-        background-color: hsl(var(--background));
-        color: hsl(var(--foreground));
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        font-feature-settings:
-            "rlig" 1,
-            "calt" 1;
+        @apply bg-background text-foreground;
     }
-
-    /* Smooth scrolling */
     html {
-        scroll-behavior: smooth;
-    }
-
-    /* Focus visible styles */
-    :focus-visible {
-        outline: none;
-        box-shadow:
-            0 0 0 2px hsl(var(--background)),
-            0 0 0 4px hsl(var(--ring));
+        @apply font-sans antialiased;
     }
 }
 
-/* Custom utility classes */
-@layer utilities {
-    .text-balance {
-        text-wrap: balance;
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
     }
+    100% {
+        background-position: 200% 0;
+    }
+}
 
-    .text-pretty {
-        text-wrap: pretty;
-    }
+/* ============================================================
+   4. Global Scrollbar Styling
+   ============================================================ */
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--brand-300) / 0.5) transparent;
+}
+
+*::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--brand-300) / 0.5);
+    border-radius: 9999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--brand-300) / 0.8);
+}
+
+*::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+.dark * {
+    scrollbar-color: hsl(var(--brand-600) / 0.5) transparent;
+}
+
+.dark *::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--brand-600) / 0.5);
+}
+
+.dark *::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--brand-600) / 0.8);
 }
