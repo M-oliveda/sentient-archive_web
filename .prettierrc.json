@@ -12,6 +12,7 @@
   "bracketSameLine": false,
   "proseWrap": "preserve",
   "quoteProps": "as-needed",
+  "plugins": ["prettier-plugin-tailwindcss"],
   "overrides": [
     {
       "files": "*.json",
