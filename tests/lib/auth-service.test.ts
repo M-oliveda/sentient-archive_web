@@ -1,0 +1,143 @@
+import {
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    signInWithPopup,
+    signOut as firebaseSignOut,
+    updateProfile,
+    type User as FirebaseUser,
+} from "firebase/auth";
+import { doc, setDoc, getDoc } from "firebase/firestore";
+import { authService } from "@/lib/auth-service";
+
+jest.mock("firebase/auth");
+jest.mock("firebase/firestore");
+jest.mock("@/lib/firebase", () => ({
+    auth: {},
+    db: {},
+}));
+
+describe("authService", () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    describe("signInWithGoogle", () => {
+        it("should sign in with Google and create user document", async () => {
+            const mockUser = {
+                uid: "test-uid",
+                email: "test@example.com",
+                displayName: "Test User",
+                photoURL: null,
+            };
+            const mockResult = { user: mockUser };
+
+            (signInWithPopup as jest.Mock).mockResolvedValue(mockResult);
+            (getDoc as jest.Mock).mockResolvedValue({ exists: () => false });
+            (setDoc as jest.Mock).mockResolvedValue(undefined);
+
+            const result = await authService.signInWithGoogle();
+
+            expect(signInWithPopup).toHaveBeenCalled();
+            expect(result).toEqual(mockResult);
+        });
+    });
+
+    describe("signInWithEmail", () => {
+        it("should sign in with email and password", async () => {
+            const mockResult = { user: { uid: "test-uid" } };
+            (signInWithEmailAndPassword as jest.Mock).mockResolvedValue(
+                mockResult,
+            );
+
+            const result = await authService.signInWithEmail(
+                "test@example.com",
+                "password123",
+            );
+
+            expect(signInWithEmailAndPassword).toHaveBeenCalledWith(
+                {},
+                "test@example.com",
+                "password123",
+            );
+            expect(result).toEqual(mockResult);
+        });
+    });
+
+    describe("signUpWithEmail", () => {
+        it("should create user with email, password and display name", async () => {
+            const mockUser = {
+                uid: "test-uid",
+                email: "test@example.com",
+            };
+            const mockResult = { user: mockUser };
+
+            (createUserWithEmailAndPassword as jest.Mock).mockResolvedValue(
+                mockResult,
+            );
+            (updateProfile as jest.Mock).mockResolvedValue(undefined);
+            (getDoc as jest.Mock).mockResolvedValue({ exists: () => false });
+            (setDoc as jest.Mock).mockResolvedValue(undefined);
+
+            const result = await authService.signUpWithEmail(
+                "test@example.com",
+                "password123",
+                "Test User",
+            );
+
+            expect(createUserWithEmailAndPassword).toHaveBeenCalledWith(
+                {},
+                "test@example.com",
+                "password123",
+            );
+            expect(updateProfile).toHaveBeenCalledWith(mockUser, {
+                displayName: "Test User",
+            });
+            expect(result).toEqual(mockResult);
+        });
+    });
+
+    describe("signOut", () => {
+        it("should sign out the user", async () => {
+            (firebaseSignOut as jest.Mock).mockResolvedValue(undefined);
+
+            await authService.signOut();
+
+            expect(firebaseSignOut).toHaveBeenCalledWith({});
+        });
+    });
+
+    describe("createUserDocument", () => {
+        it("should create user document if it doesn't exist", async () => {
+            const mockUser = {
+                uid: "test-uid",
+                email: "test@example.com",
+                displayName: "Test User",
+                photoURL: null,
+            } as FirebaseUser;
+
+            (getDoc as jest.Mock).mockResolvedValue({ exists: () => false });
+            (setDoc as jest.Mock).mockResolvedValue(undefined);
+            (doc as jest.Mock).mockReturnValue({});
+
+            await authService.createUserDocument(mockUser);
+
+            expect(setDoc).toHaveBeenCalled();
+        });
+
+        it("should not create user document if it already exists", async () => {
+            const mockUser = {
+                uid: "test-uid",
+                email: "test@example.com",
+                displayName: "Test User",
+                photoURL: null,
+            } as FirebaseUser;
+
+            (getDoc as jest.Mock).mockResolvedValue({ exists: () => true });
+            (doc as jest.Mock).mockReturnValue({});
+
+            await authService.createUserDocument(mockUser);
+
+            expect(setDoc).not.toHaveBeenCalled();
+        });
+    });
+});
