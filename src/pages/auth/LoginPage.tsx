@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import {
@@ -55,6 +55,10 @@ export function LoginPage() {
         return emailRegex.test(email);
     };
 
+    const isFormValid = useMemo(() => {
+        return email.trim() !== "" && validateEmail(email) && password.trim() !== "";
+    }, [email, password]);
+
     const handleGoogleSignIn = async () => {
         try {
             setIsLoading(true);
@@ -76,7 +80,10 @@ export function LoginPage() {
 
         let hasErrors = false;
 
-        if (!validateEmail(email)) {
+        if (!email.trim()) {
+            setEmailError("Please enter your email address");
+            hasErrors = true;
+        } else if (!validateEmail(email)) {
             setEmailError("Please enter a valid email address");
             hasErrors = true;
         }
@@ -107,7 +114,7 @@ export function LoginPage() {
 
     return (
         <div className="bg-background flex min-h-screen items-center justify-center p-4">
-            <Card className="h-[540px] w-full max-w-md justify-between gap-2">
+            <Card className="h-[540px] w-full max-w-sm justify-between gap-2">
                 <CardHeader className="text-center">
                     <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
                     <CardDescription>Sign in to your knowledge base</CardDescription>
@@ -117,7 +124,8 @@ export function LoginPage() {
                         <SentientInput
                             id="login-email"
                             label="Email address"
-                            type="email"
+                            type="text"
+                            inputMode="email"
                             placeholder="jhondoe@example.com"
                             value={email}
                             onChange={(e) => {
@@ -143,7 +151,11 @@ export function LoginPage() {
                             errorMessage={passwordError || undefined}
                         />
 
-                        <Button type="submit" className="w-full" disabled={isLoading}>
+                        <Button
+                            type="submit"
+                            className="w-full"
+                            disabled={isLoading || !isFormValid}
+                        >
                             {isLoading ? "Signing in..." : "Sign In"}
                         </Button>
                     </form>

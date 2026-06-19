@@ -81,6 +81,14 @@ export function SignupPage() {
         return emailRegex.test(value);
     };
 
+    const isStep1Valid = useMemo(() => {
+        return displayName.trim() !== "" && email.trim() !== "" && validateEmail(email);
+    }, [displayName, email]);
+
+    const isStep2Valid = useMemo(() => {
+        return passwordIsValid && confirmPassword.trim() !== "" && passwordsMatch;
+    }, [passwordIsValid, confirmPassword, passwordsMatch]);
+
     const handleNextStep = (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -91,7 +99,10 @@ export function SignupPage() {
             hasErrors = true;
         }
 
-        if (!validateEmail(email)) {
+        if (!email.trim()) {
+            setEmailError("Please enter your email address");
+            hasErrors = true;
+        } else if (!validateEmail(email)) {
             setEmailError("Please enter a valid email address");
             hasErrors = true;
         }
@@ -162,7 +173,7 @@ export function SignupPage() {
 
     return (
         <div className="bg-background flex min-h-screen items-center justify-center p-4">
-            <Card className="h-[540px] w-full max-w-md justify-between gap-2">
+            <Card className="h-[540px] w-full max-w-sm justify-between gap-2">
                 <CardHeader className="text-center">
                     <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
                     <CardDescription>
@@ -196,7 +207,8 @@ export function SignupPage() {
                                 <SentientInput
                                     id="signup-email"
                                     label="Email"
-                                    type="email"
+                                    type="text"
+                                    inputMode="email"
                                     placeholder="jhondoe@example.com"
                                     value={email}
                                     onChange={(e) => {
@@ -207,7 +219,11 @@ export function SignupPage() {
                                     errorMessage={emailError || undefined}
                                 />
 
-                                <Button type="submit" className="w-full">
+                                <Button
+                                    type="submit"
+                                    className="w-full"
+                                    disabled={!isStep1Valid}
+                                >
                                     Next
                                 </Button>
                             </form>
@@ -298,7 +314,7 @@ export function SignupPage() {
                                 <Button
                                     type="submit"
                                     className="flex-1"
-                                    disabled={isLoading}
+                                    disabled={isLoading || !isStep2Valid}
                                 >
                                     {isLoading ? "Creating account..." : "Sign Up"}
                                 </Button>
