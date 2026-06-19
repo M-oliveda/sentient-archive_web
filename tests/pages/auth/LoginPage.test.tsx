@@ -3,11 +3,14 @@ import { LoginPage } from "@/pages/auth/LoginPage";
 import { authService } from "@/lib/auth-service";
 
 jest.mock("@/lib/auth-service");
+
+const mockNavigate = jest.fn();
+
 jest.mock("@tanstack/react-router", () => ({
     Link: ({ to, children }: { to: string; children: React.ReactNode }) => (
         <a href={to}>{children}</a>
     ),
-    useNavigate: () => jest.fn(),
+    useNavigate: () => mockNavigate,
 }));
 
 describe("LoginPage", () => {
@@ -43,6 +46,7 @@ describe("LoginPage", () => {
                 "test@example.com",
                 "password123",
             );
+            expect(mockNavigate).toHaveBeenCalledWith({ to: "/dashboard" });
         });
     });
 
@@ -76,6 +80,116 @@ describe("LoginPage", () => {
 
         await waitFor(() => {
             expect(authService.signInWithGoogle).toHaveBeenCalled();
+            expect(mockNavigate).toHaveBeenCalledWith({ to: "/dashboard" });
         });
+    });
+
+    it("should display error message on failed Google sign in", async () => {
+        (authService.signInWithGoogle as jest.Mock).mockRejectedValue({
+            code: "auth/popup-closed-by-user",
+        });
+
+        render(<LoginPage />);
+
+        fireEvent.click(screen.getByText("Continue with Google"));
+
+        await waitFor(() => {
+            expect(screen.getByText("Sign-in popup was closed")).toBeInTheDocument();
+        });
+    });
+
+    it("should validate required fields on submit", () => {
+        render(<LoginPage />);
+
+        const form = screen.getByRole("button", { name: /sign in/i }).closest("form");
+        fireEvent.submit(form!);
+
+        expect(screen.getByText("Please enter your email address")).toBeInTheDocument();
+        expect(screen.getByText("Please enter your password")).toBeInTheDocument();
+    });
+
+    it("should validate email format on submit", () => {
+        render(<LoginPage />);
+
+        fireEvent.change(screen.getByLabelText("Email address"), {
+            target: { value: "invalid-email" },
+        });
+        fireEvent.change(screen.getByLabelText("Password"), {
+            target: { value: "password123" },
+        });
+
+        const form = screen.getByRole("button", { name: /sign in/i }).closest("form");
+        fireEvent.submit(form!);
+
+        expect(
+            screen.getByText("Please enter a valid email address"),
+        ).toBeInTheDocument();
+    });
+
+    it("should display fallback error message when sign in fails without code", async () => {
+        (authService.signInWithEmail as jest.Mock).mockRejectedValue(
+            new Error("Network error"),
+        );
+
+        render(<LoginPage />);
+
+        fireEvent.change(screen.getByLabelText("Email address"), {
+            target: { value: "test@example.com" },
+        });
+        fireEvent.change(screen.getByLabelText("Password"), {
+            target: { value: "password123" },
+        });
+        fireEvent.click(screen.getByRole("button", { name: /sign in/i }));
+
+        await waitFor(() => {
+            expect(
+                screen.getByText("An error occurred. Please try again"),
+            ).toBeInTheDocument();
+        });
+    });
+
+    it("should display fallback error message when Google sign in fails without code", async () => {
+        (authService.signInWithGoogle as jest.Mock).mockRejectedValue(
+            new Error("Popup blocked"),
+        );
+
+        render(<LoginPage />);
+
+        fireEvent.click(screen.getByText("Continue with Google"));
+
+        await waitFor(() => {
+            expect(
+                screen.getByText("An error occurred. Please try again"),
+            ).toBeInTheDocument();
+        });
+    });
+
+    it("should clear field errors when values change", async () => {
+        (authService.signInWithEmail as jest.Mock).mockRejectedValue({
+            code: "auth/wrong-password",
+        });
+
+        render(<LoginPage />);
+
+        fireEvent.change(screen.getByLabelText("Email address"), {
+            target: { value: "test@example.com" },
+        });
+        fireEvent.change(screen.getByLabelText("Password"), {
+            target: { value: "wrongpassword" },
+        });
+        fireEvent.click(screen.getByRole("button", { name: /sign in/i }));
+
+        await waitFor(() => {
+            expect(screen.getByText("Incorrect password")).toBeInTheDocument();
+        });
+
+        fireEvent.change(screen.getByLabelText("Email address"), {
+            target: { value: "updated@example.com" },
+        });
+        fireEvent.change(screen.getByLabelText("Password"), {
+            target: { value: "newpassword" },
+        });
+
+        expect(screen.queryByText("Incorrect password")).not.toBeInTheDocument();
     });
 });
