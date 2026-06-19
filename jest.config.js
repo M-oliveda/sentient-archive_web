@@ -20,6 +20,9 @@ export default {
         "!src/main.tsx",
         "!src/vite-env.d.ts",
         "!src/lib/env.ts",
+        "!src/routeTree.gen.ts",
+        "!src/types/**",
+        "!src/**/index.ts",
     ],
     coverageThreshold: {
         global: {
