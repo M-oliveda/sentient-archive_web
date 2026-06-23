@@ -30,4 +30,4 @@ services:
 
 networks:
   sentient-network:
-    driver: bridge
+    external: true
