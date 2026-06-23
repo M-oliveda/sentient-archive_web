@@ -21,7 +21,11 @@ const functions = getFunctions(app);
 
 // Connect to emulators in development (enabled by default for local development)
 if (isEmulatorEnabled()) {
-    connectAuthEmulator(auth, "http://localhost:9099");
+    // When running in Docker, the browser still accesses via localhost
+    // because ports are mapped to the host machine
+    connectAuthEmulator(auth, "http://localhost:9099", {
+        disableWarnings: true,
+    });
     connectFirestoreEmulator(db, "localhost", 8081);
     connectStorageEmulator(storage, "localhost", 9199);
     connectFunctionsEmulator(functions, "localhost", 5001);

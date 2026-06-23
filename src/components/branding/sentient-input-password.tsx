@@ -121,7 +121,7 @@ export function SentientInputPassword({
 
             {rules.length > 0 && (
                 <ul
-                    className="mt-1 flex flex-col gap-1"
+                    className="mt-1 ml-2 flex flex-col gap-1"
                     aria-label="Password requirements"
                 >
                     {ruleResults.map((rule) => (
