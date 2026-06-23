@@ -4,6 +4,28 @@ import { authService } from "@/lib/auth-service";
 
 jest.mock("@/lib/auth-service");
 
+jest.mock("@/components/ui/checkbox", () => ({
+    Checkbox: ({
+        checked,
+        onCheckedChange,
+        id,
+        "aria-label": ariaLabel,
+    }: {
+        checked?: boolean;
+        onCheckedChange?: (checked: boolean) => void;
+        id?: string;
+        "aria-label"?: string;
+    }) => (
+        <input
+            type="checkbox"
+            id={id}
+            aria-label={ariaLabel}
+            checked={checked}
+            onChange={(event) => onCheckedChange?.(event.target.checked)}
+        />
+    ),
+}));
+
 const mockNavigate = jest.fn();
 
 jest.mock("@tanstack/react-router", () => ({
@@ -25,6 +47,19 @@ async function goToPasswordStep(displayName = "Test User", email = "test@example
     await waitFor(() => {
         expect(screen.getByLabelText("Password")).toBeInTheDocument();
         expect(screen.getByText("Step 2 of 2: Create a password")).toBeInTheDocument();
+    });
+}
+
+async function acceptTerms() {
+    fireEvent.click(screen.getByRole("checkbox", { name: /terms of service/i }));
+}
+
+function fillPasswordFields(password = "Password123!") {
+    fireEvent.change(screen.getByLabelText("Password"), {
+        target: { value: password },
+    });
+    fireEvent.change(screen.getByLabelText("Confirm Password"), {
+        target: { value: password },
     });
 }
 
@@ -191,12 +226,8 @@ describe("SignupPage", () => {
         render(<SignupPage />);
         await goToPasswordStep();
 
-        fireEvent.change(screen.getByLabelText("Password"), {
-            target: { value: "Password123!" },
-        });
-        fireEvent.change(screen.getByLabelText("Confirm Password"), {
-            target: { value: "Password123!" },
-        });
+        fillPasswordFields();
+        await acceptTerms();
         fireEvent.click(screen.getByRole("button", { name: /sign up/i }));
 
         await waitFor(() => {
@@ -254,17 +285,9 @@ describe("SignupPage", () => {
         render(<SignupPage />);
         await goToPasswordStep();
 
-        const passwordInput = screen.getByLabelText("Password");
-        const confirmInput = screen.getByLabelText("Confirm Password");
-        const signUpButton = screen.getByRole("button", { name: /sign up/i });
-
-        fireEvent.change(passwordInput, {
-            target: { value: "Password123!" },
-        });
-        fireEvent.change(confirmInput, {
-            target: { value: "Password123!" },
-        });
-        fireEvent.click(signUpButton);
+        fillPasswordFields();
+        await acceptTerms();
+        fireEvent.click(screen.getByRole("button", { name: /sign up/i }));
 
         await waitFor(() => {
             expect(authService.signUpWithEmail).toHaveBeenCalledWith(
@@ -284,17 +307,9 @@ describe("SignupPage", () => {
         render(<SignupPage />);
         await goToPasswordStep();
 
-        const passwordInput = screen.getByLabelText("Password");
-        const confirmInput = screen.getByLabelText("Confirm Password");
-        const signUpButton = screen.getByRole("button", { name: /sign up/i });
-
-        fireEvent.change(passwordInput, {
-            target: { value: "Password123!" },
-        });
-        fireEvent.change(confirmInput, {
-            target: { value: "Password123!" },
-        });
-        fireEvent.click(signUpButton);
+        fillPasswordFields();
+        await acceptTerms();
+        fireEvent.click(screen.getByRole("button", { name: /sign up/i }));
 
         await waitFor(() => {
             expect(
@@ -311,12 +326,8 @@ describe("SignupPage", () => {
         render(<SignupPage />);
         await goToPasswordStep();
 
-        fireEvent.change(screen.getByLabelText("Password"), {
-            target: { value: "Password123!" },
-        });
-        fireEvent.change(screen.getByLabelText("Confirm Password"), {
-            target: { value: "Password123!" },
-        });
+        fillPasswordFields();
+        await acceptTerms();
         fireEvent.click(screen.getByRole("button", { name: /sign up/i }));
 
         await waitFor(() => {
@@ -332,5 +343,35 @@ describe("SignupPage", () => {
         expect(
             screen.queryByText("An account already exists with this email"),
         ).not.toBeInTheDocument();
+    });
+
+    it("should disable sign up until terms are accepted", async () => {
+        render(<SignupPage />);
+        await goToPasswordStep();
+
+        fillPasswordFields();
+
+        expect(screen.getByRole("button", { name: /sign up/i })).toBeDisabled();
+
+        await acceptTerms();
+
+        expect(screen.getByRole("button", { name: /sign up/i })).not.toBeDisabled();
+    });
+
+    it("should show loading state during signup", async () => {
+        (authService.signUpWithEmail as jest.Mock).mockImplementation(
+            () => new Promise((resolve) => setTimeout(resolve, 100)),
+        );
+
+        render(<SignupPage />);
+        await goToPasswordStep();
+
+        fillPasswordFields();
+        await acceptTerms();
+        fireEvent.click(screen.getByRole("button", { name: /sign up/i }));
+
+        expect(
+            screen.getByRole("button", { name: /creating account/i }),
+        ).toBeInTheDocument();
     });
 });

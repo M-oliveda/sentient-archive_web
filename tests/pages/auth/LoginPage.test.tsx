@@ -192,4 +192,25 @@ describe("LoginPage", () => {
 
         expect(screen.queryByText("Incorrect password")).not.toBeInTheDocument();
     });
+
+    it("should render Forgot Password link", () => {
+        render(<LoginPage />);
+
+        const forgotPasswordLink = screen.getByText("Forgot Password?");
+        expect(forgotPasswordLink).toBeInTheDocument();
+        expect(forgotPasswordLink.closest("a")).toHaveAttribute(
+            "href",
+            "/forgot-password",
+        );
+    });
+
+    it("should navigate to forgot password page when link is clicked", () => {
+        render(<LoginPage />);
+
+        const forgotPasswordLink = screen.getByText("Forgot Password?");
+        expect(forgotPasswordLink.closest("a")).toHaveAttribute(
+            "href",
+            "/forgot-password",
+        );
+    });
 });

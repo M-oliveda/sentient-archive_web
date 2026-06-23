@@ -20,3 +20,11 @@ export const CircleAlert = (props: React.SVGProps<SVGSVGElement>) =>
     React.createElement("svg", props);
 export const Loader2Icon = (props: React.SVGProps<SVGSVGElement>) =>
     React.createElement("svg", { ...props, role: "status", "aria-label": "Loading" });
+export const Scale = (props: React.SVGProps<SVGSVGElement>) =>
+    React.createElement("svg", props);
+export const ArrowUp = (props: React.SVGProps<SVGSVGElement>) =>
+    React.createElement("svg", props);
+export const CheckCircle2 = (props: React.SVGProps<SVGSVGElement>) =>
+    React.createElement("svg", props);
+export const CheckIcon = (props: React.SVGProps<SVGSVGElement>) =>
+    React.createElement("svg", props);
