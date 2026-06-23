@@ -23,6 +23,9 @@ export const env = {
     get VITE_API_PROJECT_ID(): string {
         return import.meta.env.VITE_API_PROJECT_ID || "";
     },
+    get VITE_API_BASE_URL(): string {
+        return import.meta.env.VITE_API_BASE_URL || "";
+    },
 };
 
 export const isEmulatorEnabled = (): boolean => env.VITE_USE_EMULATOR === "true";
