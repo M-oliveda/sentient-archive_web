@@ -2,6 +2,7 @@
 let mockIsEmulatorEnabled = false;
 const mockEnv = {
     VITE_FIREBASE_PROJECT_ID: "test-project",
+    VITE_API_PROJECT_ID: "",
 };
 
 jest.mock("@/lib/env", () => ({
@@ -32,6 +33,7 @@ describe("apiRequest", () => {
         mockGetIdToken.mockResolvedValue("test-token");
         mockIsEmulatorEnabled = false;
         mockEnv.VITE_FIREBASE_PROJECT_ID = "test-project";
+        mockEnv.VITE_API_PROJECT_ID = "";
     });
 
     describe("successful requests", () => {
@@ -138,6 +140,26 @@ describe("apiRequest", () => {
 
             expect(mockFetch).toHaveBeenCalledWith(
                 "https://us-central1-my-project.cloudfunctions.net/test",
+                expect.any(Object),
+            );
+        });
+
+        it("uses VITE_API_PROJECT_ID when provided", async () => {
+            mockIsEmulatorEnabled = false;
+            mockEnv.VITE_FIREBASE_PROJECT_ID = "my-project";
+            mockEnv.VITE_API_PROJECT_ID = "api-project";
+            jest.resetModules();
+
+            mockFetch.mockResolvedValueOnce({
+                ok: true,
+                json: jest.fn().mockResolvedValue({}),
+            });
+
+            const { apiRequest } = await import("@/lib/api-client");
+            await apiRequest("/test");
+
+            expect(mockFetch).toHaveBeenCalledWith(
+                "https://us-central1-api-project.cloudfunctions.net/test",
                 expect.any(Object),
             );
         });

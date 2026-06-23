@@ -3,7 +3,9 @@ import { env, isEmulatorEnabled } from "./env";
 
 const API_BASE_URL = isEmulatorEnabled()
     ? "http://localhost:5001/demo-sentient-archive/us-central1"
-    : `https://us-central1-${env.VITE_FIREBASE_PROJECT_ID}.cloudfunctions.net`;
+    : `https://us-central1-${
+          env.VITE_API_PROJECT_ID || env.VITE_FIREBASE_PROJECT_ID
+      }.cloudfunctions.net`;
 
 async function getAuthToken(): Promise<string> {
     const auth = getAuth();
