@@ -5,6 +5,9 @@ import {
     GoogleAuthProvider,
     signOut as firebaseSignOut,
     updateProfile,
+    sendPasswordResetEmail as firebaseSendPasswordResetEmail,
+    verifyPasswordResetCode as firebaseVerifyPasswordResetCode,
+    confirmPasswordReset as firebaseConfirmPasswordReset,
     type UserCredential,
     type User as FirebaseUser,
 } from "firebase/auth";
@@ -46,6 +49,21 @@ export const authService = {
 
     async signOut(): Promise<void> {
         await firebaseSignOut(auth);
+    },
+
+    async sendPasswordResetEmail(email: string): Promise<void> {
+        await firebaseSendPasswordResetEmail(auth, email);
+    },
+
+    async verifyPasswordResetCode(code: string): Promise<string> {
+        return await firebaseVerifyPasswordResetCode(auth, code);
+    },
+
+    async confirmPasswordReset(
+        code: string,
+        newPassword: string,
+    ): Promise<void> {
+        await firebaseConfirmPasswordReset(auth, code, newPassword);
     },
 
     async createUserDocument(user: FirebaseUser): Promise<void> {

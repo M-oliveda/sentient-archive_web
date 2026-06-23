@@ -13,6 +13,8 @@ export const authErrorMessages: Record<string, string> = {
     "auth/invalid-credential": "Invalid credentials. Please try again",
     "auth/popup-closed-by-user": "Sign-in popup was closed",
     "auth/cancelled-popup-request": "Only one popup request is allowed at a time",
+    "auth/invalid-action-code": "Reset link is invalid or has expired",
+    "auth/expired-action-code": "Reset link has expired. Please request a new one",
 };
 
 export function getAuthErrorMessage(code: string): string {
