@@ -21,7 +21,7 @@ jobs:
     timeout-minutes: 15
     environment:
       name: preview
-      url: ${{ steps.domain-mapping.outputs.url }}
+      url: ${{ steps.deploy.outputs.url }}
     permissions:
       contents: read
       id-token: write
@@ -31,16 +31,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Generate preview service name and domain
+      - name: Generate preview service name
         id: preview-name
         run: |
           PR_NUMBER=${{ github.event.pull_request.number }}
           SERVICE_NAME="sentient-archive-pr-${PR_NUMBER}"
-          CUSTOM_DOMAIN="preview-pr-${PR_NUMBER}.sentientarchive.moliveda.dev"
           echo "service_name=${SERVICE_NAME}" >> $GITHUB_OUTPUT
-          echo "custom_domain=${CUSTOM_DOMAIN}" >> $GITHUB_OUTPUT
           echo "Preview service: ${SERVICE_NAME}"
-          echo "Custom domain: ${CUSTOM_DOMAIN}"
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -58,8 +55,7 @@ jobs:
             --build-arg VITE_FIREBASE_PROJECT_ID=${{ secrets.VITE_FIREBASE_PROJECT_ID }} \
             --build-arg VITE_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }} \
             --build-arg VITE_FIREBASE_APP_ID=${{ secrets.VITE_FIREBASE_APP_ID }} \
-            --build-arg VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }} \
-            --build-arg VITE_APP_URL=https://${{ steps.preview-name.outputs.custom_domain }} \
+            --build-arg VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}
             -t ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }} \
             .
 
@@ -76,11 +72,8 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Install gcloud beta components
-        run: |
-          gcloud components install beta --quiet
-
       - name: Deploy to Cloud Run (Preview)
+        id: deploy
         run: |
           gcloud run deploy ${{ steps.preview-name.outputs.service_name }} \
             --image=docker.io/${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }} \
@@ -96,42 +89,21 @@ jobs:
             --timeout=60 \
             --concurrency=80 \
             --cpu-throttling \
-            --tag=pr-${{ github.event.pull_request.number }}
+            --tag=pr-${{ github.event.pull_request.number }} \
+            --format=json > deploy-output.json
 
-      - name: Map custom domain to preview service
-        id: domain-mapping
-        run: |
-          CUSTOM_DOMAIN="${{ steps.preview-name.outputs.custom_domain }}"
-          echo "Setting up domain mapping for ${CUSTOM_DOMAIN}..."
-
-          # Check if domain mapping already exists
-          if gcloud beta run domain-mappings describe \
-            --domain="${CUSTOM_DOMAIN}" \
-            --region=${{ env.REGION }} \
-            --project=${{ secrets.GCP_PROJECT_ID }} \
-            --format='value(metadata.name)' \
-            --quiet 2>/dev/null; then
-            echo "Domain mapping already exists for ${CUSTOM_DOMAIN}"
-          else
-            echo "Creating new domain mapping..."
-            gcloud beta run domain-mappings create \
-              --service=${{ steps.preview-name.outputs.service_name }} \
-              --domain="${CUSTOM_DOMAIN}" \
-              --region=${{ env.REGION }} \
-              --project=${{ secrets.GCP_PROJECT_ID }} \
-              --quiet
-          fi
-
-          echo "url=https://${CUSTOM_DOMAIN}" >> "$GITHUB_OUTPUT"
+          # Extract the service URL from the deployment output
+          SERVICE_URL=$(jq -r '.status.url' deploy-output.json)
+          echo "url=${SERVICE_URL}" >> $GITHUB_OUTPUT
+          echo "Preview URL: ${SERVICE_URL}"
 
       - name: Comment PR with preview URL
         uses: actions/github-script@v7
         with:
           script: |
             const prNumber = context.payload.pull_request.number;
-            const previewUrl = '${{ steps.domain-mapping.outputs.url }}';
+            const previewUrl = '${{ steps.deploy.outputs.url }}';
             const serviceName = '${{ steps.preview-name.outputs.service_name }}';
-            const customDomain = '${{ steps.preview-name.outputs.custom_domain }}';
 
             const comment = `## 🚀 Preview Deployment Ready!
 
@@ -141,7 +113,6 @@ jobs:
             | --- | --- |
             | **Environment** | Preview (Ephemeral) |
             | **Service** | \`${serviceName}\` |
-            | **Custom Domain** | \`${customDomain}\` |
             | **URL** | ${previewUrl} |
             | **Commit** | \`${context.sha.substring(0, 7)}\` |
 
