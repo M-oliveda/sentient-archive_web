@@ -105,7 +105,8 @@ jobs:
             --domain="${CUSTOM_DOMAIN}" \
             --region=${{ env.REGION }} \
             --project=${{ secrets.GCP_PROJECT_ID }} \
-            --format='value(metadata.name)' 2>/dev/null; then
+            --format='value(metadata.name)' \
+            --quiet 2>/dev/null; then
             echo "Domain mapping already exists for ${CUSTOM_DOMAIN}"
           else
             echo "Creating new domain mapping..."
@@ -113,7 +114,8 @@ jobs:
               --service=${{ steps.preview-name.outputs.service_name }} \
               --domain="${CUSTOM_DOMAIN}" \
               --region=${{ env.REGION }} \
-              --project=${{ secrets.GCP_PROJECT_ID }}
+              --project=${{ secrets.GCP_PROJECT_ID }} \
+              --quiet
           fi
 
           echo "url=https://${CUSTOM_DOMAIN}" >> "$GITHUB_OUTPUT"
