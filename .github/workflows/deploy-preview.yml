@@ -102,7 +102,14 @@ jobs:
         id: domain-mapping
         run: |
           CUSTOM_DOMAIN="${{ steps.preview-name.outputs.custom_domain }}"
+          BASE_DOMAIN="sentientarchive.moliveda.dev"
           echo "Creating domain mapping for ${CUSTOM_DOMAIN}..."
+
+          # Verify the base domain (one-time setup, safe to retry)
+          echo "Verifying base domain: ${BASE_DOMAIN}..."
+          gcloud domains verify "${BASE_DOMAIN}" \
+            --project=${{ secrets.GCP_PROJECT_ID }} \
+            --quiet 2>/dev/null || echo "Domain already verified or verification in progress"
 
           # Check if domain mapping already exists
           if gcloud beta run domain-mappings describe \
