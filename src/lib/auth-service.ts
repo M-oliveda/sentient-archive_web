@@ -13,6 +13,7 @@ import {
 } from "firebase/auth";
 import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "./firebase";
+import { env } from "./env";
 
 export const authService = {
     async signInWithGoogle(): Promise<UserCredential> {
@@ -52,7 +53,11 @@ export const authService = {
     },
 
     async sendPasswordResetEmail(email: string): Promise<void> {
-        await firebaseSendPasswordResetEmail(auth, email);
+        const actionCodeSettings = {
+            url: `${env.VITE_APP_URL}/reset-password`,
+            handleCodeInApp: true,
+        };
+        await firebaseSendPasswordResetEmail(auth, email, actionCodeSettings);
     },
 
     async verifyPasswordResetCode(code: string): Promise<string> {
