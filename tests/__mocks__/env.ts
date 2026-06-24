@@ -5,6 +5,7 @@ export const env = {
     VITE_FIREBASE_MESSAGING_SENDER_ID: "test-sender-id",
     VITE_FIREBASE_APP_ID: "test-app-id",
     VITE_USE_EMULATOR: "false",
+    VITE_APP_URL: "http://localhost:5173",
 };
 
 export const isEmulatorEnabled = () => false;

@@ -145,7 +145,7 @@ describe("authService", () => {
     });
 
     describe("sendPasswordResetEmail", () => {
-        it("should send password reset email", async () => {
+        it("should send password reset email with action code settings", async () => {
             (sendPasswordResetEmail as jest.Mock).mockResolvedValue(undefined);
 
             await authService.sendPasswordResetEmail("test@example.com");
@@ -153,6 +153,10 @@ describe("authService", () => {
             expect(sendPasswordResetEmail).toHaveBeenCalledWith(
                 {},
                 "test@example.com",
+                {
+                    url: "http://localhost:5173/reset-password",
+                    handleCodeInApp: true,
+                },
             );
         });
 
