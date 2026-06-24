@@ -102,14 +102,7 @@ jobs:
         id: domain-mapping
         run: |
           CUSTOM_DOMAIN="${{ steps.preview-name.outputs.custom_domain }}"
-          BASE_DOMAIN="sentientarchive.moliveda.dev"
-          echo "Creating domain mapping for ${CUSTOM_DOMAIN}..."
-
-          # Verify the base domain (one-time setup, safe to retry)
-          echo "Verifying base domain: ${BASE_DOMAIN}..."
-          gcloud domains verify "${BASE_DOMAIN}" \
-            --project=${{ secrets.GCP_PROJECT_ID }} \
-            --quiet 2>/dev/null || echo "Domain already verified or verification in progress"
+          echo "Setting up domain mapping for ${CUSTOM_DOMAIN}..."
 
           # Check if domain mapping already exists
           if gcloud beta run domain-mappings describe \
@@ -161,8 +154,6 @@ jobs:
             - **Who Uses It:** Devs, QA, Product
 
             > 💡 **Note:** This preview environment will be automatically cleaned up when the PR is closed or merged. Credentials are available in the GitHub Environment secrets.
-            > 
-            > ⚠️ **DNS Setup Required:** Make sure the wildcard DNS record \`*.sentientarchive.moliveda.dev\` is configured on Namecheap for the custom domain to work.
             `;
 
             github.rest.issues.createComment({
