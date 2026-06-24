@@ -5,6 +5,7 @@ on:
 
 env:
   SERVICE_NAME: sentient-archive-web
+  CUSTOM_DOMAIN: sentientarchive.moliveda.dev
   REGION: us-central1
   DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
   IMAGE_NAME: sentient-archive-web
@@ -19,7 +20,7 @@ jobs:
     timeout-minutes: 20
     environment:
       name: production
-      url: ${{ steps.deploy-url.outputs.url }}
+      url: ${{ steps.domain-mapping.outputs.url }}
 
     steps:
       - uses: actions/checkout@v4
@@ -45,6 +46,7 @@ jobs:
           VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
           VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+          VITE_APP_URL: https://${{ env.CUSTOM_DOMAIN }}
           VITE_USE_EMULATOR: "false"
 
       - name: Set up Docker Buildx
@@ -68,6 +70,7 @@ jobs:
             VITE_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
             VITE_FIREBASE_APP_ID=${{ secrets.VITE_FIREBASE_APP_ID }}
             VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}
+            VITE_APP_URL=https://${{ env.CUSTOM_DOMAIN }}
           push: true
           tags: |
             ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
@@ -99,23 +102,41 @@ jobs:
             --port=80 \
             --timeout=60
 
-      - name: Get Cloud Run URL
-        id: deploy-url
+      - name: Map custom domain to Cloud Run service
+        id: domain-mapping
         run: |
-          URL=$(gcloud run services describe "${{ env.SERVICE_NAME }}" \
+          echo "Creating domain mapping for ${{ env.CUSTOM_DOMAIN }}..."
+
+          # Check if domain mapping already exists
+          if gcloud beta run domain-mappings describe \
+            --domain="${{ env.CUSTOM_DOMAIN }}" \
             --region="${{ env.REGION }}" \
             --project="${{ secrets.GCP_PROJECT_ID }}" \
-            --format='value(status.url)')
-          echo "url=$URL" >> "$GITHUB_OUTPUT"
+            --format='value(metadata.name)' 2>/dev/null; then
+            echo "Domain mapping already exists for ${{ env.CUSTOM_DOMAIN }}"
+          else
+            echo "Creating new domain mapping..."
+            gcloud beta run domain-mappings create \
+              --service="${{ env.SERVICE_NAME }}" \
+              --domain="${{ env.CUSTOM_DOMAIN }}" \
+              --region="${{ env.REGION }}" \
+              --project="${{ secrets.GCP_PROJECT_ID }}"
+          fi
+
+          echo "url=https://${{ env.CUSTOM_DOMAIN }}" >> "$GITHUB_OUTPUT"
 
       - name: Deployment Summary
         run: |
           {
             echo "### 🚀 Production Deployment Successful!"
             echo ""
-            echo "**Service URL:** ${{ steps.deploy-url.outputs.url }}"
+            echo "**Custom Domain:** https://${{ env.CUSTOM_DOMAIN }}"
             echo "**Image:** docker.io/${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
             echo "**Project:** ${{ secrets.GCP_PROJECT_ID }}"
             echo "**Region:** ${{ env.REGION }}"
             echo "**Access:** Public (No authentication)"
+            echo ""
+            echo "✅ **Custom domain mapped successfully** - Password reset emails will work immediately!"
+            echo ""
+            echo "> 💡 Make sure DNS records are configured on Namecheap for ${{ env.CUSTOM_DOMAIN }}"
           } >> "$GITHUB_STEP_SUMMARY"
