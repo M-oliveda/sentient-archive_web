@@ -154,7 +154,7 @@ export function SignupPage() {
 
     return (
         <div className="bg-background flex min-h-screen items-center justify-center p-4">
-            <Card className="h-[590px] w-full max-w-sm justify-between gap-2">
+            <Card className="h-[620px] w-full max-w-sm justify-between gap-2">
                 <CardHeader className="text-center">
                     <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
                     <CardDescription>
