@@ -55,18 +55,20 @@ jobs:
         if: steps.preview-url.outputs.url != ''
         run: |
           PREVIEW_HOSTNAME=$(echo "${{ steps.preview-url.outputs.url }}" | sed 's|https://||')
-          PROJECT_ID="${{ secrets.GCP_PROJECT_ID }}"
+          FIREBASE_PROJECT_ID="${{ secrets.VITE_FIREBASE_PROJECT_ID }}"
           ACCESS_TOKEN=$(gcloud auth print-access-token)
 
           # Fetch current authorized domains and remove preview hostname
-          UPDATED_DOMAINS=$(curl -sf \
-            "https://identitytoolkit.googleapis.com/admin/v2/projects/${PROJECT_ID}/config" \
+          UPDATED_DOMAINS=$(curl -sSf \
+            "https://identitytoolkit.googleapis.com/admin/v2/projects/${FIREBASE_PROJECT_ID}/config" \
             -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+            -H "X-Goog-User-Project: ${FIREBASE_PROJECT_ID}" \
             | jq --arg d "$PREVIEW_HOSTNAME" '[.authorizedDomains[]? | select(. != $d)]')
 
-          curl -sf -X PATCH \
-            "https://identitytoolkit.googleapis.com/admin/v2/projects/${PROJECT_ID}/config?updateMask=authorizedDomains" \
+          curl -sSf -X PATCH \
+            "https://identitytoolkit.googleapis.com/admin/v2/projects/${FIREBASE_PROJECT_ID}/config?updateMask=authorizedDomains" \
             -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+            -H "X-Goog-User-Project: ${FIREBASE_PROJECT_ID}" \
             -H "Content-Type: application/json" \
             -d "{\"authorizedDomains\": $UPDATED_DOMAINS}"
 

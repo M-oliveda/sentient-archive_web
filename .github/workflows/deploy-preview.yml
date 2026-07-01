@@ -101,14 +101,14 @@ jobs:
       - name: Register preview domain in Firebase Auth
         run: |
           PREVIEW_HOSTNAME=$(echo "${{ steps.deploy.outputs.url }}" | sed 's|https://||')
-          PROJECT_ID="${{ secrets.GCP_PROJECT_ID }}"
+          FIREBASE_PROJECT_ID="${{ secrets.VITE_FIREBASE_PROJECT_ID }}"
           ACCESS_TOKEN=$(gcloud auth print-access-token)
 
           # Fetch current authorized domains
           CURRENT_DOMAINS=$(curl -sSf \
-            "https://identitytoolkit.googleapis.com/admin/v2/projects/${PROJECT_ID}/config" \
+            "https://identitytoolkit.googleapis.com/admin/v2/projects/${FIREBASE_PROJECT_ID}/config" \
             -H "Authorization: Bearer ${ACCESS_TOKEN}" \
-            -H "X-Goog-User-Project: ${PROJECT_ID}" \
+            -H "X-Goog-User-Project: ${FIREBASE_PROJECT_ID}" \
             | jq '[.authorizedDomains[]?]')
 
           # Append preview hostname (idempotent — skips if already present)
@@ -116,9 +116,9 @@ jobs:
             | jq --arg d "$PREVIEW_HOSTNAME" 'if index($d) then . else . + [$d] end')
 
           curl -sSf -X PATCH \
-            "https://identitytoolkit.googleapis.com/admin/v2/projects/${PROJECT_ID}/config?updateMask=authorizedDomains" \
+            "https://identitytoolkit.googleapis.com/admin/v2/projects/${FIREBASE_PROJECT_ID}/config?updateMask=authorizedDomains" \
             -H "Authorization: Bearer ${ACCESS_TOKEN}" \
-            -H "X-Goog-User-Project: ${PROJECT_ID}" \
+            -H "X-Goog-User-Project: ${FIREBASE_PROJECT_ID}" \
             -H "Content-Type: application/json" \
             -d "{\"authorizedDomains\": $NEW_DOMAINS}"
 
