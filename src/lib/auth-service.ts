@@ -55,7 +55,6 @@ export const authService = {
     async sendPasswordResetEmail(email: string): Promise<void> {
         const actionCodeSettings = {
             url: `${env.VITE_APP_URL}/reset-password`,
-            handleCodeInApp: true,
         };
         await firebaseSendPasswordResetEmail(auth, email, actionCodeSettings);
     },

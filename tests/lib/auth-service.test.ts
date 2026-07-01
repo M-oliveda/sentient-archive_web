@@ -155,7 +155,6 @@ describe("authService", () => {
                 "test@example.com",
                 {
                     url: "http://localhost:5173/reset-password",
-                    handleCodeInApp: true,
                 },
             );
         });
