@@ -27,18 +27,7 @@ export const env = {
         return import.meta.env.VITE_API_BASE_URL || "";
     },
     get VITE_APP_URL(): string {
-        // Use build-time VITE_APP_URL if set and valid, otherwise fall back to runtime origin
-        const buildTimeUrl = import.meta.env.VITE_APP_URL || "";
-        
-        // If we're in the browser and the build-time URL is not set or invalid, use runtime origin
-        if (typeof window !== "undefined") {
-            // Check if buildTimeUrl is empty or is a placeholder
-            if (!buildTimeUrl || buildTimeUrl.includes("preview-pr-") && !buildTimeUrl.includes(".run.app")) {
-                return window.location.origin;
-            }
-        }
-        
-        return buildTimeUrl;
+        return import.meta.env.VITE_APP_URL || window.location.origin;
     },
 };
 
