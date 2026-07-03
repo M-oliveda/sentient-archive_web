@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,15 +13,23 @@ import { Separator } from "@/components/ui/separator";
 import { SentientInput } from "@/components/branding";
 import { authService } from "@/lib/auth-service";
 import { getAuthErrorMessage } from "@/lib/auth-errors";
+import { useAuthStore } from "@/stores/authStore";
 import GoogleIcon from "@/components/branding/google-icon";
 
 export function LoginPage() {
     const navigate = useNavigate();
+    const { isAuthenticated } = useAuthStore();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [emailError, setEmailError] = useState<string | null>(null);
     const [passwordError, setPasswordError] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate({ to: "/dashboard" });
+        }
+    }, [isAuthenticated, navigate]);
 
     const validateEmail = (email: string): boolean => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -33,17 +41,15 @@ export function LoginPage() {
     }, [email, password]);
 
     const handleGoogleSignIn = async () => {
+        setIsLoading(true);
+        setEmailError(null);
+        setPasswordError(null);
         try {
-            setIsLoading(true);
-            setEmailError(null);
-            setPasswordError(null);
             await authService.signInWithGoogle();
-            navigate({ to: "/dashboard" });
+            // browser navigates away on success — nothing below runs
         } catch (err: unknown) {
             const errorCode = (err as { code?: string }).code || "";
-            const errorMessage = getAuthErrorMessage(errorCode);
-            setEmailError(errorMessage);
-        } finally {
+            setEmailError(getAuthErrorMessage(errorCode));
             setIsLoading(false);
         }
     };

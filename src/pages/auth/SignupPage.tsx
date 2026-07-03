@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,12 +18,14 @@ import {
 } from "@/components/branding";
 import { authService } from "@/lib/auth-service";
 import { getAuthErrorMessage } from "@/lib/auth-errors";
+import { useAuthStore } from "@/stores/authStore";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import GoogleIcon from "@/components/branding/google-icon";
 
 export function SignupPage() {
     const navigate = useNavigate();
+    const { isAuthenticated } = useAuthStore();
     const [step, setStep] = useState(1);
     const [displayName, setDisplayName] = useState("");
     const [email, setEmail] = useState("");
@@ -38,6 +40,12 @@ export function SignupPage() {
         null,
     );
     const [termsAccepted, setTermsAccepted] = useState(false);
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate({ to: "/dashboard" });
+        }
+    }, [isAuthenticated, navigate]);
 
     const passwordsMatch = useMemo(() => {
         if (!confirmPassword) {
@@ -101,19 +109,17 @@ export function SignupPage() {
     };
 
     const handleGoogleSignUp = async () => {
+        setIsLoading(true);
+        setDisplayNameError(null);
+        setEmailError(null);
+        setPasswordError(null);
+        setConfirmPasswordError(null);
         try {
-            setIsLoading(true);
-            setDisplayNameError(null);
-            setEmailError(null);
-            setPasswordError(null);
-            setConfirmPasswordError(null);
             await authService.signInWithGoogle();
-            navigate({ to: "/dashboard" });
+            // browser navigates away on success — nothing below runs
         } catch (err: unknown) {
             const errorCode = (err as { code?: string }).code || "";
-            const errorMessage = getAuthErrorMessage(errorCode);
-            setEmailError(errorMessage);
-        } finally {
+            setEmailError(getAuthErrorMessage(errorCode));
             setIsLoading(false);
         }
     };

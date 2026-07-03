@@ -176,7 +176,7 @@ describe("SignupPage", () => {
     });
 
     it("should handle Google sign up", async () => {
-        (authService.signInWithGoogle as jest.Mock).mockResolvedValue({});
+        (authService.signInWithGoogle as jest.Mock).mockResolvedValue(undefined);
 
         render(<SignupPage />);
 
@@ -184,13 +184,13 @@ describe("SignupPage", () => {
 
         await waitFor(() => {
             expect(authService.signInWithGoogle).toHaveBeenCalled();
-            expect(mockNavigate).toHaveBeenCalledWith({ to: "/dashboard" });
         });
+        expect(mockNavigate).not.toHaveBeenCalledWith({ to: "/dashboard" });
     });
 
     it("should display error message on failed Google sign up", async () => {
         (authService.signInWithGoogle as jest.Mock).mockRejectedValue({
-            code: "auth/popup-closed-by-user",
+            code: "auth/network-request-failed",
         });
 
         render(<SignupPage />);
@@ -198,7 +198,9 @@ describe("SignupPage", () => {
         fireEvent.click(screen.getByText("Continue with Google"));
 
         await waitFor(() => {
-            expect(screen.getByText("Sign-in popup was closed")).toBeInTheDocument();
+            expect(
+                screen.getByText("Network error. Please check your connection"),
+            ).toBeInTheDocument();
         });
     });
 

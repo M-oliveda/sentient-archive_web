@@ -1,7 +1,8 @@
 import {
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
-    signInWithPopup,
+    signInWithRedirect,
+    getRedirectResult,
     signOut as firebaseSignOut,
     updateProfile,
     sendPasswordResetEmail,
@@ -23,23 +24,40 @@ describe("authService", () => {
     });
 
     describe("signInWithGoogle", () => {
-        it("should sign in with Google and create user document", async () => {
+        it("should initiate Google sign-in redirect", async () => {
+            (signInWithRedirect as jest.Mock).mockResolvedValue(undefined);
+
+            await authService.signInWithGoogle();
+
+            expect(signInWithRedirect).toHaveBeenCalled();
+        });
+    });
+
+    describe("handleGoogleRedirectResult", () => {
+        it("should create user document when redirect result exists", async () => {
             const mockUser = {
                 uid: "test-uid",
                 email: "test@example.com",
                 displayName: "Test User",
                 photoURL: null,
             };
-            const mockResult = { user: mockUser };
-
-            (signInWithPopup as jest.Mock).mockResolvedValue(mockResult);
+            (getRedirectResult as jest.Mock).mockResolvedValue({ user: mockUser });
             (getDoc as jest.Mock).mockResolvedValue({ exists: () => false });
             (setDoc as jest.Mock).mockResolvedValue(undefined);
 
-            const result = await authService.signInWithGoogle();
+            await authService.handleGoogleRedirectResult();
 
-            expect(signInWithPopup).toHaveBeenCalled();
-            expect(result).toEqual(mockResult);
+            expect(getRedirectResult).toHaveBeenCalled();
+            expect(setDoc).toHaveBeenCalled();
+        });
+
+        it("should do nothing when there is no redirect result", async () => {
+            (getRedirectResult as jest.Mock).mockResolvedValue(null);
+
+            await authService.handleGoogleRedirectResult();
+
+            expect(getRedirectResult).toHaveBeenCalled();
+            expect(setDoc).not.toHaveBeenCalled();
         });
     });
 
