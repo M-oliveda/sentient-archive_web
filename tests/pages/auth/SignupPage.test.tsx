@@ -1,6 +1,7 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { SignupPage } from "@/pages/auth/SignupPage";
 import { authService } from "@/lib/auth-service";
+import { useAuthStore } from "@/stores/authStore";
 
 jest.mock("@/lib/auth-service");
 
@@ -66,6 +67,17 @@ function fillPasswordFields(password = "Password123!") {
 describe("SignupPage", () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        useAuthStore.setState({ isAuthenticated: false, isLoading: false, user: null });
+    });
+
+    it("should navigate to dashboard when already authenticated", async () => {
+        useAuthStore.setState({ isAuthenticated: true });
+
+        render(<SignupPage />);
+
+        await waitFor(() => {
+            expect(mockNavigate).toHaveBeenCalledWith({ to: "/dashboard" });
+        });
     });
 
     it("should render signup form", () => {

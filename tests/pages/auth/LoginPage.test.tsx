@@ -1,6 +1,7 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { LoginPage } from "@/pages/auth/LoginPage";
 import { authService } from "@/lib/auth-service";
+import { useAuthStore } from "@/stores/authStore";
 
 jest.mock("@/lib/auth-service");
 
@@ -16,6 +17,7 @@ jest.mock("@tanstack/react-router", () => ({
 describe("LoginPage", () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        useAuthStore.setState({ isAuthenticated: false, isLoading: false, user: null });
     });
 
     it("should render login form", () => {
@@ -192,6 +194,16 @@ describe("LoginPage", () => {
         });
 
         expect(screen.queryByText("Incorrect password")).not.toBeInTheDocument();
+    });
+
+    it("should navigate to dashboard when already authenticated", async () => {
+        useAuthStore.setState({ isAuthenticated: true });
+
+        render(<LoginPage />);
+
+        await waitFor(() => {
+            expect(mockNavigate).toHaveBeenCalledWith({ to: "/dashboard" });
+        });
     });
 
     it("should render Forgot Password link", () => {
