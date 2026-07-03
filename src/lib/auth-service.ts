@@ -6,8 +6,6 @@ import {
     signOut as firebaseSignOut,
     updateProfile,
     sendPasswordResetEmail as firebaseSendPasswordResetEmail,
-    verifyPasswordResetCode as firebaseVerifyPasswordResetCode,
-    confirmPasswordReset as firebaseConfirmPasswordReset,
     type UserCredential,
     type User as FirebaseUser,
 } from "firebase/auth";
@@ -54,21 +52,9 @@ export const authService = {
 
     async sendPasswordResetEmail(email: string): Promise<void> {
         const actionCodeSettings = {
-            url: `${env.VITE_APP_URL}/reset-password`,
-            handleCodeInApp: true,
+            url: `${env.VITE_APP_URL}/login`,
         };
         await firebaseSendPasswordResetEmail(auth, email, actionCodeSettings);
-    },
-
-    async verifyPasswordResetCode(code: string): Promise<string> {
-        return await firebaseVerifyPasswordResetCode(auth, code);
-    },
-
-    async confirmPasswordReset(
-        code: string,
-        newPassword: string,
-    ): Promise<void> {
-        await firebaseConfirmPasswordReset(auth, code, newPassword);
     },
 
     async createUserDocument(user: FirebaseUser): Promise<void> {

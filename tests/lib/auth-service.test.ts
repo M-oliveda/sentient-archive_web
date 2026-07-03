@@ -5,8 +5,6 @@ import {
     signOut as firebaseSignOut,
     updateProfile,
     sendPasswordResetEmail,
-    verifyPasswordResetCode,
-    confirmPasswordReset,
     type User as FirebaseUser,
 } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
@@ -170,72 +168,4 @@ describe("authService", () => {
         });
     });
 
-    describe("verifyPasswordResetCode", () => {
-        it("should verify password reset code and return email", async () => {
-            (verifyPasswordResetCode as jest.Mock).mockResolvedValue(
-                "test@example.com",
-            );
-
-            const email = await authService.verifyPasswordResetCode("valid-code");
-
-            expect(verifyPasswordResetCode).toHaveBeenCalledWith(
-                {},
-                "valid-code",
-            );
-            expect(email).toBe("test@example.com");
-        });
-
-        it("should handle invalid reset code", async () => {
-            const mockError = new Error("auth/invalid-action-code");
-            (verifyPasswordResetCode as jest.Mock).mockRejectedValue(mockError);
-
-            await expect(
-                authService.verifyPasswordResetCode("invalid-code"),
-            ).rejects.toThrow("auth/invalid-action-code");
-        });
-
-        it("should handle expired reset code", async () => {
-            const mockError = new Error("auth/expired-action-code");
-            (verifyPasswordResetCode as jest.Mock).mockRejectedValue(mockError);
-
-            await expect(
-                authService.verifyPasswordResetCode("expired-code"),
-            ).rejects.toThrow("auth/expired-action-code");
-        });
-    });
-
-    describe("confirmPasswordReset", () => {
-        it("should confirm password reset with code and new password", async () => {
-            (confirmPasswordReset as jest.Mock).mockResolvedValue(undefined);
-
-            await authService.confirmPasswordReset(
-                "valid-code",
-                "newPassword123!",
-            );
-
-            expect(confirmPasswordReset).toHaveBeenCalledWith(
-                {},
-                "valid-code",
-                "newPassword123!",
-            );
-        });
-
-        it("should handle weak password error", async () => {
-            const mockError = new Error("auth/weak-password");
-            (confirmPasswordReset as jest.Mock).mockRejectedValue(mockError);
-
-            await expect(
-                authService.confirmPasswordReset("valid-code", "weak"),
-            ).rejects.toThrow("auth/weak-password");
-        });
-
-        it("should handle invalid action code during reset", async () => {
-            const mockError = new Error("auth/invalid-action-code");
-            (confirmPasswordReset as jest.Mock).mockRejectedValue(mockError);
-
-            await expect(
-                authService.confirmPasswordReset("invalid-code", "newPass123!"),
-            ).rejects.toThrow("auth/invalid-action-code");
-        });
-    });
 });
