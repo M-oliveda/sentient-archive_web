@@ -1,8 +1,7 @@
 import {
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
-    signInWithRedirect,
-    getRedirectResult,
+    signInWithPopup,
     GoogleAuthProvider,
     signOut as firebaseSignOut,
     updateProfile,
@@ -15,16 +14,11 @@ import { auth, db } from "./firebase";
 import { env } from "./env";
 
 export const authService = {
-    async signInWithGoogle(): Promise<void> {
+    async signInWithGoogle(): Promise<UserCredential> {
         const provider = new GoogleAuthProvider();
-        await signInWithRedirect(auth, provider);
-    },
-
-    async handleGoogleRedirectResult(): Promise<void> {
-        const result = await getRedirectResult(auth);
-        if (result) {
-            await this.createUserDocument(result.user);
-        }
+        const result = await signInWithPopup(auth, provider);
+        await this.createUserDocument(result.user);
+        return result;
     },
 
     async signInWithEmail(

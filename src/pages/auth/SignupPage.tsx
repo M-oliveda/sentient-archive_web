@@ -116,7 +116,6 @@ export function SignupPage() {
         setConfirmPasswordError(null);
         try {
             await authService.signInWithGoogle();
-            // browser navigates away on success — nothing below runs
         } catch (err: unknown) {
             const errorCode = (err as { code?: string }).code || "";
             setEmailError(getAuthErrorMessage(errorCode));

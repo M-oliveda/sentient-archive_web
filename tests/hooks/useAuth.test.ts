@@ -3,18 +3,12 @@ import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { useAuth } from "@/hooks/useAuth";
 import { useAuthStore } from "@/stores/authStore";
-import { authService } from "@/lib/auth-service";
 
 jest.mock("firebase/auth");
 jest.mock("firebase/firestore");
 jest.mock("@/lib/firebase", () => ({
     auth: {},
     db: {},
-}));
-jest.mock("@/lib/auth-service", () => ({
-    authService: {
-        handleGoogleRedirectResult: jest.fn().mockResolvedValue(undefined),
-    },
 }));
 
 describe("useAuth", () => {
@@ -212,13 +206,5 @@ describe("useAuth", () => {
         unmount();
 
         expect(unsubscribe).toHaveBeenCalled();
-    });
-
-    it("should call handleGoogleRedirectResult on mount", () => {
-        (onAuthStateChanged as jest.Mock).mockImplementation(() => jest.fn());
-
-        renderHook(() => useAuth());
-
-        expect(authService.handleGoogleRedirectResult).toHaveBeenCalled();
     });
 });
