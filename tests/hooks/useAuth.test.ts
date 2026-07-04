@@ -1,14 +1,20 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, getRedirectResult } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { useAuth } from "@/hooks/useAuth";
 import { useAuthStore } from "@/stores/authStore";
+import { authService } from "@/lib/auth-service";
 
 jest.mock("firebase/auth");
 jest.mock("firebase/firestore");
 jest.mock("@/lib/firebase", () => ({
     auth: {},
     db: {},
+}));
+jest.mock("@/lib/auth-service", () => ({
+    authService: {
+        createUserDocument: jest.fn().mockResolvedValue(undefined),
+    },
 }));
 
 describe("useAuth", () => {
@@ -19,6 +25,7 @@ describe("useAuth", () => {
             isLoading: true,
             isAuthenticated: false,
         });
+        (getRedirectResult as jest.Mock).mockResolvedValue(null);
     });
 
     it("should set user when Firebase user is authenticated", async () => {
@@ -206,5 +213,59 @@ describe("useAuth", () => {
         unmount();
 
         expect(unsubscribe).toHaveBeenCalled();
+    });
+
+    it("should call createUserDocument when redirect result is present", async () => {
+        const mockRedirectUser = {
+            uid: "google-uid",
+            email: "google@example.com",
+            displayName: "Google User",
+            photoURL: null,
+        };
+
+        (getRedirectResult as jest.Mock).mockResolvedValue({
+            user: mockRedirectUser,
+        });
+        (onAuthStateChanged as jest.Mock).mockImplementation(() => jest.fn());
+
+        renderHook(() => useAuth());
+
+        await waitFor(() => {
+            expect(authService.createUserDocument).toHaveBeenCalledWith(
+                mockRedirectUser,
+            );
+        });
+    });
+
+    it("should not call createUserDocument when no redirect result", async () => {
+        (getRedirectResult as jest.Mock).mockResolvedValue(null);
+        (onAuthStateChanged as jest.Mock).mockImplementation(() => jest.fn());
+
+        renderHook(() => useAuth());
+
+        await waitFor(() => {
+            expect(getRedirectResult).toHaveBeenCalled();
+        });
+
+        expect(authService.createUserDocument).not.toHaveBeenCalled();
+    });
+
+    it("should log error when getRedirectResult rejects", async () => {
+        const consoleErrorSpy = jest
+            .spyOn(console, "error")
+            .mockImplementation(() => {});
+
+        (getRedirectResult as jest.Mock).mockRejectedValue(
+            new Error("Redirect failed"),
+        );
+        (onAuthStateChanged as jest.Mock).mockImplementation(() => jest.fn());
+
+        renderHook(() => useAuth());
+
+        await waitFor(() => {
+            expect(consoleErrorSpy).toHaveBeenCalled();
+        });
+
+        consoleErrorSpy.mockRestore();
     });
 });
