@@ -404,7 +404,12 @@ App.tsx
 ├── Router (TanStack Router)
 │   ├── AuthLayout
 │   │   ├── LoginPage
-│   │   └── SignupPage
+│   │   ├── SignupPage
+│   │   ├── ForgotPasswordPage
+│   │   │   ├── ForgotPasswordRequestCard
+│   │   │   └── ForgotPasswordConfirmationCard
+│   │   └── ResetPasswordPage
+│   │       └── ResetPasswordCard
 │   │
 │   ├── DashboardLayout
 │   │   ├── Navbar
@@ -466,6 +471,67 @@ App.tsx
 ```
 
 ### 5.2 Key Components
+
+#### Password Reset Flow Components
+
+The password reset feature consists of three main card components that guide users
+through the password recovery process:
+
+**ForgotPasswordRequestCard** - Initial password reset request
+
+```typescript
+// src/pages/auth/ForgotPasswordRequestCard.tsx
+interface IForgotPasswordRequestCardProps {
+  onSubmit: (email: string) => Promise<void>;
+  isLoading: boolean;
+}
+
+// Features:
+// - Email input with validation
+// - "Send Reset Link" button
+// - "Remember your password? Sign in" link
+// - Error handling for invalid emails
+```
+
+**ForgotPasswordConfirmationCard** - Email sent confirmation
+
+```typescript
+// src/pages/auth/ForgotPasswordConfirmationCard.tsx
+interface IForgotPasswordConfirmationCardProps {
+  email: string;
+  onResend: () => Promise<void>;
+  isResending: boolean;
+}
+
+// Features:
+// - Success checkmark icon
+// - Displays email where link was sent
+// - "Back to Login" button
+// - "Click to resend" functionality
+```
+
+**ResetPasswordCard** - New password form
+
+```typescript
+// src/pages/auth/ResetPasswordCard.tsx
+interface IResetPasswordCardProps {
+  onSubmit: (password: string) => Promise<void>;
+  isLoading: boolean;
+}
+
+// Features:
+// - Password input with live validation rules
+// - Confirm password input
+// - Password strength indicator
+// - Validates passwords match
+// - Verifies oobCode from Firebase
+```
+
+**Password Reset Routes:**
+
+- `/forgot-password` - Shows ForgotPasswordRequestCard and
+  ForgotPasswordConfirmationCard
+- `/reset-password?oobCode=XXX` - Shows ResetPasswordCard after verifying reset code
 
 #### NoteEditor Component
 
@@ -2377,15 +2443,22 @@ secrets.
 
 ### Phase 2: Authentication UI (Week 2)
 
-- [ ] Create LoginPage component
-- [ ] Create SignupPage component
-- [ ] Implement Google OAuth button
-- [ ] Implement Email/Password forms
-- [ ] Set up Firebase Auth integration
-- [ ] Create auth hooks (useAuth)
-- [ ] Set up auth store (Zustand)
-- [ ] Implement protected routes
-- [ ] Test authentication flows
+- [x] Create LoginPage component
+- [x] Create SignupPage component
+- [x] Implement Google OAuth button
+- [x] Implement Email/Password forms
+- [x] Set up Firebase Auth integration
+- [x] Create auth hooks (useAuth)
+- [x] Set up auth store (Zustand)
+- [x] Implement protected routes
+- [x] Test authentication flows
+- [x] Create ForgotPasswordRequestCard component
+- [x] Create ForgotPasswordConfirmationCard component
+- [x] Create ResetPasswordCard component
+- [x] Create ForgotPasswordPage
+- [x] Create ResetPasswordPage
+- [x] Implement password reset functionality
+- [x] Add forgot password link to LoginPage
 
 ### Phase 3: Dashboard Layout (Week 2)
 

@@ -44,7 +44,14 @@ This frontend works in conjunction with the backend API:
 
 ## Key Features
 
-### 1. Rich Note Management
+### 1. Authentication & Security
+
+- **Email/Password Authentication:** Secure user registration and login
+- **Google OAuth:** Single sign-on with Google accounts
+- **Password Reset:** Complete forgot password flow with email verification
+- **Protected Routes:** Role-based access control (RBAC) for admin features
+
+### 2. Rich Note Management
 
 - **Markdown Editor:** Full-featured editor with live preview
 - **File Content Extraction:** Upload PDF/TXT/MD files to extract text into notes
@@ -52,7 +59,7 @@ This frontend works in conjunction with the backend API:
 - **Smart Search:** Real-time search with filtering and sorting
 - **Tag Management:** Visual tag interface with auto-suggestions
 
-### 2. AI-Powered Tools
+### 3. AI-Powered Tools
 
 | Feature           | Description                                      |
 | ----------------- | ------------------------------------------------ |
@@ -61,13 +68,13 @@ This frontend works in conjunction with the backend API:
 | **Flashcards**    | Create study flashcards from note content        |
 | **Knowledge Q&A** | Chat interface to ask questions about your notes |
 
-### 3. Token Economy
+### 4. Token Economy
 
 - **Balance Widget:** Real-time token balance display
 - **Transaction History:** Track token usage and costs
 - **Usage Visualization:** Charts showing spending patterns
 
-### 4. Admin Dashboard (RBAC Protected)
+### 5. Admin Dashboard (RBAC Protected)
 
 - **User Management:** Manage users, roles, and account status
 - **Analytics:** Usage charts and cost tracking

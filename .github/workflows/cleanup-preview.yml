@@ -40,6 +40,40 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
+      - name: Get preview service URL
+        id: preview-url
+        continue-on-error: true
+        run: |
+          SERVICE_URL=$(gcloud run services describe ${{ steps.preview-name.outputs.service_name }} \
+            --region=${{ env.REGION }} \
+            --project=${{ secrets.GCP_PROJECT_ID }} \
+            --format="value(status.url)" 2>/dev/null || echo "")
+          echo "url=${SERVICE_URL}" >> $GITHUB_OUTPUT
+          echo "Preview URL: ${SERVICE_URL}"
+
+      - name: Deregister preview domain from Firebase Auth
+        if: steps.preview-url.outputs.url != ''
+        run: |
+          PREVIEW_HOSTNAME=$(echo "${{ steps.preview-url.outputs.url }}" | sed 's|https://||')
+          FIREBASE_PROJECT_ID="${{ secrets.VITE_FIREBASE_PROJECT_ID }}"
+          ACCESS_TOKEN=$(gcloud auth print-access-token)
+
+          # Fetch current authorized domains and remove preview hostname
+          UPDATED_DOMAINS=$(curl -sSf \
+            "https://identitytoolkit.googleapis.com/admin/v2/projects/${FIREBASE_PROJECT_ID}/config" \
+            -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+            -H "X-Goog-User-Project: ${FIREBASE_PROJECT_ID}" \
+            | jq --arg d "$PREVIEW_HOSTNAME" '[.authorizedDomains[]? | select(. != $d)]')
+
+          curl -sSf -X PATCH \
+            "https://identitytoolkit.googleapis.com/admin/v2/projects/${FIREBASE_PROJECT_ID}/config?updateMask=authorizedDomains" \
+            -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+            -H "X-Goog-User-Project: ${FIREBASE_PROJECT_ID}" \
+            -H "Content-Type: application/json" \
+            -d "{\"authorizedDomains\": $UPDATED_DOMAINS}"
+
+          echo "Removed ${PREVIEW_HOSTNAME} from Firebase authorized domains"
+
       - name: Delete Cloud Run service
         continue-on-error: true
         run: |

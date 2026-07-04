@@ -1,0 +1,65 @@
+import { Link } from "@tanstack/react-router";
+import { Button } from "@/components/ui/button";
+
+export function PublicNavbar() {
+    return (
+        <header className="border-border/40 bg-background/95 supports-backdrop-filter:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
+            <nav className="container mx-auto flex h-16 items-center justify-between px-4">
+                <Link
+                    to="/"
+                    className="flex items-center gap-2 transition-opacity hover:opacity-80"
+                >
+                    <svg
+                        width="30"
+                        height="36"
+                        viewBox="0 0 30 36"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="size-8"
+                        aria-hidden="true"
+                    >
+                        <path
+                            d="M7.5 30.5V25.125C6.3125 24.0417 5.39062 22.776 4.73438 21.3281C4.07812 19.8802 3.75 18.3542 3.75 16.75C3.75 13.625 4.84375 10.9688 7.03125 8.78125C9.21875 6.59375 11.875 5.5 15 5.5C17.6042 5.5 19.9115 6.26562 21.9219 7.79688C23.9323 9.32812 25.2396 11.3229 25.8438 13.7812L27.4688 20.1875C27.5729 20.5833 27.5 20.9427 27.25 21.2656C27 21.5885 26.6667 21.75 26.25 21.75H23.75V25.5C23.75 26.1875 23.5052 26.776 23.0156 27.2656C22.526 27.7552 21.9375 28 21.25 28H18.75V30.5H16.25V25.5H21.25V19.25H24.625L23.4375 14.4062C22.9583 12.5104 21.9375 10.9688 20.375 9.78125C18.8125 8.59375 17.0208 8 15 8C12.5833 8 10.5208 8.84375 8.8125 10.5312C7.10417 12.2188 6.25 14.2708 6.25 16.6875C6.25 17.9375 6.50521 19.125 7.01562 20.25C7.52604 21.375 8.25 22.375 9.1875 23.25L10 24V30.5H7.5ZM13.75 21.75H16.25L16.4375 20.1875C16.6042 20.125 16.7552 20.0521 16.8906 19.9688C17.026 19.8854 17.1458 19.7917 17.25 19.6875L18.6875 20.3125L19.9375 18.1875L18.6875 17.25C18.7292 17.0833 18.75 16.9167 18.75 16.75C18.75 16.5833 18.7292 16.4167 18.6875 16.25L19.9375 15.3125L18.6875 13.1875L17.25 13.8125C17.1458 13.7083 17.026 13.6146 16.8906 13.5312C16.7552 13.4479 16.6042 13.375 16.4375 13.3125L16.25 11.75H13.75L13.5625 13.3125C13.3958 13.375 13.2448 13.4479 13.1094 13.5312C12.974 13.6146 12.8542 13.7083 12.75 13.8125L11.3125 13.1875L10.0625 15.3125L11.3125 16.25C11.2708 16.4167 11.25 16.5833 11.25 16.75C11.25 16.9167 11.2708 17.0833 11.3125 17.25L10.0625 18.1875L11.3125 20.3125L12.75 19.6875C12.8542 19.7917 12.974 19.8854 13.1094 19.9688C13.2448 20.0521 13.3958 20.125 13.5625 20.1875L13.75 21.75ZM15 18.625C14.4792 18.625 14.0365 18.4427 13.6719 18.0781C13.3073 17.7135 13.125 17.2708 13.125 16.75C13.125 16.2292 13.3073 15.7865 13.6719 15.4219C14.0365 15.0573 14.4792 14.875 15 14.875C15.5208 14.875 15.9635 15.0573 16.3281 15.4219C16.6927 15.7865 16.875 16.2292 16.875 16.75C16.875 17.2708 16.6927 17.7135 16.3281 18.0781C15.9635 18.4427 15.5208 18.625 15 18.625Z"
+                            fill="currentColor"
+                            className="text-foreground"
+                        />
+                    </svg>
+                    <span className="text-foreground text-lg font-bold">
+                        SentientArchive
+                    </span>
+                </Link>
+
+                <div className="hidden items-center gap-6 md:flex">
+                    <Link
+                        to="/"
+                        className="text-foreground/80 hover:text-foreground text-sm font-medium transition-colors"
+                    >
+                        Features
+                    </Link>
+                    <Link
+                        to="/"
+                        className="text-foreground/80 hover:text-foreground text-sm font-medium transition-colors"
+                    >
+                        How it Works
+                    </Link>
+                    <Link
+                        to="/"
+                        className="text-foreground/80 hover:text-foreground text-sm font-medium transition-colors"
+                    >
+                        Token System
+                    </Link>
+                </div>
+
+                <Link to="/signup">
+                    <Button
+                        variant="default"
+                        size="default"
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                    >
+                        Get Started
+                    </Button>
+                </Link>
+            </nav>
+        </header>
+    );
+}

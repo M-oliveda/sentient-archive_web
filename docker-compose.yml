@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: builder
-    container_name: frontend
+    container_name: sentient-archive-web_local-frontend
     ports:
       - "5173:5173"
     volumes:
@@ -30,4 +30,4 @@ services:
 
 networks:
   sentient-network:
-    driver: bridge
+    external: true

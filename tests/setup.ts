@@ -29,6 +29,23 @@ global.IntersectionObserver = jest.fn().mockImplementation(() => ({
     disconnect: jest.fn(),
 }));
 
+// Base UI checkbox relies on PointerEvent, which jsdom does not provide
+class MockPointerEvent extends Event {
+    button: number;
+    ctrlKey: boolean;
+
+    constructor(type: string, props?: PointerEventInit) {
+        super(type, props);
+        this.button = props?.button ?? 0;
+        this.ctrlKey = props?.ctrlKey ?? false;
+    }
+}
+
+Object.defineProperty(window, "PointerEvent", {
+    writable: true,
+    value: MockPointerEvent,
+});
+
 // Suppress console errors during tests (optional)
 const originalError = console.error;
 beforeAll(() => {

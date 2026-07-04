@@ -21,7 +21,7 @@ jobs:
     timeout-minutes: 15
     environment:
       name: preview
-      url: ${{ steps.preview-url.outputs.url }}
+      url: ${{ steps.deploy.outputs.url }}
     permissions:
       contents: read
       id-token: write
@@ -47,9 +47,16 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build --target protected \
+          docker build \
+            --target protected \
             --build-arg AUTH_USERNAME=${{ secrets.AUTH_USERNAME }} \
             --build-arg AUTH_PASSWORD=${{ secrets.AUTH_PASSWORD }} \
+            --build-arg VITE_FIREBASE_API_KEY=${{ secrets.VITE_FIREBASE_API_KEY }} \
+            --build-arg VITE_FIREBASE_AUTH_DOMAIN=${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }} \
+            --build-arg VITE_FIREBASE_PROJECT_ID=${{ secrets.VITE_FIREBASE_PROJECT_ID }} \
+            --build-arg VITE_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }} \
+            --build-arg VITE_FIREBASE_APP_ID=${{ secrets.VITE_FIREBASE_APP_ID }} \
+            --build-arg VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }} \
             -t ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }} \
             .
 
@@ -67,6 +74,7 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
 
       - name: Deploy to Cloud Run (Preview)
+        id: deploy
         run: |
           gcloud run deploy ${{ steps.preview-name.outputs.service_name }} \
             --image=docker.io/${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }} \
@@ -82,24 +90,46 @@ jobs:
             --timeout=60 \
             --concurrency=80 \
             --cpu-throttling \
-            --tag=pr-${{ github.event.pull_request.number }}
+            --tag=pr-${{ github.event.pull_request.number }} \
+            --format=json > deploy-output.json
 
-      - name: Get Preview URL
-        id: preview-url
-        run: |
-          SERVICE_URL=$(gcloud run services describe ${{ steps.preview-name.outputs.service_name }} \
-            --region=${{ env.REGION }} \
-            --project=${{ secrets.GCP_PROJECT_ID }} \
-            --format='value(status.url)')
+          # Extract the service URL from the deployment output
+          SERVICE_URL=$(jq -r '.status.url' deploy-output.json)
           echo "url=${SERVICE_URL}" >> $GITHUB_OUTPUT
           echo "Preview URL: ${SERVICE_URL}"
+
+      - name: Register preview domain in Firebase Auth
+        run: |
+          PREVIEW_HOSTNAME=$(echo "${{ steps.deploy.outputs.url }}" | sed 's|https://||')
+          FIREBASE_PROJECT_ID="${{ secrets.VITE_FIREBASE_PROJECT_ID }}"
+          ACCESS_TOKEN=$(gcloud auth print-access-token)
+
+          # Fetch current authorized domains
+          CURRENT_DOMAINS=$(curl -sSf \
+            "https://identitytoolkit.googleapis.com/admin/v2/projects/${FIREBASE_PROJECT_ID}/config" \
+            -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+            -H "X-Goog-User-Project: ${FIREBASE_PROJECT_ID}" \
+            | jq '[.authorizedDomains[]?]')
+
+          # Append preview hostname (idempotent — skips if already present)
+          NEW_DOMAINS=$(echo "$CURRENT_DOMAINS" \
+            | jq --arg d "$PREVIEW_HOSTNAME" 'if index($d) then . else . + [$d] end')
+
+          curl -sSf -X PATCH \
+            "https://identitytoolkit.googleapis.com/admin/v2/projects/${FIREBASE_PROJECT_ID}/config?updateMask=authorizedDomains" \
+            -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+            -H "X-Goog-User-Project: ${FIREBASE_PROJECT_ID}" \
+            -H "Content-Type: application/json" \
+            -d "{\"authorizedDomains\": $NEW_DOMAINS}"
+
+          echo "Registered ${PREVIEW_HOSTNAME} in Firebase authorized domains"
 
       - name: Comment PR with preview URL
         uses: actions/github-script@v7
         with:
           script: |
             const prNumber = context.payload.pull_request.number;
-            const previewUrl = '${{ steps.preview-url.outputs.url }}';
+            const previewUrl = '${{ steps.deploy.outputs.url }}';
             const serviceName = '${{ steps.preview-name.outputs.service_name }}';
 
             const comment = `## 🚀 Preview Deployment Ready!

@@ -100,6 +100,7 @@ describe("firebase", () => {
             expect(mockConnectAuthEmulator).toHaveBeenCalledWith(
                 mockAuth,
                 "http://localhost:9099",
+                { disableWarnings: true },
             );
             expect(mockConnectFirestoreEmulator).toHaveBeenCalledWith(
                 mockDb,

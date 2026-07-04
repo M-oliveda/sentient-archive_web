@@ -20,6 +20,15 @@ export const env = {
     get VITE_FIREBASE_APP_ID(): string {
         return import.meta.env.VITE_FIREBASE_APP_ID || "";
     },
+    get VITE_API_PROJECT_ID(): string {
+        return import.meta.env.VITE_API_PROJECT_ID || "";
+    },
+    get VITE_API_BASE_URL(): string {
+        return import.meta.env.VITE_API_BASE_URL || "";
+    },
+    get VITE_APP_URL(): string {
+        return import.meta.env.VITE_APP_URL || window.location.origin;
+    },
 };
 
 export const isEmulatorEnabled = (): boolean => env.VITE_USE_EMULATOR === "true";
