@@ -1,13 +1,22 @@
 import { useEffect } from "react";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, getRedirectResult } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { useAuthStore } from "@/stores/authStore";
+import { authService } from "@/lib/auth-service";
 
 export function useAuth() {
     const { setUser, setLoading, logout } = useAuthStore();
 
     useEffect(() => {
+        getRedirectResult(auth)
+            .then(async (result) => {
+                if (result) {
+                    await authService.createUserDocument(result.user);
+                }
+            })
+            .catch(console.error);
+
         const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
             if (firebaseUser) {
                 try {
