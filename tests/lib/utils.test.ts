@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn, formatTimeAgo } from "@/lib/utils";
 
 describe("cn", () => {
     it("merges class names correctly", () => {
@@ -27,5 +27,27 @@ describe("cn", () => {
 
     it("returns empty string for no inputs", () => {
         expect(cn()).toBe("");
+    });
+});
+
+describe("formatTimeAgo", () => {
+    it("returns seconds format for less than 60 seconds ago", () => {
+        const date = new Date(Date.now() - 30 * 1000);
+        expect(formatTimeAgo(date)).toBe("30s ago");
+    });
+
+    it("returns minutes format for less than 60 minutes ago", () => {
+        const date = new Date(Date.now() - 5 * 60 * 1000);
+        expect(formatTimeAgo(date)).toBe("5m ago");
+    });
+
+    it("returns hours format for less than 24 hours ago", () => {
+        const date = new Date(Date.now() - 3 * 60 * 60 * 1000);
+        expect(formatTimeAgo(date)).toBe("3h ago");
+    });
+
+    it("returns days format for 24 or more hours ago", () => {
+        const date = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
+        expect(formatTimeAgo(date)).toBe("2d ago");
     });
 });
