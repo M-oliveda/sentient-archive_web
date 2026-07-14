@@ -1,4 +1,5 @@
 import {
+    SentientArchiveLogo,
     SentientInput,
     SentientInputPassword,
     defaultPasswordRules,
@@ -6,6 +7,7 @@ import {
 
 describe("branding barrel exports", () => {
     it("should export branding components and password rules", () => {
+        expect(SentientArchiveLogo).toBeDefined();
         expect(SentientInput).toBeDefined();
         expect(SentientInputPassword).toBeDefined();
         expect(defaultPasswordRules.length).toBeGreaterThan(0);

@@ -28,5 +28,6 @@ export const useAuthStore = create<IAuthState>((set) => ({
         set({
             user: null,
             isAuthenticated: false,
+            isLoading: false,
         }),
 }));

@@ -11,6 +11,7 @@ export default {
         "\\.(css|less|scss|sass)$": "identity-obj-proxy",
         "\\.(jpg|jpeg|png|gif|svg)$": "<rootDir>/tests/__mocks__/fileMock.js",
         "^lucide-react$": "<rootDir>/tests/__mocks__/lucide-react.ts",
+        "^framer-motion$": "<rootDir>/tests/__mocks__/framer-motion.tsx",
         "^firebase/functions$": "<rootDir>/tests/__mocks__/firebase-functions.ts",
     },
     setupFilesAfterEnv: ["<rootDir>/tests/setup.ts"],

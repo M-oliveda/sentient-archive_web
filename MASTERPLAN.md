@@ -2460,17 +2460,48 @@ secrets.
 - [x] Implement password reset functionality
 - [x] Add forgot password link to LoginPage
 
-### Phase 3: Dashboard Layout (Week 2)
+### Phase 3: Dashboard Layout & Landing Page (Week 2)
 
-- [ ] Create DashboardLayout component
-- [ ] Build Navbar with user menu
-- [ ] Build Sidebar with navigation
-- [ ] Implement responsive design
-- [ ] Create DashboardHome page
-- [ ] Build WelcomeCard
-- [ ] Build TokenBalanceCard
-- [ ] Build RecentNotesCard
-- [ ] Test layout on mobile/tablet/desktop
+#### Landing Page (public home page at `/`)
+
+- [x] Create `src/pages/landing/LandingPage.tsx` as the root page container
+- [x] Build `LandingNavbar` component — logo left, anchor nav links (Features, How It
+      Works, Token System) center, "Get Started" button right; collapses to hamburger on
+      mobile
+- [x] Build `HeroSection` component — "v1.0 is now live" badge, headline "Unlock the
+      wisdom in your digital archive.", subtitle, "Start for Free" CTA button, app
+      screenshot/mockup
+- [x] Build `WhySentientArchiveSection` component — section heading "Why
+      SentientArchive?", 3 feature highlight cards: Cognitive Search, Auto-Linking,
+      Private by Design
+- [x] Build `FeaturesSection` component — section heading "Everything You Need to Build
+      Your Knowledge Empire", 8 feature cards in a responsive grid: Real-Time Search,
+      Activity Tracking, Smart Note-Taking, Hierarchical Folders, AI Summarization (2
+      tokens), Flashcard Generation (3 tokens), Auto-Tagging (3 tokens), Knowledge Q&A
+      (4 tokens/query); token-cost badge on AI cards
+- [x] Build `HowItWorksSection` component — section heading "How It Works", 3-step
+      horizontal flow: Create Your Account → Capture Your Knowledge → Unlock AI
+      Insights, each with icon and description; "Start For Free" CTA button below
+- [x] Build `TokenSystemSection` component — section heading "Simple Token-Based
+      System", left-side explanatory text (20 free tokens, cost-per-operation, request
+      more), right-side 2×2 token cost grid: Auto-Tagging (1), Summarization (2),
+      Flashcards (2), Q&A Chat (4/query)
+- [x] Build `LandingFooter` component — logo left, copyright and tagline right
+- [x] Wire smooth-scroll anchor navigation (`#features`, `#how-it-works`,
+      `#token-system`) from `LandingNavbar` links
+- [x] Test landing page responsiveness on mobile / tablet / desktop
+
+#### Dashboard Layout
+
+- [x] Create DashboardLayout component
+- [x] Build Navbar with user menu
+- [x] Build Sidebar with navigation
+- [x] Implement responsive design
+- [x] Create DashboardHome page
+- [x] Build WelcomeCard
+- [x] Build TokenBalanceCard
+- [x] Build RecentNotesCard
+- [x] Test layout on mobile/tablet/desktop
 
 ### Phase 4: Note Management UI (Week 3)
 

@@ -1,25 +1,6 @@
-import { createFileRoute, Navigate } from "@tanstack/react-router";
-import { useAuthStore } from "@/stores/authStore";
-import { Spinner } from "@/components/ui/spinner";
+import { createFileRoute } from "@tanstack/react-router";
+import { LandingPage } from "@/pages/landing/LandingPage";
 
 export const Route = createFileRoute("/")({
-    component: IndexPage,
+    component: LandingPage,
 });
-
-function IndexPage() {
-    const { isAuthenticated, isLoading } = useAuthStore();
-
-    if (isLoading) {
-        return (
-            <div className="flex min-h-screen items-center justify-center">
-                <Spinner className="size-8" />
-            </div>
-        );
-    }
-
-    if (isAuthenticated) {
-        return <Navigate to="/dashboard" />;
-    }
-
-    return <Navigate to="/login" />;
-}
