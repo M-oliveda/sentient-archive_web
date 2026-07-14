@@ -1,4 +1,13 @@
 import "@testing-library/jest-dom";
+import { TextEncoder } from "util";
+
+// Polyfill TextEncoder for jsdom environment
+if (!global.TextEncoder) {
+    Object.defineProperty(global, "TextEncoder", {
+        writable: true,
+        value: TextEncoder,
+    });
+}
 
 // Mock window.matchMedia
 Object.defineProperty(window, "matchMedia", {
