@@ -2,8 +2,8 @@ import { getAuth } from "firebase/auth";
 import { env, isEmulatorEnabled } from "./env";
 
 const API_BASE_URL = isEmulatorEnabled()
-    ? "http://localhost:5001/demo-sentient-archive/us-central1"
-    : env.VITE_API_BASE_URL
+    ? "/emulator-api/demo-sentient-archive/us-central1/sentientArchiveApi"
+    :env.VITE_API_BASE_URL
       ? `https://${env.VITE_API_BASE_URL}`
       : `https://us-central1-${
             env.VITE_API_PROJECT_ID || env.VITE_FIREBASE_PROJECT_ID

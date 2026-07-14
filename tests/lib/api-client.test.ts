@@ -122,7 +122,7 @@ describe("apiRequest", () => {
             await apiRequest("/test");
 
             expect(mockFetch).toHaveBeenCalledWith(
-                "http://localhost:5001/demo-sentient-archive/us-central1/test",
+                "/emulator-api/demo-sentient-archive/us-central1/sentientArchiveApi/test",
                 expect.any(Object),
             );
         });

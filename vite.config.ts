@@ -26,6 +26,13 @@ export default defineConfig({
         watch: {
             usePolling: true, // Important for Docker on some systems
         },
+        proxy: {
+            "/emulator-api": {
+                target: "http://firebase-emulators:5001",
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/emulator-api/, ""),
+            },
+        },
     },
     preview: {
         host: "0.0.0.0",
