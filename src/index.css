@@ -4,6 +4,10 @@
 
 @custom-variant dark (&:is(.dark *));
 
+html {
+    scroll-behavior: smooth;
+}
+
 /* ============================================================
    1. CSS Variable Definitions (SentientArchive Brand Palette)
    ============================================================ */
