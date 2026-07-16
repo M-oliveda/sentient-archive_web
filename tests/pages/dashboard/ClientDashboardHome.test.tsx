@@ -1,13 +1,41 @@
-import { render, screen } from "@testing-library/react";
+import React from "react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { ClientDashboardHome } from "@/pages/dashboard/ClientDashboardHome";
 import { useAuthStore } from "@/stores/authStore";
 import { useRecentNotes } from "@/hooks/useRecentNotes";
 
+const mockNavigate = jest.fn();
+const mockCreateNote = {
+    mutateAsync: jest.fn().mockResolvedValue("new-note-id"),
+    isPending: false,
+};
+
 jest.mock("@/stores/authStore");
 jest.mock("@/hooks/useRecentNotes");
 jest.mock("@tanstack/react-router", () => ({
+    useNavigate: () => mockNavigate,
     Link: ({ to, children }: { to: string; children: React.ReactNode }) => (
         <a href={to}>{children}</a>
+    ),
+}));
+jest.mock("@/hooks/useNotesMutations", () => ({
+    useCreateNote: () => mockCreateNote,
+}));
+jest.mock("@/components/notes/FileExtractor", () => ({
+    FileExtractor: ({
+        onNoteCreated,
+        className,
+    }: {
+        onNoteCreated: (id: string) => void;
+        className?: string;
+    }) => (
+        <button
+            data-testid="file-extractor"
+            className={className}
+            onClick={() => onNoteCreated("extracted-note-id")}
+        >
+            Upload Document
+        </button>
     ),
 }));
 
@@ -32,6 +60,9 @@ const mockNote = {
 
 describe("ClientDashboardHome", () => {
     beforeEach(() => {
+        jest.clearAllMocks();
+        mockCreateNote.mutateAsync = jest.fn().mockResolvedValue("new-note-id");
+        mockCreateNote.isPending = false;
         (useAuthStore as unknown as jest.Mock).mockReturnValue({ user: mockUser });
         (useRecentNotes as jest.Mock).mockReturnValue({
             data: { notes: [mockNote], totalCount: 5 },
@@ -56,6 +87,47 @@ describe("ClientDashboardHome", () => {
         render(<ClientDashboardHome />);
         expect(screen.getByText("New Note")).toBeInTheDocument();
         expect(screen.getByText("Upload Document")).toBeInTheDocument();
+    });
+
+    it("disables the New Note button when createNote is pending", () => {
+        mockCreateNote.isPending = true;
+        render(<ClientDashboardHome />);
+        expect(screen.getByRole("button", { name: /New Note/ })).toBeDisabled();
+    });
+
+    it("clicking New Note calls createNote.mutateAsync with null", async () => {
+        render(<ClientDashboardHome />);
+        fireEvent.click(screen.getByRole("button", { name: /New Note/ }));
+        await waitFor(() =>
+            expect(mockCreateNote.mutateAsync).toHaveBeenCalledWith(null),
+        );
+    });
+
+    it("clicking New Note navigates to /notes/$noteId in edit mode", async () => {
+        render(<ClientDashboardHome />);
+        fireEvent.click(screen.getByRole("button", { name: /New Note/ }));
+        await waitFor(() =>
+            expect(mockNavigate).toHaveBeenCalledWith({
+                to: "/notes/$noteId",
+                params: { noteId: "new-note-id" },
+                search: { edit: "1" },
+            }),
+        );
+    });
+
+    it("FileExtractor.onNoteCreated navigates to the note read view", () => {
+        render(<ClientDashboardHome />);
+        fireEvent.click(screen.getByTestId("file-extractor"));
+        expect(mockNavigate).toHaveBeenCalledWith({
+            to: "/notes/$noteId",
+            params: { noteId: "extracted-note-id" },
+        });
+    });
+
+    it("passes brand className to FileExtractor", () => {
+        render(<ClientDashboardHome />);
+        const extractor = screen.getByTestId("file-extractor");
+        expect(extractor.className).toContain("bg-brand-500");
     });
 
     it("renders stats section with token balance from store", () => {

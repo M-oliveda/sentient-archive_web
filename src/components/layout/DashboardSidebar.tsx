@@ -32,7 +32,9 @@ export function DashboardSidebar({
             <nav className="flex-1 px-2 md:px-4" aria-label="Main navigation">
                 <ul className="space-y-1">
                     {navItems.map((item) => {
-                        const isActive = location.pathname === item.to;
+                        const isActive =
+                            location.pathname === item.to ||
+                            location.pathname.startsWith(item.to + "/");
                         return (
                             <li key={item.to}>
                                 <Link

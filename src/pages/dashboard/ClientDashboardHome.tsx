@@ -1,20 +1,40 @@
-import { ArrowRight, Bot, Coins, FileText, FilePlus, Upload } from "lucide-react";
+import { useCallback } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { ArrowRight, Bot, Coins, FileText, FilePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { RecentNoteCard } from "@/components/dashboard/RecentNoteCard";
+import { FileExtractor } from "@/components/notes/FileExtractor";
 import { useAuthStore } from "@/stores/authStore";
 import { useRecentNotes } from "@/hooks/useRecentNotes";
+import { useCreateNote } from "@/hooks/useNotesMutations";
 import { formatTimeAgo } from "@/lib/utils";
 
 export function ClientDashboardHome() {
+    const navigate = useNavigate();
     const { user } = useAuthStore();
     const firstName = user?.displayName?.trim().split(/\s+/)[0] ?? "there";
     const { data, isLoading } = useRecentNotes();
+    const createNote = useCreateNote();
 
     const notes = data?.notes ?? [];
     const totalCount = data?.totalCount ?? 0;
     const lastEdited = notes[0]?.title ?? "—";
     const recentNotes = notes.slice(0, 2);
+
+    const handleNewNote = useCallback(async () => {
+        const id = await createNote.mutateAsync(null);
+        void navigate({
+            to: "/notes/$noteId",
+            params: { noteId: id },
+            search: { edit: "1" },
+        });
+    }, [createNote, navigate]);
+
+    const handleNoteCreated = useCallback(
+        (noteId: string) => void navigate({ to: "/notes/$noteId", params: { noteId } }),
+        [navigate],
+    );
 
     return (
         <div className="space-y-8">
@@ -28,18 +48,18 @@ export function ClientDashboardHome() {
                     Your knowledge base is organized and ready for insights.
                 </p>
                 <div className="mt-6 flex flex-wrap gap-3">
-                    <Button size="default">
+                    <Button
+                        size="default"
+                        onClick={() => void handleNewNote()}
+                        disabled={createNote.isPending}
+                    >
                         <FilePlus className="size-4" />
                         New Note
                     </Button>
-                    <Button
-                        variant="secondary"
-                        size="default"
+                    <FileExtractor
+                        onNoteCreated={handleNoteCreated}
                         className="bg-brand-500 text-brand-50 hover:bg-brand-600"
-                    >
-                        <Upload className="size-4" />
-                        Upload Document
-                    </Button>
+                    />
                 </div>
             </section>
 
