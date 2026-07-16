@@ -54,3 +54,30 @@ export const Sparkles = svg;
 // PublicNavbar icons
 export const Menu = svg;
 export const ChevronRight = svg;
+
+// Notes components icons
+export const Pin = svg;
+export const FolderOpen = svg;
+export const FilePlus2 = svg;
+export const Loader2 = svg;
+export const Trash2 = svg;
+export const Plus = svg;
+export const ArrowLeft = svg;
+export const Calendar = svg;
+export const Home = svg;
+export const MoreHorizontal = svg;
+
+// AI sidebar icons
+export const Layers = svg;
+export const XIcon = svg;
+
+// Markdown formatting toolbar icons
+export const Bold = svg;
+export const Italic = svg;
+export const Heading1 = svg;
+export const Heading2 = svg;
+export const List = svg;
+export const ListOrdered = svg;
+export const Link = svg;
+export const Quote = svg;
+export const Code = svg;
