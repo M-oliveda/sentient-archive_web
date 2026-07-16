@@ -17,6 +17,36 @@ export interface IRecentNotesData {
     totalCount: number;
 }
 
+function mapDocToNote(docSnap: {
+    id: string;
+    data: () => Record<string, unknown>;
+}): INote {
+    const data = docSnap.data();
+    const toDate = (val: unknown): Date =>
+        val ? (val as Timestamp).toDate() : new Date();
+
+    return {
+        id: docSnap.id,
+        userId: (data.userId as string) ?? "",
+        title: (data.title as string) ?? "",
+        content: (data.content as string) ?? "",
+        excerpt: (data.excerpt as string) ?? "",
+        tags: (data.tags as string[]) ?? [],
+        aiTags: (data.aiTags as string[]) ?? [],
+        folderId: (data.folderId as string | null) ?? null,
+        summary: (data.summary as string | null) ?? null,
+        flashcards: (data.flashcards as INote["flashcards"]) ?? null,
+        createdAt: toDate(data.createdAt),
+        updatedAt: toDate(data.updatedAt),
+        viewedAt: toDate(data.viewedAt),
+        isPinned: (data.isPinned as boolean) ?? false,
+        isArchived: (data.isArchived as boolean) ?? false,
+        sourceFile: (data.sourceFile as INote["sourceFile"]) ?? null,
+    };
+}
+
+export { mapDocToNote };
+
 export async function fetchRecentNotes(userId: string): Promise<IRecentNotesData> {
     const notesRef = collection(db, "users", userId, "notes");
 
@@ -25,17 +55,7 @@ export async function fetchRecentNotes(userId: string): Promise<IRecentNotesData
         getDocs(query(notesRef, orderBy("updatedAt", "desc"), limit(5))),
     ]);
 
-    const notes: INote[] = notesSnapshot.docs.map((docSnap) => {
-        const data = docSnap.data();
-        return {
-            id: docSnap.id,
-            title: data.title as string,
-            excerpt: data.excerpt as string,
-            tags: (data.tags as string[]) ?? [],
-            folderId: (data.folderId as string | null) ?? null,
-            updatedAt: (data.updatedAt as Timestamp).toDate(),
-        };
-    });
+    const notes: INote[] = notesSnapshot.docs.map(mapDocToNote);
 
     return {
         notes,

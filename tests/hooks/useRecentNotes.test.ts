@@ -16,7 +16,8 @@ jest.mock("firebase/firestore");
 jest.mock("@/lib/firebase", () => ({ db: {} }));
 jest.mock("@/stores/authStore");
 
-const mockTimestamp = { toDate: () => new Date("2024-06-01T12:00:00Z") };
+const FIXED_DATE = new Date("2024-06-01T12:00:00Z");
+const mockTimestamp = { toDate: () => FIXED_DATE };
 
 function createWrapper() {
     const queryClient = new QueryClient({
@@ -49,11 +50,21 @@ describe("fetchRecentNotes", () => {
                 {
                     id: "note-1",
                     data: () => ({
+                        userId: "user-123",
                         title: "My Note",
+                        content: "# My Note\n\nBody text.",
                         excerpt: "Some excerpt",
                         tags: ["tag1", "tag2"],
+                        aiTags: ["ai-tag"],
                         folderId: "folder-abc",
+                        summary: null,
+                        flashcards: null,
+                        isPinned: false,
+                        isArchived: false,
+                        sourceFile: null,
+                        createdAt: mockTimestamp,
                         updatedAt: mockTimestamp,
+                        viewedAt: mockTimestamp,
                     }),
                 },
             ],
@@ -65,15 +76,25 @@ describe("fetchRecentNotes", () => {
         expect(result.notes).toHaveLength(1);
         expect(result.notes[0]).toEqual({
             id: "note-1",
+            userId: "user-123",
             title: "My Note",
+            content: "# My Note\n\nBody text.",
             excerpt: "Some excerpt",
             tags: ["tag1", "tag2"],
+            aiTags: ["ai-tag"],
             folderId: "folder-abc",
-            updatedAt: new Date("2024-06-01T12:00:00Z"),
+            summary: null,
+            flashcards: null,
+            isPinned: false,
+            isArchived: false,
+            sourceFile: null,
+            createdAt: FIXED_DATE,
+            updatedAt: FIXED_DATE,
+            viewedAt: FIXED_DATE,
         });
     });
 
-    it("handles notes with null tags and null folderId", async () => {
+    it("handles notes with null tags, null folderId, and missing timestamps", async () => {
         (getCountFromServer as jest.Mock).mockResolvedValue({
             data: () => ({ count: 1 }),
         });
@@ -82,11 +103,21 @@ describe("fetchRecentNotes", () => {
                 {
                     id: "note-2",
                     data: () => ({
+                        userId: null,
                         title: "Tagless Note",
+                        content: null,
                         excerpt: "No tags",
                         tags: null,
+                        aiTags: null,
                         folderId: null,
+                        summary: null,
+                        flashcards: null,
+                        isPinned: null,
+                        isArchived: null,
+                        sourceFile: null,
+                        createdAt: null,
                         updatedAt: mockTimestamp,
+                        viewedAt: null,
                     }),
                 },
             ],
@@ -96,6 +127,43 @@ describe("fetchRecentNotes", () => {
 
         expect(result.notes[0]?.tags).toEqual([]);
         expect(result.notes[0]?.folderId).toBeNull();
+        expect(result.notes[0]?.userId).toBe("");
+        expect(result.notes[0]?.isPinned).toBe(false);
+    });
+
+    it("falls back to empty string when title and excerpt are null", async () => {
+        (getCountFromServer as jest.Mock).mockResolvedValue({
+            data: () => ({ count: 1 }),
+        });
+        (getDocs as jest.Mock).mockResolvedValue({
+            docs: [
+                {
+                    id: "note-3",
+                    data: () => ({
+                        userId: "user-123",
+                        title: null,
+                        content: "body",
+                        excerpt: null,
+                        tags: [],
+                        aiTags: [],
+                        folderId: null,
+                        summary: null,
+                        flashcards: null,
+                        isPinned: false,
+                        isArchived: false,
+                        sourceFile: null,
+                        createdAt: null,
+                        updatedAt: null,
+                        viewedAt: null,
+                    }),
+                },
+            ],
+        });
+
+        const result = await fetchRecentNotes("user-123");
+
+        expect(result.notes[0]?.title).toBe("");
+        expect(result.notes[0]?.excerpt).toBe("");
     });
 });
 
