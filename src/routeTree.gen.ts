@@ -11,10 +11,13 @@
 import { Route as rootRouteImport } from "./routes/__root";
 import { Route as TermsAndPrivacyRouteImport } from "./routes/terms-and-privacy";
 import { Route as SignupRouteImport } from "./routes/signup";
+import { Route as NotesRouteImport } from "./routes/notes";
 import { Route as LoginRouteImport } from "./routes/login";
 import { Route as ForgotPasswordRouteImport } from "./routes/forgot-password";
 import { Route as DashboardRouteImport } from "./routes/dashboard";
 import { Route as IndexRouteImport } from "./routes/index";
+import { Route as NotesIndexRouteImport } from "./routes/notes.index";
+import { Route as NotesNoteIdRouteImport } from "./routes/notes.$noteId";
 
 const TermsAndPrivacyRoute = TermsAndPrivacyRouteImport.update({
     id: "/terms-and-privacy",
@@ -24,6 +27,11 @@ const TermsAndPrivacyRoute = TermsAndPrivacyRouteImport.update({
 const SignupRoute = SignupRouteImport.update({
     id: "/signup",
     path: "/signup",
+    getParentRoute: () => rootRouteImport,
+} as any);
+const NotesRoute = NotesRouteImport.update({
+    id: "/notes",
+    path: "/notes",
     getParentRoute: () => rootRouteImport,
 } as any);
 const LoginRoute = LoginRouteImport.update({
@@ -46,14 +54,27 @@ const IndexRoute = IndexRouteImport.update({
     path: "/",
     getParentRoute: () => rootRouteImport,
 } as any);
+const NotesIndexRoute = NotesIndexRouteImport.update({
+    id: "/",
+    path: "/",
+    getParentRoute: () => NotesRoute,
+} as any);
+const NotesNoteIdRoute = NotesNoteIdRouteImport.update({
+    id: "/$noteId",
+    path: "/$noteId",
+    getParentRoute: () => NotesRoute,
+} as any);
 
 export interface FileRoutesByFullPath {
     "/": typeof IndexRoute;
     "/dashboard": typeof DashboardRoute;
     "/forgot-password": typeof ForgotPasswordRoute;
     "/login": typeof LoginRoute;
+    "/notes": typeof NotesRouteWithChildren;
     "/signup": typeof SignupRoute;
     "/terms-and-privacy": typeof TermsAndPrivacyRoute;
+    "/notes/$noteId": typeof NotesNoteIdRoute;
+    "/notes/": typeof NotesIndexRoute;
 }
 export interface FileRoutesByTo {
     "/": typeof IndexRoute;
@@ -62,6 +83,8 @@ export interface FileRoutesByTo {
     "/login": typeof LoginRoute;
     "/signup": typeof SignupRoute;
     "/terms-and-privacy": typeof TermsAndPrivacyRoute;
+    "/notes/$noteId": typeof NotesNoteIdRoute;
+    "/notes": typeof NotesIndexRoute;
 }
 export interface FileRoutesById {
     __root__: typeof rootRouteImport;
@@ -69,8 +92,11 @@ export interface FileRoutesById {
     "/dashboard": typeof DashboardRoute;
     "/forgot-password": typeof ForgotPasswordRoute;
     "/login": typeof LoginRoute;
+    "/notes": typeof NotesRouteWithChildren;
     "/signup": typeof SignupRoute;
     "/terms-and-privacy": typeof TermsAndPrivacyRoute;
+    "/notes/$noteId": typeof NotesNoteIdRoute;
+    "/notes/": typeof NotesIndexRoute;
 }
 export interface FileRouteTypes {
     fileRoutesByFullPath: FileRoutesByFullPath;
@@ -79,8 +105,11 @@ export interface FileRouteTypes {
         | "/dashboard"
         | "/forgot-password"
         | "/login"
+        | "/notes"
         | "/signup"
-        | "/terms-and-privacy";
+        | "/terms-and-privacy"
+        | "/notes/$noteId"
+        | "/notes/";
     fileRoutesByTo: FileRoutesByTo;
     to:
         | "/"
@@ -88,15 +117,20 @@ export interface FileRouteTypes {
         | "/forgot-password"
         | "/login"
         | "/signup"
-        | "/terms-and-privacy";
+        | "/terms-and-privacy"
+        | "/notes/$noteId"
+        | "/notes";
     id:
         | "__root__"
         | "/"
         | "/dashboard"
         | "/forgot-password"
         | "/login"
+        | "/notes"
         | "/signup"
-        | "/terms-and-privacy";
+        | "/terms-and-privacy"
+        | "/notes/$noteId"
+        | "/notes/";
     fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
@@ -104,6 +138,7 @@ export interface RootRouteChildren {
     DashboardRoute: typeof DashboardRoute;
     ForgotPasswordRoute: typeof ForgotPasswordRoute;
     LoginRoute: typeof LoginRoute;
+    NotesRoute: typeof NotesRouteWithChildren;
     SignupRoute: typeof SignupRoute;
     TermsAndPrivacyRoute: typeof TermsAndPrivacyRoute;
 }
@@ -122,6 +157,13 @@ declare module "@tanstack/react-router" {
             path: "/signup";
             fullPath: "/signup";
             preLoaderRoute: typeof SignupRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
+        "/notes": {
+            id: "/notes";
+            path: "/notes";
+            fullPath: "/notes";
+            preLoaderRoute: typeof NotesRouteImport;
             parentRoute: typeof rootRouteImport;
         };
         "/login": {
@@ -152,14 +194,41 @@ declare module "@tanstack/react-router" {
             preLoaderRoute: typeof IndexRouteImport;
             parentRoute: typeof rootRouteImport;
         };
+        "/notes/": {
+            id: "/notes/";
+            path: "/";
+            fullPath: "/notes/";
+            preLoaderRoute: typeof NotesIndexRouteImport;
+            parentRoute: typeof NotesRoute;
+        };
+        "/notes/$noteId": {
+            id: "/notes/$noteId";
+            path: "/$noteId";
+            fullPath: "/notes/$noteId";
+            preLoaderRoute: typeof NotesNoteIdRouteImport;
+            parentRoute: typeof NotesRoute;
+        };
     }
 }
+
+interface NotesRouteChildren {
+    NotesNoteIdRoute: typeof NotesNoteIdRoute;
+    NotesIndexRoute: typeof NotesIndexRoute;
+}
+
+const NotesRouteChildren: NotesRouteChildren = {
+    NotesNoteIdRoute: NotesNoteIdRoute,
+    NotesIndexRoute: NotesIndexRoute,
+};
+
+const NotesRouteWithChildren = NotesRoute._addFileChildren(NotesRouteChildren);
 
 const rootRouteChildren: RootRouteChildren = {
     IndexRoute: IndexRoute,
     DashboardRoute: DashboardRoute,
     ForgotPasswordRoute: ForgotPasswordRoute,
     LoginRoute: LoginRoute,
+    NotesRoute: NotesRouteWithChildren,
     SignupRoute: SignupRoute,
     TermsAndPrivacyRoute: TermsAndPrivacyRoute,
 };

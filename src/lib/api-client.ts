@@ -26,19 +26,28 @@ export async function apiRequest<T>(
 ): Promise<T> {
     const token = await getAuthToken();
 
+    const isFormData = options.body instanceof FormData;
+
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         ...options,
         headers: {
-            "Content-Type": "application/json",
+            ...(isFormData ? {} : { "Content-Type": "application/json" }),
             Authorization: `Bearer ${token}`,
             ...options.headers,
         },
     });
 
     if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error?.message || "API request failed");
+        const text = await response.text();
+        let message = "API request failed";
+        try {
+            const json = JSON.parse(text) as { error?: { message?: string } };
+            message = json.error?.message ?? message;
+        } catch {
+            // response was not JSON (e.g. HTML error page)
+        }
+        throw new Error(message);
     }
 
-    return await response.json();
+    return await response.json() as T;
 }

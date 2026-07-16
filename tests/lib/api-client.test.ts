@@ -106,6 +106,24 @@ describe("apiRequest", () => {
                 }),
             );
         });
+
+        it("omits Content-Type header when body is FormData", async () => {
+            jest.resetModules();
+            mockFetch.mockResolvedValueOnce({
+                ok: true,
+                json: jest.fn().mockResolvedValue({}),
+            });
+
+            const { apiRequest } = await import("@/lib/api-client");
+            const formData = new FormData();
+            formData.append("file", new Blob(["data"]), "file.pdf");
+            await apiRequest("/test", { method: "POST", body: formData });
+
+            const calledHeaders = (mockFetch.mock.calls[0][1] as RequestInit)
+                .headers as Record<string, string>;
+            expect(calledHeaders).not.toHaveProperty("Content-Type");
+            expect(calledHeaders).toHaveProperty("Authorization", "Bearer test-token");
+        });
     });
 
     describe("URL configuration", () => {
@@ -199,13 +217,15 @@ describe("apiRequest", () => {
             );
         });
 
-        it("throws error with message from API response", async () => {
+        it("throws error with message from JSON API response", async () => {
             jest.resetModules();
             mockFetch.mockResolvedValueOnce({
                 ok: false,
-                json: jest
+                text: jest
                     .fn()
-                    .mockResolvedValue({ error: { message: "Custom error" } }),
+                    .mockResolvedValue(
+                        JSON.stringify({ error: { message: "Custom error" } }),
+                    ),
             });
 
             const { apiRequest } = await import("@/lib/api-client");
@@ -217,7 +237,23 @@ describe("apiRequest", () => {
             jest.resetModules();
             mockFetch.mockResolvedValueOnce({
                 ok: false,
-                json: jest.fn().mockResolvedValue({}),
+                text: jest.fn().mockResolvedValue(JSON.stringify({})),
+            });
+
+            const { apiRequest } = await import("@/lib/api-client");
+
+            await expect(apiRequest("/test")).rejects.toThrow(
+                "API request failed",
+            );
+        });
+
+        it("throws generic error when API response is non-JSON (e.g. HTML)", async () => {
+            jest.resetModules();
+            mockFetch.mockResolvedValueOnce({
+                ok: false,
+                text: jest
+                    .fn()
+                    .mockResolvedValue("<!DOCTYPE html><html>Error</html>"),
             });
 
             const { apiRequest } = await import("@/lib/api-client");
