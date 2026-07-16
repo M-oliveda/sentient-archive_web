@@ -2505,19 +2505,19 @@ secrets.
 
 ### Phase 4: Note Management UI (Week 3)
 
-- [ ] Create NotesPage layout
-- [ ] Build NotesList component
-- [ ] Build NoteCard component
-- [ ] Implement FolderTree component
-- [ ] Build MarkdownEditor
-- [ ] Implement live preview
-- [ ] Build FileExtractor component (PDF/TXT/MD content extraction)
-- [ ] Implement file upload with validation (type, size)
-- [ ] Integrate file extraction API endpoint
-- [ ] Create tag management UI
-- [ ] Implement search functionality
-- [ ] Test note CRUD operations
-- [ ] Test file content extraction flow
+- [x] Create NotesPage layout
+- [x] Build NotesList component
+- [x] Build NoteCard component
+- [x] Implement FolderTree component
+- [x] Build MarkdownEditor
+- [x] Implement live preview
+- [x] Build FileExtractor component (PDF/TXT/MD content extraction)
+- [x] Implement file upload with validation (type, size)
+- [x] Integrate file extraction API endpoint
+- [x] Create tag management UI
+- [x] Implement search functionality
+- [x] Test note CRUD operations
+- [x] Test file content extraction flow
 
 ### Phase 5: AI Features UI (Week 4)
 
