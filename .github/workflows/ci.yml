@@ -1,7 +1,8 @@
 # CI Workflow
 #
-# Runs on all pull requests to develop, release/** and main branches
-# Validates code quality, runs tests, and checks coverage
+# Runs only on pull requests targeting develop, release/**, or main.
+# Does not run on push (e.g. merges into develop) — those use deploy-dev / other deploy workflows.
+# After tests pass, deploys a PR preview via the reusable Deploy to Preview workflow.
 
 name: CI
 
@@ -58,3 +59,12 @@ jobs:
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
+
+  deploy-preview:
+    needs: test
+    uses: ./.github/workflows/deploy-preview.yml
+    secrets: inherit
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write

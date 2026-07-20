@@ -1,14 +1,13 @@
 # Deploy Preview Workflow
 #
-# Deploys ephemeral preview environments for Pull Requests
-# Each PR gets its own Cloud Run service with HTTP Basic Auth
+# Reusable workflow that deploys ephemeral preview environments for Pull Requests.
+# Each PR gets its own Cloud Run service with HTTP Basic Auth.
+# Invoked by CI after the test job succeeds.
 
 name: Deploy to Preview
 
 on:
-  workflow_run:
-    workflows: ["CI"]
-    types: [completed]
+  workflow_call:
 
 env:
   REGION: us-central1
@@ -17,7 +16,6 @@ env:
 
 jobs:
   deploy-preview:
-    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment:
@@ -30,14 +28,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.workflow_run.head_sha }}
+        uses: actions/checkout@v7
 
       - name: Generate preview service name
         id: preview-name
         run: |
-          PR_NUMBER=${{ github.event.workflow_run.pull_requests[0].number }}
+          PR_NUMBER=${{ github.event.pull_request.number }}
           SERVICE_NAME="sentient-archive-pr-${PR_NUMBER}"
           echo "service_name=${SERVICE_NAME}" >> $GITHUB_OUTPUT
           echo "pr_number=${PR_NUMBER}" >> $GITHUB_OUTPUT
@@ -135,7 +131,7 @@ jobs:
             const prNumber = ${{ steps.preview-name.outputs.pr_number }};
             const previewUrl = '${{ steps.deploy.outputs.url }}';
             const serviceName = '${{ steps.preview-name.outputs.service_name }}';
-            const headSha = '${{ github.event.workflow_run.head_sha }}';
+            const headSha = '${{ github.sha }}';
 
             const comment = `## 🚀 Preview Deployment Ready!
 
