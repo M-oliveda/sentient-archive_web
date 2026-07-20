@@ -15,6 +15,7 @@ const CLIENT_NAV_ITEMS: INavItem[] = [
     { label: "Dashboard", icon: LayoutDashboard, to: "/dashboard" },
     { label: "My Notes", icon: FileText, to: "/notes" },
     { label: "AI Features", icon: Bot, to: "/ai-features" },
+    { label: "Tokens", icon: Coins, to: "/tokens" },
     { label: "Activity", icon: Clock, to: "/activity" },
     { label: "Settings", icon: Settings, to: "/settings" },
 ];
