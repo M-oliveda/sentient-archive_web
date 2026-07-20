@@ -196,4 +196,43 @@ describe("ClientDashboardHome", () => {
         const allNotes = screen.getAllByText("Notes");
         expect(allNotes.length).toBeGreaterThanOrEqual(2);
     });
+
+    it("shows low-balance alert when tokenBalance is below 20", () => {
+        (useAuthStore as unknown as jest.Mock).mockReturnValue({
+            user: { ...mockUser, tokenBalance: 10 },
+        });
+        render(<ClientDashboardHome />);
+        expect(screen.getByTestId("low-balance-alert")).toBeInTheDocument();
+        expect(screen.getByText(/Your token balance is low/)).toBeInTheDocument();
+    });
+
+    it("does not show low-balance alert when tokenBalance is 20 or above", () => {
+        (useAuthStore as unknown as jest.Mock).mockReturnValue({
+            user: { ...mockUser, tokenBalance: 20 },
+        });
+        render(<ClientDashboardHome />);
+        expect(screen.queryByTestId("low-balance-alert")).not.toBeInTheDocument();
+    });
+
+    it("does not show low-balance alert when user is null (balance is 0 which is < 20)", () => {
+        (useAuthStore as unknown as jest.Mock).mockReturnValue({ user: null });
+        render(<ClientDashboardHome />);
+        expect(screen.getByTestId("low-balance-alert")).toBeInTheDocument();
+    });
+
+    it("low-balance alert contains a link to /tokens", () => {
+        (useAuthStore as unknown as jest.Mock).mockReturnValue({
+            user: { ...mockUser, tokenBalance: 5 },
+        });
+        render(<ClientDashboardHome />);
+        const link = screen.getByRole("link", { name: /Request more tokens/ });
+        expect(link).toHaveAttribute("href", "/tokens");
+    });
+
+    it("Tokens StatsCard action navigates to /tokens", () => {
+        render(<ClientDashboardHome />);
+        const requestMoreButton = screen.getByRole("button", { name: /Request More/ });
+        fireEvent.click(requestMoreButton);
+        expect(mockNavigate).toHaveBeenCalledWith({ to: "/tokens" });
+    });
 });

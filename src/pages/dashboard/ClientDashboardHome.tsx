@@ -1,7 +1,15 @@
 import { useCallback } from "react";
-import { useNavigate } from "@tanstack/react-router";
-import { ArrowRight, Bot, Coins, FileText, FilePlus } from "lucide-react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import {
+    ArrowRight,
+    Bot,
+    Coins,
+    FileText,
+    FilePlus,
+    TriangleAlert,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { RecentNoteCard } from "@/components/dashboard/RecentNoteCard";
 import { FileExtractor } from "@/components/notes/FileExtractor";
@@ -9,6 +17,8 @@ import { useAuthStore } from "@/stores/authStore";
 import { useRecentNotes } from "@/hooks/useRecentNotes";
 import { useCreateNote } from "@/hooks/useNotesMutations";
 import { formatTimeAgo } from "@/lib/utils";
+
+const LOW_BALANCE_THRESHOLD = 20;
 
 export function ClientDashboardHome() {
     const navigate = useNavigate();
@@ -38,6 +48,23 @@ export function ClientDashboardHome() {
 
     return (
         <div className="space-y-8">
+            {/* Low balance warning */}
+            {(user?.tokenBalance ?? 0) < LOW_BALANCE_THRESHOLD && (
+                <Alert variant="destructive" data-testid="low-balance-alert">
+                    <TriangleAlert className="size-4" />
+                    <AlertDescription>
+                        Your token balance is low.{" "}
+                        <Link
+                            to="/tokens"
+                            className="font-semibold underline underline-offset-2"
+                        >
+                            Request more tokens
+                        </Link>{" "}
+                        to keep using AI features.
+                    </AlertDescription>
+                </Alert>
+            )}
+
             {/* Welcome */}
             <section>
                 <Bot className="text-muted-foreground mb-2 size-8" />
@@ -77,7 +104,10 @@ export function ClientDashboardHome() {
                     icon={Coins}
                     label="Tokens"
                     value={user?.tokenBalance ?? 0}
-                    action={{ label: "Request More" }}
+                    action={{
+                        label: "Request More",
+                        onClick: () => void navigate({ to: "/tokens" }),
+                    }}
                 />
                 <StatsCard
                     icon={FileText}

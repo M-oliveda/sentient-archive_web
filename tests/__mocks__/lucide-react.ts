@@ -90,3 +90,6 @@ export const Lightbulb = svg;
 
 // RAGQueryModal icons
 export const Send = svg;
+
+// Token / alert icons
+export const TriangleAlert = svg;
