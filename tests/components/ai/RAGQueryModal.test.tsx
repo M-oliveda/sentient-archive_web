@@ -89,6 +89,26 @@ describe("RAGQueryModal rendering", () => {
         expect(btn).toHaveTextContent(/not enough tokens/i);
         expect(btn).toBeDisabled();
     });
+
+    it("handles null user by defaulting token balance to 0", () => {
+        (useAuthStore as unknown as jest.Mock).mockReturnValue({
+            user: null,
+        });
+        renderModal();
+        const btn = screen.getByTestId("ask-button");
+        expect(btn).toHaveTextContent(/not enough tokens/i);
+        expect(btn).toBeDisabled();
+    });
+
+    it("handles undefined tokenBalance by defaulting to 0", () => {
+        (useAuthStore as unknown as jest.Mock).mockReturnValue({
+            user: { uid: "user-1", tokenBalance: undefined },
+        });
+        renderModal();
+        const btn = screen.getByTestId("ask-button");
+        expect(btn).toHaveTextContent(/not enough tokens/i);
+        expect(btn).toBeDisabled();
+    });
 });
 
 // ── Interaction ───────────────────────────────────────────────────────────────
@@ -124,8 +144,30 @@ describe("RAGQueryModal interaction", () => {
         fireEvent.change(screen.getByTestId("question-input"), {
             target: { value: "   " },
         });
-        fireEvent.click(screen.getByTestId("ask-button"));
+        const button = screen.getByTestId("ask-button");
+        expect(button).toBeDisabled();
+        fireEvent.click(button);
         expect(mockRagQueryMutate).not.toHaveBeenCalled();
+    });
+
+    it("does not call mutate on Ctrl+Enter when the question is empty whitespace", () => {
+        renderModal();
+        const textarea = screen.getByTestId("question-input");
+        fireEvent.change(textarea, { target: { value: "   " } });
+        fireEvent.keyDown(textarea, { key: "Enter", ctrlKey: true });
+        expect(mockRagQueryMutate).not.toHaveBeenCalled();
+    });
+
+    it("trims question before submission", () => {
+        renderModal();
+        fireEvent.change(screen.getByTestId("question-input"), {
+            target: { value: "  What is Vue?  " },
+        });
+        fireEvent.click(screen.getByTestId("ask-button"));
+        expect(mockRagQueryMutate).toHaveBeenCalledWith(
+            "What is Vue?",
+            expect.any(Object),
+        );
     });
 
     it("submits on Ctrl+Enter keyboard shortcut", () => {
@@ -232,5 +274,52 @@ describe("RAGQueryModal error state", () => {
     it("does not show an error message when there is no error", () => {
         renderModal();
         expect(screen.queryByTestId("error-message")).not.toBeInTheDocument();
+    });
+});
+
+// ── Modal lifecycle ────────────────────────────────────────────────────────────
+
+describe("RAGQueryModal lifecycle", () => {
+    it("clears question and answer when modal closes", () => {
+        const { rerender } = render(
+            <RAGQueryModal noteId="note-1" open={true} onOpenChange={jest.fn()} />,
+        );
+        const textarea = screen.getByTestId("question-input");
+
+        fireEvent.change(textarea, { target: { value: "What is React?" } });
+        fireEvent.click(screen.getByTestId("ask-button"));
+
+        const { onSuccess } = (mockRagQueryMutate as jest.Mock).mock.calls[0][1] as {
+            onSuccess: (data: unknown) => void;
+        };
+        act(() => {
+            onSuccess({
+                success: true,
+                data: { answer: "React is a UI library.", tokensUsed: 4, tokenCost: 4 },
+            });
+        });
+
+        expect(screen.getByTestId("answer-content")).toBeInTheDocument();
+        expect(textarea).toHaveValue("What is React?");
+
+        rerender(
+            <RAGQueryModal noteId="note-1" open={false} onOpenChange={jest.fn()} />,
+        );
+
+        rerender(
+            <RAGQueryModal noteId="note-1" open={true} onOpenChange={jest.fn()} />,
+        );
+
+        const newTextarea = screen.getByTestId("question-input");
+        expect(newTextarea).toHaveValue("");
+        expect(screen.queryByTestId("answer-content")).not.toBeInTheDocument();
+    });
+
+    it("submits on Meta+Enter keyboard shortcut (macOS)", () => {
+        renderModal();
+        const textarea = screen.getByTestId("question-input");
+        fireEvent.change(textarea, { target: { value: "My question" } });
+        fireEvent.keyDown(textarea, { key: "Enter", metaKey: true });
+        expect(mockRagQueryMutate).toHaveBeenCalled();
     });
 });

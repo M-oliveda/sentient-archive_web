@@ -75,6 +75,23 @@ describe("DashboardSidebar", () => {
         expect(screen.getByRole("progressbar")).toBeInTheDocument();
     });
 
+    it("defaults TokenWidget balance to 0 when tokenBalance is undefined", () => {
+        (useAuthStore as unknown as jest.Mock).mockReturnValue({
+            user: { displayName: "Alex", tokenBalance: undefined },
+        });
+        render(<DashboardSidebar navItems={mockNavItems} showTokenWidget={true} />);
+        expect(screen.getByRole("progressbar")).toBeInTheDocument();
+        expect(screen.getByText("0")).toBeInTheDocument();
+    });
+
+    it("hides TokenWidget when user is null even if showTokenWidget is true", () => {
+        (useAuthStore as unknown as jest.Mock).mockReturnValue({
+            user: null,
+        });
+        render(<DashboardSidebar navItems={mockNavItems} showTokenWidget={true} />);
+        expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+    });
+
     it("hides TokenWidget when showTokenWidget is false", () => {
         render(<DashboardSidebar navItems={mockNavItems} showTokenWidget={false} />);
         expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
