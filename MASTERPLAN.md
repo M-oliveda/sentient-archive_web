@@ -2521,24 +2521,24 @@ secrets.
 
 ### Phase 5: AI Features UI (Week 4)
 
-- [ ] Create AIToolbar component
-- [ ] Build SummarizeButton with modal
-- [ ] Build AutoTagButton
-- [ ] Build FlashcardsButton
-- [ ] Build AskQuestionButton with chat UI
-- [ ] Implement FlashcardViewer
-- [ ] Add loading states
-- [ ] Add error handling
-- [ ] Test AI feature flows
+- [x] Create AIToolbar component
+- [x] Build SummarizeButton with modal
+- [x] Build AutoTagButton
+- [x] Build FlashcardsButton
+- [x] Build AskQuestionButton with chat UI
+- [x] Implement FlashcardViewer
+- [x] Add loading states
+- [x] Add error handling
+- [x] Test AI feature flows
 
 ### Phase 6: Token Management UI (Week 5)
 
-- [ ] Create TokenBalance component
-- [ ] Build TransactionHistory table
-- [ ] Implement RequestTokensModal
-- [ ] Add threshold warnings
-- [ ] Create token-related hooks
-- [ ] Test token displays and updates
+- [x] Create TokenBalance component
+- [x] Build TransactionHistory table
+- [x] Implement RequestTokensModal
+- [x] Add threshold warnings
+- [x] Create token-related hooks
+- [x] Test token displays and updates
 
 ### Phase 7: Admin Dashboard (Week 6)
 
