@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, within } from "@testing-library/react";
 import { AIAssistantModal } from "@/components/notes/AIAssistantModal";
 import type { INote } from "@/types/note";
 
@@ -24,6 +24,19 @@ jest.mock("@/components/ui/dialog", () => ({
         <div>{children}</div>
     ),
     DialogTitle: ({ children }: { children: React.ReactNode }) => <h2>{children}</h2>,
+}));
+jest.mock("@/components/ai/RAGQueryModal", () => ({
+    RAGQueryModal: ({
+        open,
+        onOpenChange,
+    }: {
+        open: boolean;
+        onOpenChange: (v: boolean) => void;
+    }) => (
+        <div data-testid="rag-query-modal" data-open={String(open)}>
+            <button onClick={() => onOpenChange(false)}>Close Q&A</button>
+        </div>
+    ),
 }));
 
 import { useAuthStore } from "@/stores/authStore";
@@ -82,6 +95,14 @@ function setupMocks({
             mutate: mockFlashcardsMutate,
             isPending: flashcardsPending,
             error: flashcardsError ? new Error(flashcardsError) : null,
+        },
+        ragQuery: {
+            mutate: jest.fn(),
+            isPending: false,
+            isSuccess: false,
+            isError: false,
+            error: null,
+            data: null,
         },
     });
     (useUpdateNote as jest.Mock).mockReturnValue({
@@ -353,23 +374,23 @@ describe("SuggestedTagsCard – with AI tags", () => {
 // ── Generate Flashcards card ──────────────────────────────────────────────────
 
 describe("GenerateFlashcardsCard", () => {
-    it("shows 'Generate (5 tokens)' when no flashcards exist", () => {
+    it("shows 'Generate (3 tokens)' when no flashcards exist", () => {
         renderModal(makeNote({ flashcards: null }));
         expect(
-            screen.getByRole("button", { name: /generate \(5 tokens\)/i }),
+            screen.getByRole("button", { name: /generate \(3 tokens\)/i }),
         ).toBeInTheDocument();
     });
 
-    it("shows 'Regenerate (5 tokens)' when flashcards already exist", () => {
+    it("shows 'Regenerate (3 tokens)' when flashcards already exist", () => {
         renderModal(makeNote({ flashcards: [{ front: "Q", back: "A" }] }));
         expect(
-            screen.getByRole("button", { name: /regenerate \(5 tokens\)/i }),
+            screen.getByRole("button", { name: /regenerate \(3 tokens\)/i }),
         ).toBeInTheDocument();
     });
 
     it("calls flashcards.mutate with onSuccess handler when generate is clicked", () => {
         renderModal(makeNote());
-        fireEvent.click(screen.getByRole("button", { name: /generate \(5 tokens\)/i }));
+        fireEvent.click(screen.getByRole("button", { name: /generate \(3 tokens\)/i }));
         expect(mockFlashcardsMutate).toHaveBeenCalledWith(
             undefined,
             expect.objectContaining({ onSuccess: expect.any(Function) }),
@@ -379,7 +400,7 @@ describe("GenerateFlashcardsCard", () => {
     it("calls onAppendContent with formatted flashcards markdown on success", () => {
         const onAppendContent = jest.fn();
         renderModal(makeNote(), { onAppendContent });
-        fireEvent.click(screen.getByRole("button", { name: /generate \(5 tokens\)/i }));
+        fireEvent.click(screen.getByRole("button", { name: /generate \(3 tokens\)/i }));
 
         const { onSuccess } = (mockFlashcardsMutate as jest.Mock).mock.calls[0][1] as {
             onSuccess: (data: unknown) => void;
@@ -400,7 +421,7 @@ describe("GenerateFlashcardsCard", () => {
         render(
             <AIAssistantModal note={makeNote()} open={true} onOpenChange={jest.fn()} />,
         );
-        fireEvent.click(screen.getByRole("button", { name: /generate \(5 tokens\)/i }));
+        fireEvent.click(screen.getByRole("button", { name: /generate \(3 tokens\)/i }));
         const { onSuccess } = (mockFlashcardsMutate as jest.Mock).mock.calls[0][1] as {
             onSuccess: (data: unknown) => void;
         };
@@ -415,7 +436,7 @@ describe("GenerateFlashcardsCard", () => {
     it("closes the modal after flashcards are appended", () => {
         const onOpenChange = jest.fn();
         renderModal(makeNote(), { onOpenChange });
-        fireEvent.click(screen.getByRole("button", { name: /generate \(5 tokens\)/i }));
+        fireEvent.click(screen.getByRole("button", { name: /generate \(3 tokens\)/i }));
 
         const { onSuccess } = (mockFlashcardsMutate as jest.Mock).mock.calls[0][1] as {
             onSuccess: (data: unknown) => void;
@@ -429,9 +450,12 @@ describe("GenerateFlashcardsCard", () => {
     });
 
     it("shows 'Not enough tokens' and disables when balance is too low", () => {
-        setupMocks({ tokenBalance: 4 });
+        setupMocks({ tokenBalance: 2 });
         renderModal(makeNote());
-        const btn = screen.getByRole("button", { name: /not enough tokens/i });
+        const flashcardsCard = screen.getByTestId("flashcards-card");
+        const btn = within(flashcardsCard).getByRole("button", {
+            name: /not enough tokens/i,
+        });
         expect(btn).toBeDisabled();
     });
 
@@ -447,5 +471,54 @@ describe("GenerateFlashcardsCard", () => {
         expect(
             screen.getByText("Something went wrong. Please try again."),
         ).toBeInTheDocument();
+    });
+});
+
+// ── Knowledge Q&A card ────────────────────────────────────────────────────────
+
+describe("KnowledgeQACard", () => {
+    it("renders the card with 'Ask a Question' button when balance is sufficient", () => {
+        renderModal(makeNote());
+        expect(
+            screen.getByRole("button", { name: /ask a question \(4 tokens\)/i }),
+        ).toBeInTheDocument();
+    });
+
+    it("shows 'Not enough tokens' when balance is below 4", () => {
+        setupMocks({ tokenBalance: 3 });
+        renderModal(makeNote());
+        const qaCard = screen.getByTestId("knowledge-qa-card");
+        const btn = within(qaCard).getByRole("button", { name: /not enough tokens/i });
+        expect(btn).toBeDisabled();
+    });
+
+    it("opens the RAGQueryModal when Ask a Question is clicked", () => {
+        renderModal(makeNote());
+        const modal = screen.getByTestId("rag-query-modal");
+        expect(modal).toHaveAttribute("data-open", "false");
+
+        fireEvent.click(
+            screen.getByRole("button", { name: /ask a question \(4 tokens\)/i }),
+        );
+
+        expect(modal).toHaveAttribute("data-open", "true");
+    });
+
+    it("closes the RAGQueryModal via its onOpenChange callback", () => {
+        renderModal(makeNote());
+        fireEvent.click(
+            screen.getByRole("button", { name: /ask a question \(4 tokens\)/i }),
+        );
+        expect(screen.getByTestId("rag-query-modal")).toHaveAttribute(
+            "data-open",
+            "true",
+        );
+
+        fireEvent.click(screen.getByRole("button", { name: /close q&a/i }));
+
+        expect(screen.getByTestId("rag-query-modal")).toHaveAttribute(
+            "data-open",
+            "false",
+        );
     });
 });

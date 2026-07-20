@@ -1,4 +1,5 @@
-import { Layers, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { Layers, Sparkles, Brain } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import {
     Dialog,
@@ -9,6 +10,7 @@ import {
 import { useAuthStore } from "@/stores/authStore";
 import { useAINoteActions } from "@/hooks/useAINoteActions";
 import { useUpdateNote } from "@/hooks/useNotesMutations";
+import { RAGQueryModal } from "@/components/ai/RAGQueryModal";
 import type { INote, IFlashcard } from "@/types/note";
 
 function friendlyAiError(raw: string | null): string | null {
@@ -22,7 +24,8 @@ function friendlyAiError(raw: string | null): string | null {
 const TOKEN_COSTS = {
     summarize: 2,
     autoTag: 1,
-    flashcards: 5,
+    flashcards: 3,
+    ragQuery: 4,
 } as const;
 
 function formatFlashcardsAsMarkdown(cards: IFlashcard[]): string {
@@ -51,6 +54,7 @@ export function AIAssistantModal({
     const tokenBalance = user?.tokenBalance ?? 0;
     const { summarize, autoTag, flashcards } = useAINoteActions(note.id);
     const updateNote = useUpdateNote();
+    const [isKnowledgeQAOpen, setIsKnowledgeQAOpen] = useState(false);
 
     const handleInsertSummary = () => {
         // note.summary is guaranteed non-null here; button only renders when summary exists
@@ -83,39 +87,51 @@ export function AIAssistantModal({
     const isTagsPending = autoTag.isPending || updateNote.isPending;
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="flex max-h-[90vh] flex-col gap-4 overflow-y-auto">
-                <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
-                        <Sparkles className="text-primary size-5" />
-                        AI Assistant
-                    </DialogTitle>
-                </DialogHeader>
+        <>
+            <Dialog open={open} onOpenChange={onOpenChange}>
+                <DialogContent className="flex max-h-[90vh] flex-col gap-4 overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <Sparkles className="text-primary size-5" />
+                            AI Assistant
+                        </DialogTitle>
+                    </DialogHeader>
 
-                <SummaryCard
-                    summary={note.summary}
-                    tokenBalance={tokenBalance}
-                    isPending={summarize.isPending}
-                    error={friendlyAiError(summarize.error?.message ?? null)}
-                    onGenerate={() => summarize.mutate()}
-                    onInsert={handleInsertSummary}
-                />
-                <SuggestedTagsCard
-                    note={note}
-                    tokenBalance={tokenBalance}
-                    isPending={isTagsPending}
-                    error={friendlyAiError(autoTag.error?.message ?? null)}
-                    onGenerate={handleGenerateTags}
-                />
-                <GenerateFlashcardsCard
-                    hasFlashcards={!!note.flashcards?.length}
-                    tokenBalance={tokenBalance}
-                    isPending={flashcards.isPending}
-                    error={friendlyAiError(flashcards.error?.message ?? null)}
-                    onGenerate={handleGenerateFlashcards}
-                />
-            </DialogContent>
-        </Dialog>
+                    <SummaryCard
+                        summary={note.summary}
+                        tokenBalance={tokenBalance}
+                        isPending={summarize.isPending}
+                        error={friendlyAiError(summarize.error?.message ?? null)}
+                        onGenerate={() => summarize.mutate()}
+                        onInsert={handleInsertSummary}
+                    />
+                    <SuggestedTagsCard
+                        note={note}
+                        tokenBalance={tokenBalance}
+                        isPending={isTagsPending}
+                        error={friendlyAiError(autoTag.error?.message ?? null)}
+                        onGenerate={handleGenerateTags}
+                    />
+                    <GenerateFlashcardsCard
+                        hasFlashcards={!!note.flashcards?.length}
+                        tokenBalance={tokenBalance}
+                        isPending={flashcards.isPending}
+                        error={friendlyAiError(flashcards.error?.message ?? null)}
+                        onGenerate={handleGenerateFlashcards}
+                    />
+                    <KnowledgeQACard
+                        tokenBalance={tokenBalance}
+                        onOpen={() => setIsKnowledgeQAOpen(true)}
+                    />
+                </DialogContent>
+            </Dialog>
+
+            <RAGQueryModal
+                noteId={note.id}
+                open={isKnowledgeQAOpen}
+                onOpenChange={setIsKnowledgeQAOpen}
+            />
+        </>
     );
 }
 
@@ -131,16 +147,19 @@ function CardAction({
     children,
     onClick,
     disabled,
+    "data-testid": testId,
 }: {
     children: React.ReactNode;
     onClick?: () => void;
     disabled?: boolean;
+    "data-testid"?: string;
 }) {
     return (
         <button
             type="button"
             onClick={onClick}
             disabled={disabled}
+            data-testid={testId}
             className="bg-primary text-primary-foreground hover:bg-primary/90 w-full rounded-lg px-4 py-2.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
         >
             {children}
@@ -277,7 +296,10 @@ function GenerateFlashcardsCard({
     const label = hasFlashcards ? "Regenerate" : "Generate";
 
     return (
-        <div className="bg-muted flex flex-col items-center gap-3 rounded-xl p-4">
+        <div
+            className="bg-muted flex flex-col items-center gap-3 rounded-xl p-4"
+            data-testid="flashcards-card"
+        >
             <div className="bg-secondary rounded-full p-3">
                 <Layers className="text-foreground size-6" />
             </div>
@@ -300,6 +322,35 @@ function GenerateFlashcardsCard({
                 )}
             </CardAction>
             {error && <p className="text-error text-xs">{error}</p>}
+        </div>
+    );
+}
+
+interface IKnowledgeQACardProps {
+    tokenBalance: number;
+    onOpen: () => void;
+}
+
+function KnowledgeQACard({ tokenBalance, onOpen }: IKnowledgeQACardProps) {
+    const canAfford = tokenBalance >= TOKEN_COSTS.ragQuery;
+
+    return (
+        <div
+            className="bg-muted flex flex-col items-center gap-3 rounded-xl p-4"
+            data-testid="knowledge-qa-card"
+        >
+            <div className="bg-secondary rounded-full p-3">
+                <Brain className="text-foreground size-6" />
+            </div>
+            <span className="text-foreground text-sm font-bold">Knowledge Q&A</span>
+            <p className="text-muted-foreground text-center text-sm">
+                Ask questions and get answers sourced from all your notes.
+            </p>
+            <CardAction onClick={onOpen} disabled={!canAfford}>
+                {canAfford
+                    ? `Ask a Question (${TOKEN_COSTS.ragQuery} tokens)`
+                    : "Not enough tokens"}
+            </CardAction>
         </div>
     );
 }
