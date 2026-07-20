@@ -32,13 +32,13 @@ jobs:
           echo "service_name=${SERVICE_NAME}" >> $GITHUB_OUTPUT
 
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v3
         with:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
 
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+        uses: google-github-actions/setup-gcloud@v3
 
       - name: Get preview service URL
         id: preview-url
@@ -83,7 +83,7 @@ jobs:
             --quiet || echo "Service not found or already deleted"
 
       - name: Comment PR with cleanup status
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             const prNumber = context.payload.pull_request.number;
