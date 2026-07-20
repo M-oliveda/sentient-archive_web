@@ -1,0 +1,136 @@
+import { render, screen, fireEvent } from "@testing-library/react";
+import { AIFeaturesPage } from "@/pages/dashboard/AIFeaturesPage";
+import { useAuthStore } from "@/stores/authStore";
+import { useTokenBalance } from "@/hooks/useTokenBalance";
+
+jest.mock("@/stores/authStore");
+jest.mock("@/hooks/useTokenBalance");
+jest.mock("@tanstack/react-router", () => ({
+    Link: ({
+        to,
+        children,
+        className,
+        "data-testid": testId,
+    }: {
+        to: string;
+        children: React.ReactNode;
+        className?: string;
+        "data-testid"?: string;
+    }) => (
+        <a href={to} className={className} data-testid={testId}>
+            {children}
+        </a>
+    ),
+}));
+jest.mock("@/components/tokens/RequestTokensModal", () => ({
+    RequestTokensModal: ({
+        open,
+        onOpenChange,
+    }: {
+        open: boolean;
+        onOpenChange: (v: boolean) => void;
+    }) => (
+        <div data-testid="request-tokens-modal" data-open={open}>
+            <button onClick={() => onOpenChange(false)}>Close</button>
+        </div>
+    ),
+}));
+
+const mockUser = {
+    uid: "user-1",
+    email: "test@example.com",
+    displayName: "Test User",
+    photoURL: null,
+    role: "client" as const,
+    isActive: true,
+    tokenBalance: 450,
+};
+
+describe("AIFeaturesPage", () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        (useAuthStore as unknown as jest.Mock).mockReturnValue({ user: mockUser });
+        (useTokenBalance as jest.Mock).mockReturnValue({
+            data: undefined,
+            isLoading: false,
+            isError: false,
+        });
+    });
+
+    it("renders the hero badge and heading", () => {
+        render(<AIFeaturesPage />);
+        expect(screen.getByText("AI Features Hub")).toBeInTheDocument();
+        expect(screen.getByText("Supercharge Your Knowledge")).toBeInTheDocument();
+    });
+
+    it("falls back to the auth store balance when hook has no data yet", () => {
+        render(<AIFeaturesPage />);
+        expect(screen.getByText(/450/)).toBeInTheDocument();
+    });
+
+    it("prefers live balance from the hook over the stale store value", () => {
+        (useTokenBalance as jest.Mock).mockReturnValue({
+            data: { balance: 999, totalGranted: 1000, totalSpent: 1 },
+            isLoading: false,
+            isError: false,
+        });
+
+        render(<AIFeaturesPage />);
+
+        expect(screen.getByText(/999/)).toBeInTheDocument();
+        expect(screen.queryByText(/450/)).not.toBeInTheDocument();
+    });
+
+    it("renders 0 as balance when user is null and hook has no data", () => {
+        (useAuthStore as unknown as jest.Mock).mockReturnValue({ user: null });
+        render(<AIFeaturesPage />);
+        expect(screen.getByText("Available Balance")).toBeInTheDocument();
+        expect(screen.queryByText(/450/)).not.toBeInTheDocument();
+    });
+
+    it("renders all 4 AI feature cards", () => {
+        render(<AIFeaturesPage />);
+        expect(
+            screen.getByTestId("feature-card-Smart Summarization"),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByTestId("feature-card-Semantic Auto-Tagging"),
+        ).toBeInTheDocument();
+        expect(screen.getByTestId("feature-card-Flash Generator")).toBeInTheDocument();
+        expect(screen.getByTestId("feature-card-Knowledge Q&A")).toBeInTheDocument();
+    });
+
+    it("renders token cost on each feature card", () => {
+        render(<AIFeaturesPage />);
+        expect(screen.getByText("2 tokens")).toBeInTheDocument();
+        expect(screen.getByText("1 token")).toBeInTheDocument();
+        expect(screen.getByText("3 tokens")).toBeInTheDocument();
+        expect(screen.getByText("4 tokens")).toBeInTheDocument();
+    });
+
+    it("renders How Tokens Work section with 3 steps", () => {
+        render(<AIFeaturesPage />);
+        expect(screen.getByText("How Tokens Work")).toBeInTheDocument();
+        expect(screen.getByText(/1. Select a Feature/)).toBeInTheDocument();
+        expect(screen.getByText(/2. Spend Tokens/)).toBeInTheDocument();
+        expect(screen.getByText(/3. Get Insights/)).toBeInTheDocument();
+    });
+
+    it("Top Up Tokens button opens RequestTokensModal", () => {
+        render(<AIFeaturesPage />);
+        const modal = screen.getByTestId("request-tokens-modal");
+        expect(modal).toHaveAttribute("data-open", "false");
+
+        fireEvent.click(screen.getByTestId("top-up-tokens-button"));
+
+        expect(modal).toHaveAttribute("data-open", "true");
+    });
+
+    it("feature cards link to /notes", () => {
+        render(<AIFeaturesPage />);
+        const cards = screen.getAllByRole("link");
+        cards.forEach((card) => {
+            expect(card).toHaveAttribute("href", "/notes");
+        });
+    });
+});

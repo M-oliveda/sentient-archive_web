@@ -61,7 +61,7 @@ export function DashboardSidebar({
             <div className="space-y-4 px-2 md:px-4">
                 {showTokenWidget && user && (
                     <div className="hidden md:block">
-                        <TokenWidget balance={user.tokenBalance} />
+                        <TokenWidget balance={user.tokenBalance ?? 0} />
                     </div>
                 )}
                 <button

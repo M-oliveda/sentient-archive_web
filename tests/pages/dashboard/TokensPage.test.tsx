@@ -1,0 +1,89 @@
+import { render, screen, fireEvent } from "@testing-library/react";
+import { TokensPage } from "@/pages/dashboard/TokensPage";
+import { useAuthStore } from "@/stores/authStore";
+
+jest.mock("@/stores/authStore");
+jest.mock("@/components/tokens/TokenBalance", () => ({
+    TokenBalance: ({ balance }: { balance: number }) => (
+        <div data-testid="token-balance">{balance}</div>
+    ),
+}));
+jest.mock("@/components/tokens/TransactionHistory", () => ({
+    TransactionHistory: () => <div data-testid="transaction-history" />,
+}));
+jest.mock("@/components/tokens/PendingRequests", () => ({
+    PendingRequests: () => <div data-testid="pending-requests" />,
+}));
+jest.mock("@/components/tokens/RequestTokensModal", () => ({
+    RequestTokensModal: ({
+        open,
+        onOpenChange,
+    }: {
+        open: boolean;
+        onOpenChange: (v: boolean) => void;
+    }) => (
+        <div data-testid="request-tokens-modal" data-open={open}>
+            <button onClick={() => onOpenChange(false)}>Close</button>
+        </div>
+    ),
+}));
+
+const mockUser = {
+    uid: "user-1",
+    email: "test@example.com",
+    displayName: "Test User",
+    photoURL: null,
+    role: "client" as const,
+    isActive: true,
+    tokenBalance: 750,
+};
+
+describe("TokensPage", () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        (useAuthStore as unknown as jest.Mock).mockReturnValue({ user: mockUser });
+    });
+
+    it("renders the page header", () => {
+        render(<TokensPage />);
+        expect(screen.getByText("Token Balance")).toBeInTheDocument();
+        expect(screen.getByText("Token Management")).toBeInTheDocument();
+    });
+
+    it("renders the Request More Tokens button", () => {
+        render(<TokensPage />);
+        expect(screen.getByTestId("request-tokens-button")).toBeInTheDocument();
+    });
+
+    it("clicking Request More Tokens opens the modal", () => {
+        render(<TokensPage />);
+        const modal = screen.getByTestId("request-tokens-modal");
+        expect(modal).toHaveAttribute("data-open", "false");
+
+        fireEvent.click(screen.getByTestId("request-tokens-button"));
+
+        expect(modal).toHaveAttribute("data-open", "true");
+    });
+
+    it("renders TokenBalance with the user's token balance", () => {
+        render(<TokensPage />);
+        expect(screen.getByTestId("token-balance")).toHaveTextContent("750");
+    });
+
+    it("renders TokenBalance with 0 when user is null", () => {
+        (useAuthStore as unknown as jest.Mock).mockReturnValue({ user: null });
+        render(<TokensPage />);
+        expect(screen.getByTestId("token-balance")).toHaveTextContent("0");
+    });
+
+    it("renders Transaction History section", () => {
+        render(<TokensPage />);
+        expect(screen.getByText("Transaction History")).toBeInTheDocument();
+        expect(screen.getByTestId("transaction-history")).toBeInTheDocument();
+    });
+
+    it("renders the PendingRequests component", () => {
+        render(<TokensPage />);
+        expect(screen.getByTestId("pending-requests")).toBeInTheDocument();
+    });
+});

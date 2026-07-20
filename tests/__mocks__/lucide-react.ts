@@ -81,3 +81,16 @@ export const ListOrdered = svg;
 export const Link = svg;
 export const Quote = svg;
 export const Code = svg;
+
+// AI Features page icons
+export const MessageSquare = svg;
+export const HandCoins = svg;
+export const Zap = svg;
+export const Lightbulb = svg;
+
+// RAGQueryModal icons
+export const Send = svg;
+
+// Token / alert icons
+export const TriangleAlert = svg;
+export const CheckCircle = svg;

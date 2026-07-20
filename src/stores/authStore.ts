@@ -7,6 +7,7 @@ interface IAuthState {
     isAuthenticated: boolean;
     setUser: (user: User | null) => void;
     setLoading: (isLoading: boolean) => void;
+    setTokenBalance: (balance: number) => void;
     logout: () => void;
 }
 
@@ -23,6 +24,11 @@ export const useAuthStore = create<IAuthState>((set) => ({
         }),
 
     setLoading: (isLoading) => set({ isLoading }),
+
+    setTokenBalance: (balance) =>
+        set((state) => ({
+            user: state.user ? { ...state.user, tokenBalance: balance } : null,
+        })),
 
     logout: () =>
         set({

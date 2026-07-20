@@ -9,16 +9,23 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from "./routes/__root";
+import { Route as TokensRouteImport } from "./routes/tokens";
 import { Route as TermsAndPrivacyRouteImport } from "./routes/terms-and-privacy";
 import { Route as SignupRouteImport } from "./routes/signup";
 import { Route as NotesRouteImport } from "./routes/notes";
 import { Route as LoginRouteImport } from "./routes/login";
 import { Route as ForgotPasswordRouteImport } from "./routes/forgot-password";
 import { Route as DashboardRouteImport } from "./routes/dashboard";
+import { Route as AiFeaturesRouteImport } from "./routes/ai-features";
 import { Route as IndexRouteImport } from "./routes/index";
 import { Route as NotesIndexRouteImport } from "./routes/notes.index";
 import { Route as NotesNoteIdRouteImport } from "./routes/notes.$noteId";
 
+const TokensRoute = TokensRouteImport.update({
+    id: "/tokens",
+    path: "/tokens",
+    getParentRoute: () => rootRouteImport,
+} as any);
 const TermsAndPrivacyRoute = TermsAndPrivacyRouteImport.update({
     id: "/terms-and-privacy",
     path: "/terms-and-privacy",
@@ -49,6 +56,11 @@ const DashboardRoute = DashboardRouteImport.update({
     path: "/dashboard",
     getParentRoute: () => rootRouteImport,
 } as any);
+const AiFeaturesRoute = AiFeaturesRouteImport.update({
+    id: "/ai-features",
+    path: "/ai-features",
+    getParentRoute: () => rootRouteImport,
+} as any);
 const IndexRoute = IndexRouteImport.update({
     id: "/",
     path: "/",
@@ -67,34 +79,40 @@ const NotesNoteIdRoute = NotesNoteIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
     "/": typeof IndexRoute;
+    "/ai-features": typeof AiFeaturesRoute;
     "/dashboard": typeof DashboardRoute;
     "/forgot-password": typeof ForgotPasswordRoute;
     "/login": typeof LoginRoute;
     "/notes": typeof NotesRouteWithChildren;
     "/signup": typeof SignupRoute;
     "/terms-and-privacy": typeof TermsAndPrivacyRoute;
+    "/tokens": typeof TokensRoute;
     "/notes/$noteId": typeof NotesNoteIdRoute;
     "/notes/": typeof NotesIndexRoute;
 }
 export interface FileRoutesByTo {
     "/": typeof IndexRoute;
+    "/ai-features": typeof AiFeaturesRoute;
     "/dashboard": typeof DashboardRoute;
     "/forgot-password": typeof ForgotPasswordRoute;
     "/login": typeof LoginRoute;
     "/signup": typeof SignupRoute;
     "/terms-and-privacy": typeof TermsAndPrivacyRoute;
+    "/tokens": typeof TokensRoute;
     "/notes/$noteId": typeof NotesNoteIdRoute;
     "/notes": typeof NotesIndexRoute;
 }
 export interface FileRoutesById {
     __root__: typeof rootRouteImport;
     "/": typeof IndexRoute;
+    "/ai-features": typeof AiFeaturesRoute;
     "/dashboard": typeof DashboardRoute;
     "/forgot-password": typeof ForgotPasswordRoute;
     "/login": typeof LoginRoute;
     "/notes": typeof NotesRouteWithChildren;
     "/signup": typeof SignupRoute;
     "/terms-and-privacy": typeof TermsAndPrivacyRoute;
+    "/tokens": typeof TokensRoute;
     "/notes/$noteId": typeof NotesNoteIdRoute;
     "/notes/": typeof NotesIndexRoute;
 }
@@ -102,49 +120,64 @@ export interface FileRouteTypes {
     fileRoutesByFullPath: FileRoutesByFullPath;
     fullPaths:
         | "/"
+        | "/ai-features"
         | "/dashboard"
         | "/forgot-password"
         | "/login"
         | "/notes"
         | "/signup"
         | "/terms-and-privacy"
+        | "/tokens"
         | "/notes/$noteId"
         | "/notes/";
     fileRoutesByTo: FileRoutesByTo;
     to:
         | "/"
+        | "/ai-features"
         | "/dashboard"
         | "/forgot-password"
         | "/login"
         | "/signup"
         | "/terms-and-privacy"
+        | "/tokens"
         | "/notes/$noteId"
         | "/notes";
     id:
         | "__root__"
         | "/"
+        | "/ai-features"
         | "/dashboard"
         | "/forgot-password"
         | "/login"
         | "/notes"
         | "/signup"
         | "/terms-and-privacy"
+        | "/tokens"
         | "/notes/$noteId"
         | "/notes/";
     fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
     IndexRoute: typeof IndexRoute;
+    AiFeaturesRoute: typeof AiFeaturesRoute;
     DashboardRoute: typeof DashboardRoute;
     ForgotPasswordRoute: typeof ForgotPasswordRoute;
     LoginRoute: typeof LoginRoute;
     NotesRoute: typeof NotesRouteWithChildren;
     SignupRoute: typeof SignupRoute;
     TermsAndPrivacyRoute: typeof TermsAndPrivacyRoute;
+    TokensRoute: typeof TokensRoute;
 }
 
 declare module "@tanstack/react-router" {
     interface FileRoutesByPath {
+        "/tokens": {
+            id: "/tokens";
+            path: "/tokens";
+            fullPath: "/tokens";
+            preLoaderRoute: typeof TokensRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
         "/terms-and-privacy": {
             id: "/terms-and-privacy";
             path: "/terms-and-privacy";
@@ -187,6 +220,13 @@ declare module "@tanstack/react-router" {
             preLoaderRoute: typeof DashboardRouteImport;
             parentRoute: typeof rootRouteImport;
         };
+        "/ai-features": {
+            id: "/ai-features";
+            path: "/ai-features";
+            fullPath: "/ai-features";
+            preLoaderRoute: typeof AiFeaturesRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
         "/": {
             id: "/";
             path: "/";
@@ -225,12 +265,14 @@ const NotesRouteWithChildren = NotesRoute._addFileChildren(NotesRouteChildren);
 
 const rootRouteChildren: RootRouteChildren = {
     IndexRoute: IndexRoute,
+    AiFeaturesRoute: AiFeaturesRoute,
     DashboardRoute: DashboardRoute,
     ForgotPasswordRoute: ForgotPasswordRoute,
     LoginRoute: LoginRoute,
     NotesRoute: NotesRouteWithChildren,
     SignupRoute: SignupRoute,
     TermsAndPrivacyRoute: TermsAndPrivacyRoute,
+    TokensRoute: TokensRoute,
 };
 export const routeTree = rootRouteImport
     ._addFileChildren(rootRouteChildren)

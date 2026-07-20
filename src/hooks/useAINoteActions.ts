@@ -9,6 +9,7 @@ export interface ISummarizeData {
     summary: string;
     tokensUsed: number;
     tokenCost: number;
+    balanceAfter: number;
 }
 
 export interface IAutoTagData {
@@ -16,6 +17,7 @@ export interface IAutoTagData {
     tags: string[];
     tokensUsed: number;
     tokenCost: number;
+    balanceAfter: number;
 }
 
 export interface IFlashcardsData {
@@ -23,6 +25,14 @@ export interface IFlashcardsData {
     flashcards: IFlashcard[];
     tokensUsed: number;
     tokenCost: number;
+    balanceAfter: number;
+}
+
+export interface IRagQueryData {
+    answer: string;
+    tokensUsed: number;
+    tokenCost: number;
+    balanceAfter: number;
 }
 
 export function useAINoteActions(noteId: string) {
@@ -35,7 +45,9 @@ export function useAINoteActions(noteId: string) {
                 method: "POST",
                 body: JSON.stringify({ noteId }),
             }),
-        onSuccess: () => {
+        onSuccess: (data) => {
+            useAuthStore.getState().setTokenBalance(data.data.balanceAfter);
+            queryClient.invalidateQueries({ queryKey: ["tokens", "balance"] });
             queryClient.invalidateQueries({
                 queryKey: ["notes", "detail", user!.uid, noteId],
             });
@@ -48,7 +60,9 @@ export function useAINoteActions(noteId: string) {
                 method: "POST",
                 body: JSON.stringify({ noteId }),
             }),
-        onSuccess: () => {
+        onSuccess: (data) => {
+            useAuthStore.getState().setTokenBalance(data.data.balanceAfter);
+            queryClient.invalidateQueries({ queryKey: ["tokens", "balance"] });
             queryClient.invalidateQueries({
                 queryKey: ["notes", "detail", user!.uid, noteId],
             });
@@ -61,12 +75,26 @@ export function useAINoteActions(noteId: string) {
                 method: "POST",
                 body: JSON.stringify({ noteId }),
             }),
-        onSuccess: () => {
+        onSuccess: (data) => {
+            useAuthStore.getState().setTokenBalance(data.data.balanceAfter);
+            queryClient.invalidateQueries({ queryKey: ["tokens", "balance"] });
             queryClient.invalidateQueries({
                 queryKey: ["notes", "detail", user!.uid, noteId],
             });
         },
     });
 
-    return { summarize, autoTag, flashcards };
+    const ragQuery = useMutation({
+        mutationFn: (question: string) =>
+            apiRequest<IApiResponse<IRagQueryData>>("/v1/ai/ragQuery", {
+                method: "POST",
+                body: JSON.stringify({ query: question }),
+            }),
+        onSuccess: (data) => {
+            useAuthStore.getState().setTokenBalance(data.data.balanceAfter);
+            queryClient.invalidateQueries({ queryKey: ["tokens", "balance"] });
+        },
+    });
+
+    return { summarize, autoTag, flashcards, ragQuery };
 }

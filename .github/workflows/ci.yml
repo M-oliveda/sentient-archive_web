@@ -1,7 +1,8 @@
 # CI Workflow
 #
-# Runs on all pull requests to develop, release/** and main branches
-# Validates code quality, runs tests, and checks coverage
+# Runs only on pull requests targeting develop, release/**, or main.
+# Does not run on push (e.g. merges into develop) — those use deploy-dev / other deploy workflows.
+# After tests pass, deploys a PR preview via the reusable Deploy to Preview workflow.
 
 name: CI
 
@@ -19,7 +20,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: "24"
           cache: "npm"
@@ -56,5 +57,19 @@ jobs:
             exit 1
           fi
 
-      - name: Upload coverage
-        uses: codecov/codecov-action@v4
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-report
+          path: coverage/
+          if-no-files-found: error
+          retention-days: 7
+
+  deploy-preview:
+    needs: test
+    uses: ./.github/workflows/deploy-preview.yml
+    secrets: inherit
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
