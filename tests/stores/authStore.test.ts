@@ -62,4 +62,29 @@ describe("authStore", () => {
         const state = useAuthStore.getState();
         expect(state.isLoading).toBe(false);
     });
+
+    it("should update tokenBalance when user is set", () => {
+        const mockUser: User = {
+            uid: "test-uid",
+            email: "test@example.com",
+            displayName: "Test User",
+            photoURL: null,
+            role: "client",
+            isActive: true,
+            tokenBalance: 100,
+        };
+
+        useAuthStore.getState().setUser(mockUser);
+        useAuthStore.getState().setTokenBalance(250);
+
+        const state = useAuthStore.getState();
+        expect(state.user?.tokenBalance).toBe(250);
+    });
+
+    it("should not change user to non-null when setTokenBalance called with no user", () => {
+        useAuthStore.getState().setTokenBalance(999);
+
+        const state = useAuthStore.getState();
+        expect(state.user).toBeNull();
+    });
 });
