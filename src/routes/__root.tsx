@@ -1,4 +1,5 @@
 import { createRootRoute, Outlet } from "@tanstack/react-router";
+import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -17,6 +18,7 @@ function RootComponent() {
             disableTransitionOnChange
         >
             <Outlet />
+            <Toaster richColors position="top-center" />
         </ThemeProvider>
     );
 }
