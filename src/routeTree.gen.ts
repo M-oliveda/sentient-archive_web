@@ -12,11 +12,13 @@ import { Route as rootRouteImport } from "./routes/__root";
 import { Route as TokensRouteImport } from "./routes/tokens";
 import { Route as TermsAndPrivacyRouteImport } from "./routes/terms-and-privacy";
 import { Route as SignupRouteImport } from "./routes/signup";
+import { Route as SettingsRouteImport } from "./routes/settings";
 import { Route as NotesRouteImport } from "./routes/notes";
 import { Route as LoginRouteImport } from "./routes/login";
 import { Route as ForgotPasswordRouteImport } from "./routes/forgot-password";
 import { Route as DashboardRouteImport } from "./routes/dashboard";
 import { Route as AiFeaturesRouteImport } from "./routes/ai-features";
+import { Route as ActivityRouteImport } from "./routes/activity";
 import { Route as IndexRouteImport } from "./routes/index";
 import { Route as NotesIndexRouteImport } from "./routes/notes.index";
 import { Route as NotesNoteIdRouteImport } from "./routes/notes.$noteId";
@@ -34,6 +36,11 @@ const TermsAndPrivacyRoute = TermsAndPrivacyRouteImport.update({
 const SignupRoute = SignupRouteImport.update({
     id: "/signup",
     path: "/signup",
+    getParentRoute: () => rootRouteImport,
+} as any);
+const SettingsRoute = SettingsRouteImport.update({
+    id: "/settings",
+    path: "/settings",
     getParentRoute: () => rootRouteImport,
 } as any);
 const NotesRoute = NotesRouteImport.update({
@@ -61,6 +68,11 @@ const AiFeaturesRoute = AiFeaturesRouteImport.update({
     path: "/ai-features",
     getParentRoute: () => rootRouteImport,
 } as any);
+const ActivityRoute = ActivityRouteImport.update({
+    id: "/activity",
+    path: "/activity",
+    getParentRoute: () => rootRouteImport,
+} as any);
 const IndexRoute = IndexRouteImport.update({
     id: "/",
     path: "/",
@@ -79,11 +91,13 @@ const NotesNoteIdRoute = NotesNoteIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
     "/": typeof IndexRoute;
+    "/activity": typeof ActivityRoute;
     "/ai-features": typeof AiFeaturesRoute;
     "/dashboard": typeof DashboardRoute;
     "/forgot-password": typeof ForgotPasswordRoute;
     "/login": typeof LoginRoute;
     "/notes": typeof NotesRouteWithChildren;
+    "/settings": typeof SettingsRoute;
     "/signup": typeof SignupRoute;
     "/terms-and-privacy": typeof TermsAndPrivacyRoute;
     "/tokens": typeof TokensRoute;
@@ -92,10 +106,12 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
     "/": typeof IndexRoute;
+    "/activity": typeof ActivityRoute;
     "/ai-features": typeof AiFeaturesRoute;
     "/dashboard": typeof DashboardRoute;
     "/forgot-password": typeof ForgotPasswordRoute;
     "/login": typeof LoginRoute;
+    "/settings": typeof SettingsRoute;
     "/signup": typeof SignupRoute;
     "/terms-and-privacy": typeof TermsAndPrivacyRoute;
     "/tokens": typeof TokensRoute;
@@ -105,11 +121,13 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
     __root__: typeof rootRouteImport;
     "/": typeof IndexRoute;
+    "/activity": typeof ActivityRoute;
     "/ai-features": typeof AiFeaturesRoute;
     "/dashboard": typeof DashboardRoute;
     "/forgot-password": typeof ForgotPasswordRoute;
     "/login": typeof LoginRoute;
     "/notes": typeof NotesRouteWithChildren;
+    "/settings": typeof SettingsRoute;
     "/signup": typeof SignupRoute;
     "/terms-and-privacy": typeof TermsAndPrivacyRoute;
     "/tokens": typeof TokensRoute;
@@ -120,11 +138,13 @@ export interface FileRouteTypes {
     fileRoutesByFullPath: FileRoutesByFullPath;
     fullPaths:
         | "/"
+        | "/activity"
         | "/ai-features"
         | "/dashboard"
         | "/forgot-password"
         | "/login"
         | "/notes"
+        | "/settings"
         | "/signup"
         | "/terms-and-privacy"
         | "/tokens"
@@ -133,10 +153,12 @@ export interface FileRouteTypes {
     fileRoutesByTo: FileRoutesByTo;
     to:
         | "/"
+        | "/activity"
         | "/ai-features"
         | "/dashboard"
         | "/forgot-password"
         | "/login"
+        | "/settings"
         | "/signup"
         | "/terms-and-privacy"
         | "/tokens"
@@ -145,11 +167,13 @@ export interface FileRouteTypes {
     id:
         | "__root__"
         | "/"
+        | "/activity"
         | "/ai-features"
         | "/dashboard"
         | "/forgot-password"
         | "/login"
         | "/notes"
+        | "/settings"
         | "/signup"
         | "/terms-and-privacy"
         | "/tokens"
@@ -159,11 +183,13 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
     IndexRoute: typeof IndexRoute;
+    ActivityRoute: typeof ActivityRoute;
     AiFeaturesRoute: typeof AiFeaturesRoute;
     DashboardRoute: typeof DashboardRoute;
     ForgotPasswordRoute: typeof ForgotPasswordRoute;
     LoginRoute: typeof LoginRoute;
     NotesRoute: typeof NotesRouteWithChildren;
+    SettingsRoute: typeof SettingsRoute;
     SignupRoute: typeof SignupRoute;
     TermsAndPrivacyRoute: typeof TermsAndPrivacyRoute;
     TokensRoute: typeof TokensRoute;
@@ -190,6 +216,13 @@ declare module "@tanstack/react-router" {
             path: "/signup";
             fullPath: "/signup";
             preLoaderRoute: typeof SignupRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
+        "/settings": {
+            id: "/settings";
+            path: "/settings";
+            fullPath: "/settings";
+            preLoaderRoute: typeof SettingsRouteImport;
             parentRoute: typeof rootRouteImport;
         };
         "/notes": {
@@ -225,6 +258,13 @@ declare module "@tanstack/react-router" {
             path: "/ai-features";
             fullPath: "/ai-features";
             preLoaderRoute: typeof AiFeaturesRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
+        "/activity": {
+            id: "/activity";
+            path: "/activity";
+            fullPath: "/activity";
+            preLoaderRoute: typeof ActivityRouteImport;
             parentRoute: typeof rootRouteImport;
         };
         "/": {
@@ -265,11 +305,13 @@ const NotesRouteWithChildren = NotesRoute._addFileChildren(NotesRouteChildren);
 
 const rootRouteChildren: RootRouteChildren = {
     IndexRoute: IndexRoute,
+    ActivityRoute: ActivityRoute,
     AiFeaturesRoute: AiFeaturesRoute,
     DashboardRoute: DashboardRoute,
     ForgotPasswordRoute: ForgotPasswordRoute,
     LoginRoute: LoginRoute,
     NotesRoute: NotesRouteWithChildren,
+    SettingsRoute: SettingsRoute,
     SignupRoute: SignupRoute,
     TermsAndPrivacyRoute: TermsAndPrivacyRoute,
     TokensRoute: TokensRoute,

@@ -29,6 +29,7 @@ export const Users = svg;
 export const Coins = svg;
 export const Power = svg;
 export const Clock = svg;
+export const Pencil = svg;
 
 // Dashboard home icons
 export const FilePlus = svg;

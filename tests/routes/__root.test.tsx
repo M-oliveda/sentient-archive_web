@@ -6,6 +6,10 @@ jest.mock("@/hooks/useAuth", () => ({
     useAuth: jest.fn(),
 }));
 
+jest.mock("sonner", () => ({
+    Toaster: () => <div data-testid="toaster" />,
+}));
+
 jest.mock("@tanstack/react-router", () => ({
     createRootRoute: (options: { component: React.ComponentType }) => ({
         options,
@@ -18,5 +22,6 @@ describe("__root route", () => {
         renderRouteComponent(Route.options.component);
 
         expect(screen.getByTestId("outlet")).toBeInTheDocument();
+        expect(screen.getByTestId("toaster")).toBeInTheDocument();
     });
 });

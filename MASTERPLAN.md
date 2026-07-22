@@ -96,6 +96,16 @@ features.
    - Threshold warnings
    - Request tokens modal
 
+5. **Activity Log**
+   - Summary stats (actions today, AI ops this week, total actions)
+   - Filter chips and search over activity entries
+   - Date-grouped timeline of AI, token, note, and folder actions
+
+6. **Settings**
+   - Profile card with avatar and editable display name
+   - Email shown as username (read-only)
+   - Save profile changes via Cloud Functions API
+
 #### For Admins
 
 1. **User Management**
@@ -258,10 +268,19 @@ sentient-archive_web/
 │   │   │   ├── ActivityLogs.tsx
 │   │   │   └── SystemConfigForm.tsx
 │   │   │
-│   │   └── tokens/
-│   │       ├── TokenBalance.tsx
-│   │       ├── TransactionHistory.tsx
-│   │       └── RequestTokensModal.tsx
+│   │   ├── tokens/
+│   │   │   ├── TokenBalance.tsx
+│   │   │   ├── TransactionHistory.tsx
+│   │   │   └── RequestTokensModal.tsx
+│   │   │
+│   │   ├── activity/
+│   │   │   ├── ActivityStatsCards.tsx
+│   │   │   ├── ActivityFilterBar.tsx
+│   │   │   ├── ActivityTimeline.tsx
+│   │   │   └── ActivityTimelineItem.tsx
+│   │   │
+│   │   └── settings/
+│   │       └── ProfileSettingsCard.tsx
 │   │
 │   ├── pages/
 │   │   ├── auth/
@@ -271,6 +290,8 @@ sentient-archive_web/
 │   │   ├── dashboard/
 │   │   │   ├── DashboardHome.tsx
 │   │   │   ├── NotesPage.tsx
+│   │   │   ├── ActivityPage.tsx
+│   │   │   ├── SettingsPage.tsx
 │   │   │   └── AdminPage.tsx
 │   │   │
 │   │   └── 404.tsx
@@ -284,7 +305,9 @@ sentient-archive_web/
 │   │   ├── useAuth.ts
 │   │   ├── useNotes.ts
 │   │   ├── useTokens.ts
-│   │   └── useAI.ts
+│   │   ├── useAI.ts
+│   │   ├── useActivity.ts
+│   │   └── useUpdateProfile.ts
 │   │
 │   ├── stores/
 │   │   ├── authStore.ts             # Zustand store
@@ -294,6 +317,7 @@ sentient-archive_web/
 │   │   ├── note.ts
 │   │   ├── user.ts
 │   │   ├── transaction.ts
+│   │   ├── activity.ts
 │   │   └── api.ts
 │   │
 │   ├── locales/
@@ -303,7 +327,9 @@ sentient-archive_web/
 │   │       └── translation.json
 │   │
 │   ├── routes/
-│   │   └── __root.tsx               # TanStack Router root
+│   │   ├── __root.tsx               # TanStack Router root
+│   │   ├── activity.tsx
+│   │   └── settings.tsx
 │   │
 │   ├── App.tsx
 │   ├── main.tsx
@@ -2540,7 +2566,58 @@ secrets.
 - [x] Create token-related hooks
 - [x] Test token displays and updates
 
-### Phase 7: Admin Dashboard (Week 6)
+### Phase 7: Client Activity and Settings Page (Week 6)
+
+Build the client Activity Log (`/activity`) and Settings (`/settings`) pages to match
+the Figma designs (mobile + desktop).
+
+**Out of scope for Phase 7:** billing UI; theme / language / notifications preferences
+UI (Phase 9 / later); admin system-wide ActivityLogs viewer (Phase 8).
+
+**Backend (functions repo):** `PUT /v1/users/me`, `GET /v1/activity`, and
+`GET /v1/activity/stats` implemented on branch
+`feature/phase7-activity-and-settings-api`.
+
+#### Activity Log page (`/activity`)
+
+- [x] Create `src/routes/activity.tsx` (ProtectedRoute + DashboardLayout)
+- [x] Create `src/pages/dashboard/ActivityPage.tsx` — title “Activity Log”, subtitle:
+      “Track all your actions, AI operations, and token usage history.”
+- [x] Build `ActivityStatsCards` — Actions today (+% delta), AI Ops This Week (+%
+      delta), Total Actions (responsive: 2+1 mobile, 3-col desktop)
+- [x] Build `ActivityFilterBar` — chips: All / AI Ops / Tokens / Notes / Folders +
+      “Search logs...” input
+- [x] Build `ActivityTimeline` — date group headers (`TODAY, OCT 24` style) + vertical
+      timeline
+- [x] Build `ActivityTimelineItem` — type icon + title + description card
+- [x] Add activity types / icons mapping (AI / tokens / notes / folders)
+- [x] Create `src/types/activity.ts`
+- [x] Create `src/hooks/useActivity.ts` (TanStack Query) against client activity API
+- [x] Wire filters + search (prefer URL search params if notes pattern fits)
+- [x] Coordinate / consume functions endpoint(s) for feed + stats (expected contract:
+      category filter, search, pagination, percentage deltas for today / this week)
+- [x] Add loading / empty / error states
+- [x] Write tests for ActivityPage, ActivityStatsCards, ActivityFilterBar, and timeline
+      items
+- [x] Verify mobile / desktop layout against Figma
+
+#### Settings page (`/settings`)
+
+- [x] Create `src/routes/settings.tsx` (ProtectedRoute + DashboardLayout)
+- [x] Create `src/pages/dashboard/SettingsPage.tsx` — title “Settings”, subtitle:
+      “Manage your account settings, preferences, and billing.”
+- [x] Build `ProfileSettingsCard` — avatar, Full Name (`displayName`), Username field
+      showing email (read-only), Save Changes button
+- [x] Form validation with Zod + React Hook Form (`displayName` required / min length)
+- [x] Create `src/hooks/useUpdateProfile.ts` mutation via `apiRequest`
+- [x] Coordinate / consume functions `PUT /v1/users/me` (or equivalent) to update
+      `displayName` and sync Firebase Auth profile
+- [x] Extend frontend `IUser` if needed once API returns updated profile fields
+- [x] Add success / error toasts or inline feedback after save
+- [x] Write tests for SettingsPage and ProfileSettingsCard
+- [x] Verify mobile / desktop layout against Figma
+
+### Phase 8: Admin Dashboard (Week 7)
 
 - [ ] Create AdminPage layout
 - [ ] Build UserManagementTable
@@ -2552,7 +2629,7 @@ secrets.
 - [ ] Implement RBAC protection
 - [ ] Test admin features
 
-### Phase 8: Internationalization (Week 7)
+### Phase 9: Internationalization (Week 8)
 
 - [ ] Set up i18next
 - [ ] Create translation files (en, es)
@@ -2561,7 +2638,7 @@ secrets.
 - [ ] Test language switching
 - [ ] Verify RTL support (if needed)
 
-### Phase 9: Testing & Polish (Week 8)
+### Phase 10: Testing & Polish (Week 9)
 
 - [ ] Write unit tests (100% coverage)
 - [ ] Write integration tests
@@ -2572,7 +2649,7 @@ secrets.
 - [ ] Improve accessibility (a11y)
 - [ ] Test on multiple browsers
 
-### Phase 10: Documentation & Deployment (Week 9)
+### Phase 11: Documentation & Deployment (Week 10)
 
 - [ ] Complete README.md
 - [ ] Document component API
