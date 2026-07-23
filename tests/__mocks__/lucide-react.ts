@@ -55,6 +55,9 @@ export const Sparkles = svg;
 // PublicNavbar icons
 export const Menu = svg;
 export const ChevronRight = svg;
+export const ChevronRightIcon = svg;
+export const ChevronLeftIcon = svg;
+export const MoreHorizontalIcon = svg;
 
 // Notes components icons
 export const Pin = svg;
@@ -95,3 +98,13 @@ export const Send = svg;
 // Token / alert icons
 export const TriangleAlert = svg;
 export const CheckCircle = svg;
+export const ChevronDown = svg;
+export const ChevronDownIcon = svg;
+
+// Admin dashboard icons
+export const BarChart3 = svg;
+export const TrendingUp = svg;
+export const MoreVertical = svg;
+export const ChevronLeft = svg;
+export const RefreshCw = svg;
+export const Save = svg;
