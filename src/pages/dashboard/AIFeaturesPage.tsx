@@ -18,10 +18,10 @@ import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { RequestTokensModal } from "@/components/tokens/RequestTokensModal";
 
 const TOKEN_COSTS = {
-    summarize: 2,
-    autoTag: 1,
-    flashcards: 3,
-    ragQuery: 4,
+    summarize: 5,
+    autoTag: 3,
+    flashcards: 8,
+    ragQuery: 10,
 } as const;
 
 const AI_FEATURES = [
@@ -150,10 +150,7 @@ export function AIFeaturesPage() {
                                             <feature.icon className="text-brand-50 size-5" />
                                         </div>
                                         <span className="bg-brand-900/30 text-brand-100 rounded-full px-2.5 py-1 text-xs font-semibold">
-                                            {feature.tokenCost}{" "}
-                                            {feature.tokenCost === 1
-                                                ? "token"
-                                                : "tokens"}
+                                            {feature.tokenCost} tokens
                                         </span>
                                     </div>
                                     <div>

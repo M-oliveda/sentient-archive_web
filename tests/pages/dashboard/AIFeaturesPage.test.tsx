@@ -102,10 +102,10 @@ describe("AIFeaturesPage", () => {
 
     it("renders token cost on each feature card", () => {
         render(<AIFeaturesPage />);
-        expect(screen.getByText("2 tokens")).toBeInTheDocument();
-        expect(screen.getByText("1 token")).toBeInTheDocument();
+        expect(screen.getByText("5 tokens")).toBeInTheDocument();
         expect(screen.getByText("3 tokens")).toBeInTheDocument();
-        expect(screen.getByText("4 tokens")).toBeInTheDocument();
+        expect(screen.getByText("8 tokens")).toBeInTheDocument();
+        expect(screen.getByText("10 tokens")).toBeInTheDocument();
     });
 
     it("renders How Tokens Work section with 3 steps", () => {

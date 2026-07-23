@@ -22,10 +22,10 @@ function friendlyAiError(raw: string | null): string | null {
 }
 
 const TOKEN_COSTS = {
-    summarize: 2,
-    autoTag: 1,
-    flashcards: 3,
-    ragQuery: 4,
+    summarize: 5,
+    autoTag: 3,
+    flashcards: 8,
+    ragQuery: 10,
 } as const;
 
 function formatFlashcardsAsMarkdown(cards: IFlashcard[]): string {
@@ -135,7 +135,7 @@ export function AIAssistantModal({
     );
 }
 
-function TokenBadge({ count }: { count: number }) {
+export function TokenBadge({ count }: { count: number }) {
     return (
         <span className="bg-foreground text-background rounded-full px-2.5 py-0.5 text-xs font-medium">
             {count} {count === 1 ? "token" : "tokens"}
