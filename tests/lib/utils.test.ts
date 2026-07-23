@@ -1,4 +1,4 @@
-import { cn, formatTimeAgo } from "@/lib/utils";
+import { cn, formatTimeAgo, formatTokenAmount } from "@/lib/utils";
 
 describe("cn", () => {
     it("merges class names correctly", () => {
@@ -49,5 +49,21 @@ describe("formatTimeAgo", () => {
     it("returns days format for 24 or more hours ago", () => {
         const date = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
         expect(formatTimeAgo(date)).toBe("2d ago");
+    });
+});
+
+describe("formatTokenAmount", () => {
+    it("returns the raw amount for values under 1000", () => {
+        expect(formatTokenAmount(0)).toBe("0 TKN");
+        expect(formatTokenAmount(250)).toBe("250 TKN");
+    });
+
+    it("returns a compact 'k' format for whole thousands", () => {
+        expect(formatTokenAmount(50000)).toBe("50k TKN");
+        expect(formatTokenAmount(1000)).toBe("1k TKN");
+    });
+
+    it("returns a compact 'k' format with one decimal for partial thousands", () => {
+        expect(formatTokenAmount(1500)).toBe("1.5k TKN");
     });
 });

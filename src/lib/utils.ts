@@ -15,3 +15,18 @@ export function formatTimeAgo(date: Date): string {
     const days = Math.floor(hours / 24);
     return `${days}d ago`;
 }
+
+/**
+ * Format a raw token amount into a compact "TKN" display value,
+ * e.g. 50000 -> "50k TKN", 250 -> "250 TKN".
+ */
+export function formatTokenAmount(amount: number): string {
+    if (amount >= 1000) {
+        const rounded = amount / 1000;
+        const compact = Number.isInteger(rounded)
+            ? rounded.toString()
+            : rounded.toFixed(1);
+        return `${compact}k TKN`;
+    }
+    return `${amount} TKN`;
+}
