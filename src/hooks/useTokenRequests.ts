@@ -1,57 +1,114 @@
-import { useQuery } from "@tanstack/react-query";
-import {
-    collection,
-    query,
-    where,
-    orderBy,
-    limit,
-    getDocs,
-    type Timestamp,
-} from "firebase/firestore";
-import { db } from "@/lib/firebase";
-import { useAuthStore } from "@/stores/authStore";
-import type { ITokenRequest } from "@/types/transaction";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/api-client";
+import type { IApiResponse } from "@/types/api";
+import type { ITokenRequest } from "@/types/admin";
 
-function mapDocToRequest(docSnap: {
-    id: string;
-    data: () => Record<string, unknown>;
-}): ITokenRequest {
-    const data = docSnap.data();
-    const toDate = (val: unknown): Date =>
-        val ? (val as Timestamp).toDate() : new Date();
-
-    return {
-        id: docSnap.id,
-        userId: (data.userId as string) ?? "",
-        amount: (data.amount as number) ?? 0,
-        status: (data.status as ITokenRequest["status"]) ?? "pending",
-        createdAt: toDate(data.createdAt),
-        reviewedAt: data.reviewedAt ? toDate(data.reviewedAt) : undefined,
-        reviewedBy: (data.reviewedBy as string | undefined) ?? undefined,
-    };
+export interface TokenRequestsResponse {
+    requests: ITokenRequest[];
+    total: number;
+    limit: number;
+    offset: number;
 }
 
-export { mapDocToRequest };
-
-export async function fetchTokenRequests(userId: string): Promise<ITokenRequest[]> {
-    const requestsRef = collection(db, "tokenRequests");
-    const snapshot = await getDocs(
-        query(
-            requestsRef,
-            where("userId", "==", userId),
-            orderBy("createdAt", "desc"),
-            limit(20),
-        ),
-    );
-    return snapshot.docs.map(mapDocToRequest);
+export interface TokenRequestsQueryParams {
+    limit?: number;
+    offset?: number;
+    status?: "all" | "pending" | "approved" | "rejected";
+    userId?: string;
+    startDate?: string;
+    endDate?: string;
 }
 
-export function useTokenRequests() {
-    const { user } = useAuthStore();
+/**
+ * Fetch token requests for admin review, unwrapping the ApiResponse envelope.
+ */
+export function useTokenRequests(params?: TokenRequestsQueryParams) {
+    const queryParams = new URLSearchParams();
+    if (params?.limit) queryParams.append("limit", params.limit.toString());
+    if (params?.offset !== undefined)
+        queryParams.append("offset", params.offset.toString());
+    if (params?.status) queryParams.append("status", params.status);
+    if (params?.userId) queryParams.append("userId", params.userId);
+    if (params?.startDate) queryParams.append("startDate", params.startDate);
+    if (params?.endDate) queryParams.append("endDate", params.endDate);
 
     return useQuery({
-        queryKey: ["tokens", "requests", user?.uid],
-        queryFn: () => fetchTokenRequests(user!.uid),
-        enabled: !!user?.uid,
+        queryKey: ["token-requests", params],
+        queryFn: async () => {
+            const response = await apiRequest<IApiResponse<TokenRequestsResponse>>(
+                `/v1/admin/token-requests?${queryParams.toString()}`,
+            );
+            return response.data;
+        },
+    });
+}
+
+export interface ApproveTokenRequestPayload {
+    amount?: number;
+    notes?: string;
+}
+
+/**
+ * Approve a token request
+ */
+export function useApproveTokenRequest() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({
+            requestId,
+            payload,
+        }: {
+            requestId: string;
+            payload: ApproveTokenRequestPayload;
+        }) => {
+            const response = await apiRequest<IApiResponse<ITokenRequest>>(
+                `/v1/admin/token-requests/${requestId}/approve`,
+                {
+                    method: "POST",
+                    body: JSON.stringify(payload),
+                },
+            );
+            return response.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["token-requests"] });
+            queryClient.invalidateQueries({ queryKey: ["tokens", "requests"] });
+            queryClient.invalidateQueries({ queryKey: ["tokens", "balance"] });
+        },
+    });
+}
+
+export interface RejectTokenRequestPayload {
+    reason?: string;
+}
+
+/**
+ * Reject a token request
+ */
+export function useRejectTokenRequest() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({
+            requestId,
+            payload,
+        }: {
+            requestId: string;
+            payload: RejectTokenRequestPayload;
+        }) => {
+            const response = await apiRequest<IApiResponse<ITokenRequest>>(
+                `/v1/admin/token-requests/${requestId}/reject`,
+                {
+                    method: "POST",
+                    body: JSON.stringify(payload),
+                },
+            );
+            return response.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["token-requests"] });
+            queryClient.invalidateQueries({ queryKey: ["tokens", "requests"] });
+        },
     });
 }
