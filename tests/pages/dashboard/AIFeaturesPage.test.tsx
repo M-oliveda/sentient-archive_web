@@ -2,9 +2,12 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { AIFeaturesPage } from "@/pages/dashboard/AIFeaturesPage";
 import { useAuthStore } from "@/stores/authStore";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
+import { useClientConfig } from "@/hooks/useClientConfig";
+import { DEFAULT_FEATURE_FLAGS, DEFAULT_TOKEN_COSTS } from "@/types/config";
 
 jest.mock("@/stores/authStore");
 jest.mock("@/hooks/useTokenBalance");
+jest.mock("@/hooks/useClientConfig");
 jest.mock("@tanstack/react-router", () => ({
     Link: ({
         to,
@@ -55,6 +58,12 @@ describe("AIFeaturesPage", () => {
             isLoading: false,
             isError: false,
         });
+        (useClientConfig as jest.Mock).mockReturnValue({
+            features: DEFAULT_FEATURE_FLAGS,
+            tokenCosts: DEFAULT_TOKEN_COSTS,
+            isLoading: false,
+            isError: false,
+        });
     });
 
     it("renders the hero badge and heading", () => {
@@ -98,6 +107,50 @@ describe("AIFeaturesPage", () => {
         ).toBeInTheDocument();
         expect(screen.getByTestId("feature-card-Flash Generator")).toBeInTheDocument();
         expect(screen.getByTestId("feature-card-Knowledge Q&A")).toBeInTheDocument();
+    });
+
+    it("hides disabled feature cards", () => {
+        (useClientConfig as jest.Mock).mockReturnValue({
+            features: {
+                ...DEFAULT_FEATURE_FLAGS,
+                flashcardsEnabled: false,
+                ragQueryEnabled: false,
+            },
+            tokenCosts: DEFAULT_TOKEN_COSTS,
+            isLoading: false,
+            isError: false,
+        });
+
+        render(<AIFeaturesPage />);
+
+        expect(
+            screen.getByTestId("feature-card-Smart Summarization"),
+        ).toBeInTheDocument();
+        expect(
+            screen.queryByTestId("feature-card-Flash Generator"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("feature-card-Knowledge Q&A"),
+        ).not.toBeInTheDocument();
+    });
+
+    it("shows empty state when all AI features are disabled", () => {
+        (useClientConfig as jest.Mock).mockReturnValue({
+            features: {
+                summarizeEnabled: false,
+                autoTagEnabled: false,
+                flashcardsEnabled: false,
+                ragQueryEnabled: false,
+                fileExtractionEnabled: true,
+            },
+            tokenCosts: DEFAULT_TOKEN_COSTS,
+            isLoading: false,
+            isError: false,
+        });
+
+        render(<AIFeaturesPage />);
+
+        expect(screen.getByTestId("no-ai-features")).toBeInTheDocument();
     });
 
     it("renders token cost on each feature card", () => {

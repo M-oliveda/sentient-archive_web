@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useExtractFile } from "@/hooks/useExtractFile";
+import { useClientConfig } from "@/hooks/useClientConfig";
 import { cn } from "@/lib/utils";
 
 const ALLOWED_TYPES = ["application/pdf", "text/plain", "text/markdown"];
@@ -20,6 +21,7 @@ interface IFileExtractorProps {
 export function FileExtractor({ onNoteCreated, className }: IFileExtractorProps) {
     const inputRef = useRef<HTMLInputElement>(null);
     const extractFile = useExtractFile();
+    const { features } = useClientConfig();
     const isPending = extractFile.isPending;
     const [stageIndex, setStageIndex] = useState(0);
 
@@ -33,6 +35,10 @@ export function FileExtractor({ onNoteCreated, className }: IFileExtractorProps)
         }, STAGE_INTERVAL_MS);
         return () => clearInterval(id);
     }, [isPending]);
+
+    if (!features.fileExtractionEnabled) {
+        return null;
+    }
 
     const validate = (file: File): string | null => {
         const ext = file.name.substring(file.name.lastIndexOf(".")).toLowerCase();

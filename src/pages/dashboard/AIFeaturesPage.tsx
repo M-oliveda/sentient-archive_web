@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
     FileText,
@@ -15,45 +15,52 @@ import {
 } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
+import { useClientConfig } from "@/hooks/useClientConfig";
 import { RequestTokensModal } from "@/components/tokens/RequestTokensModal";
+import type { IFeatureFlags, ITokenCosts } from "@/types/config";
 
-const TOKEN_COSTS = {
-    summarize: 5,
-    autoTag: 3,
-    flashcards: 8,
-    ragQuery: 10,
-} as const;
+interface IAIFeatureCard {
+    key: keyof IFeatureFlags;
+    icon: typeof FileText;
+    name: string;
+    description: string;
+    costKey: keyof ITokenCosts;
+}
 
-const AI_FEATURES = [
+const AI_FEATURES: IAIFeatureCard[] = [
     {
+        key: "summarizeEnabled",
         icon: FileText,
         name: "Smart Summarization",
         description:
             "Use AI to generate a concise and useful summarization of any note.",
-        tokenCost: TOKEN_COSTS.summarize,
+        costKey: "summarize",
     },
     {
+        key: "autoTagEnabled",
         icon: Tag,
         name: "Semantic Auto-Tagging",
         description:
             "Automatically organize your notes. The AI analyzes context and appends relevant tags to improve search ability.",
-        tokenCost: TOKEN_COSTS.autoTag,
+        costKey: "autoTag",
     },
     {
+        key: "flashcardsEnabled",
         icon: Layers,
         name: "Flash Generator",
         description:
             "Turn your study notes or technical documentation into active recall flashcards instantly.",
-        tokenCost: TOKEN_COSTS.flashcards,
+        costKey: "flashcards",
     },
     {
+        key: "ragQueryEnabled",
         icon: Brain,
         name: "Knowledge Q&A",
         description:
             "Ask questions across your entire archive. The AI retrieves relevant notes and generates a contextual answer.",
-        tokenCost: TOKEN_COSTS.ragQuery,
+        costKey: "ragQuery",
     },
-] as const;
+];
 
 const HOW_IT_WORKS = [
     {
@@ -81,9 +88,15 @@ const HOW_IT_WORKS = [
 export function AIFeaturesPage() {
     const { user } = useAuthStore();
     const tokenBalance = useTokenBalance();
+    const { features, tokenCosts } = useClientConfig();
     const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
 
     const balance = tokenBalance.data?.balance ?? user?.tokenBalance ?? 0;
+
+    const visibleFeatures = useMemo(
+        () => AI_FEATURES.filter((feature) => features[feature.key]),
+        [features],
+    );
 
     return (
         <>
@@ -133,42 +146,52 @@ export function AIFeaturesPage() {
 
                 {/* Feature Cards */}
                 <section className="space-y-4">
-                    <div
-                        className="-mx-6 flex gap-4 overflow-x-auto px-6 pb-2 md:mx-0 md:grid md:grid-cols-2 md:overflow-visible md:px-0 lg:grid-cols-4"
-                        aria-label="AI features"
-                    >
-                        {AI_FEATURES.map((feature) => (
-                            <Link
-                                key={feature.name}
-                                to="/notes"
-                                className="bg-brand-500 text-brand-50 flex min-w-[250px] flex-col justify-between gap-4 rounded-3xl p-4 transition-opacity hover:opacity-90 md:min-w-0"
-                                data-testid={`feature-card-${feature.name}`}
-                            >
-                                <div className="space-y-3">
-                                    <div className="flex items-start justify-between">
-                                        <div className="bg-brand-50/10 rounded-xl p-2.5">
-                                            <feature.icon className="text-brand-50 size-5" />
+                    {visibleFeatures.length === 0 ? (
+                        <p
+                            className="text-muted-foreground text-sm"
+                            data-testid="no-ai-features"
+                        >
+                            No AI features are currently available. Please check back
+                            later.
+                        </p>
+                    ) : (
+                        <div
+                            className="-mx-6 flex gap-4 overflow-x-auto px-6 pb-2 md:mx-0 md:grid md:grid-cols-2 md:overflow-visible md:px-0 lg:grid-cols-4"
+                            aria-label="AI features"
+                        >
+                            {visibleFeatures.map((feature) => (
+                                <Link
+                                    key={feature.name}
+                                    to="/notes"
+                                    className="bg-brand-500 text-brand-50 flex min-w-62.5 flex-col justify-between gap-4 rounded-3xl p-4 transition-opacity hover:opacity-90 md:min-w-0"
+                                    data-testid={`feature-card-${feature.name}`}
+                                >
+                                    <div className="space-y-3">
+                                        <div className="flex items-start justify-between">
+                                            <div className="bg-brand-50/10 rounded-xl p-2.5">
+                                                <feature.icon className="text-brand-50 size-5" />
+                                            </div>
+                                            <span className="bg-brand-900/30 text-brand-100 rounded-full px-2.5 py-1 text-xs font-semibold">
+                                                {tokenCosts[feature.costKey]} tokens
+                                            </span>
                                         </div>
-                                        <span className="bg-brand-900/30 text-brand-100 rounded-full px-2.5 py-1 text-xs font-semibold">
-                                            {feature.tokenCost} tokens
-                                        </span>
+                                        <div>
+                                            <p className="text-brand-50 text-lg font-bold">
+                                                {feature.name}
+                                            </p>
+                                            <p className="text-brand-100 mt-1 text-sm leading-relaxed">
+                                                {feature.description}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="text-brand-50 text-lg font-bold">
-                                            {feature.name}
-                                        </p>
-                                        <p className="text-brand-100 mt-1 text-sm leading-relaxed">
-                                            {feature.description}
-                                        </p>
+                                    <div className="text-brand-100/60 flex items-center gap-1.5 text-xs">
+                                        <Clock className="size-3.5" />
+                                        Open a note to use
                                     </div>
-                                </div>
-                                <div className="text-brand-100/60 flex items-center gap-1.5 text-xs">
-                                    <Clock className="size-3.5" />
-                                    Open a note to use
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    )}
                 </section>
 
                 {/* How Tokens Work */}

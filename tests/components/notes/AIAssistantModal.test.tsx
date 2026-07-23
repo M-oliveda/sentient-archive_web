@@ -14,6 +14,9 @@ jest.mock("@/hooks/useAINoteActions");
 jest.mock("@/hooks/useNotesMutations", () => ({
     useUpdateNote: jest.fn(),
 }));
+jest.mock("@/hooks/useClientConfig", () => ({
+    useClientConfig: jest.fn(),
+}));
 jest.mock("@/components/ui/dialog", () => ({
     Dialog: ({ children }: { children: React.ReactNode }) => <>{children}</>,
     DialogContent: ({ children }: { children: React.ReactNode }) => (
@@ -41,6 +44,9 @@ jest.mock("@/components/ai/RAGQueryModal", () => ({
 import { useAuthStore } from "@/stores/authStore";
 import { useAINoteActions } from "@/hooks/useAINoteActions";
 import { useUpdateNote } from "@/hooks/useNotesMutations";
+import { useClientConfig } from "@/hooks/useClientConfig";
+import { DEFAULT_FEATURE_FLAGS, DEFAULT_TOKEN_COSTS } from "@/types/config";
+import type { IFeatureFlags } from "@/types/config";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -75,9 +81,17 @@ function setupMocks({
     flashcardsPending = false,
     flashcardsError = null as string | null,
     updateNotePending = false,
+    features = DEFAULT_FEATURE_FLAGS,
 } = {}) {
     (useAuthStore as unknown as jest.Mock).mockReturnValue({
         user: { uid: "user-1", tokenBalance },
+    });
+    (useClientConfig as jest.Mock).mockReturnValue({
+        features,
+        tokenCosts: DEFAULT_TOKEN_COSTS,
+        isLoading: false,
+        isError: false,
+        data: { features, tokens: { costs: DEFAULT_TOKEN_COSTS } },
     });
     (useAINoteActions as jest.Mock).mockReturnValue({
         summarize: {
@@ -531,5 +545,39 @@ describe("KnowledgeQACard", () => {
             "data-open",
             "false",
         );
+    });
+});
+
+describe("AIAssistantModal feature flags", () => {
+    it("hides flashcards when flashcardsEnabled is false", () => {
+        setupMocks({
+            features: {
+                ...DEFAULT_FEATURE_FLAGS,
+                flashcardsEnabled: false,
+            } satisfies IFeatureFlags,
+        });
+        renderModal(makeNote());
+
+        expect(screen.queryByTestId("flashcards-card")).not.toBeInTheDocument();
+        expect(screen.getByText("Summary")).toBeInTheDocument();
+        expect(screen.getByTestId("knowledge-qa-card")).toBeInTheDocument();
+    });
+
+    it("hides all AI cards when every feature is disabled", () => {
+        setupMocks({
+            features: {
+                summarizeEnabled: false,
+                autoTagEnabled: false,
+                flashcardsEnabled: false,
+                ragQueryEnabled: false,
+                fileExtractionEnabled: true,
+            },
+        });
+        renderModal(makeNote());
+
+        expect(screen.getByTestId("no-ai-features")).toBeInTheDocument();
+        expect(screen.queryByText("Summary")).not.toBeInTheDocument();
+        expect(screen.queryByTestId("flashcards-card")).not.toBeInTheDocument();
+        expect(screen.queryByTestId("knowledge-qa-card")).not.toBeInTheDocument();
     });
 });
