@@ -8,6 +8,7 @@ const mockRagQueryMutate = jest.fn();
 
 jest.mock("@/stores/authStore");
 jest.mock("@/hooks/useAINoteActions");
+jest.mock("@/hooks/useClientConfig");
 jest.mock("@/components/ui/dialog", () => ({
     Dialog: ({ children }: { children: React.ReactNode }) => <>{children}</>,
     DialogContent: ({ children }: { children: React.ReactNode }) => (
@@ -21,6 +22,8 @@ jest.mock("@/components/ui/dialog", () => ({
 
 import { useAuthStore } from "@/stores/authStore";
 import { useAINoteActions } from "@/hooks/useAINoteActions";
+import { useClientConfig } from "@/hooks/useClientConfig";
+import { DEFAULT_TOKEN_COSTS } from "@/types/config";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -32,6 +35,18 @@ function setupMocks({
 } = {}) {
     (useAuthStore as unknown as jest.Mock).mockReturnValue({
         user: { uid: "user-1", tokenBalance },
+    });
+    (useClientConfig as jest.Mock).mockReturnValue({
+        features: {
+            summarizeEnabled: true,
+            autoTagEnabled: true,
+            flashcardsEnabled: true,
+            ragQueryEnabled: true,
+            fileExtractionEnabled: true,
+        },
+        tokenCosts: DEFAULT_TOKEN_COSTS,
+        isLoading: false,
+        isError: false,
     });
     (useAINoteActions as jest.Mock).mockReturnValue({
         ragQuery: {
@@ -78,7 +93,7 @@ describe("RAGQueryModal rendering", () => {
     it("renders the Ask button with token cost when balance is sufficient", () => {
         renderModal();
         expect(
-            screen.getByRole("button", { name: /ask \(4 tokens\)/i }),
+            screen.getByRole("button", { name: /ask \(10 tokens\)/i }),
         ).toBeInTheDocument();
     });
 

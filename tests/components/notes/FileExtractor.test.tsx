@@ -12,12 +12,32 @@ jest.mock("@/hooks/useExtractFile", () => ({
     })),
 }));
 
+jest.mock("@/hooks/useClientConfig", () => ({
+    useClientConfig: jest.fn(() => ({
+        features: {
+            summarizeEnabled: true,
+            autoTagEnabled: true,
+            flashcardsEnabled: true,
+            ragQueryEnabled: true,
+            fileExtractionEnabled: true,
+        },
+        tokenCosts: {
+            summarize: 5,
+            autoTag: 3,
+            flashcards: 8,
+            ragQuery: 10,
+        },
+    })),
+}));
+
 jest.mock("sonner", () => ({
     toast: {
         error: jest.fn(),
         success: jest.fn(),
     },
 }));
+
+import { useClientConfig } from "@/hooks/useClientConfig";
 
 function makeFile(name: string, type: string, sizeBytes = 100): File {
     const blob = new Blob([new ArrayBuffer(sizeBytes)], { type });
@@ -135,5 +155,26 @@ describe("FileExtractor", () => {
         fireEvent.change(input, { target: { files: [file] } });
 
         await waitFor(() => expect(mockMutateAsync).toHaveBeenCalledWith(file));
+    });
+
+    it("renders nothing when file extraction is disabled", () => {
+        (useClientConfig as jest.Mock).mockReturnValue({
+            features: {
+                summarizeEnabled: true,
+                autoTagEnabled: true,
+                flashcardsEnabled: true,
+                ragQueryEnabled: true,
+                fileExtractionEnabled: false,
+            },
+            tokenCosts: {
+                summarize: 5,
+                autoTag: 3,
+                flashcards: 8,
+                ragQuery: 10,
+            },
+        });
+
+        const { container } = render(<FileExtractor onNoteCreated={onNoteCreated} />);
+        expect(container).toBeEmptyDOMElement();
     });
 });

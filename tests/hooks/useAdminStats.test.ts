@@ -39,13 +39,13 @@ function createWrapper() {
 }
 
 describe("fetchAdminStats", () => {
-    it("calls apiRequest with the admin stats endpoint and returns the response", async () => {
+    it("calls apiRequest with the admin stats endpoint and unwraps ApiResponse data", async () => {
         (apiRequest as jest.Mock).mockResolvedValue(mockResponse);
 
         const result = await fetchAdminStats();
 
         expect(apiRequest).toHaveBeenCalledWith("/v1/admin/stats");
-        expect(result).toEqual(mockResponse);
+        expect(result).toEqual(mockResponse.data);
     });
 });
 
@@ -54,7 +54,7 @@ describe("useAdminStats", () => {
         jest.clearAllMocks();
     });
 
-    it("fetches admin stats and returns data on success", async () => {
+    it("fetches admin stats and returns unwrapped data on success", async () => {
         (apiRequest as jest.Mock).mockResolvedValue(mockResponse);
 
         const { result } = renderHook(() => useAdminStats(), {
@@ -63,7 +63,7 @@ describe("useAdminStats", () => {
 
         await waitFor(() => expect(result.current.isLoading).toBe(false));
 
-        expect(result.current.data).toEqual(mockResponse);
+        expect(result.current.data).toEqual(mockResponse.data);
         expect(result.current.isError).toBe(false);
     });
 

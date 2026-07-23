@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { ActivityItem } from "@/components/dashboard/ActivityItem";
 import { useAdminStats } from "@/hooks/useAdminStats";
-import type { ServiceStatus } from "@/types/admin";
+import type { IAdminStatsResponse, ServiceStatus } from "@/types/admin";
 
 function statusVariant(status: ServiceStatus): "success" | "destructive" | "outline" {
     if (status === "Operational") return "success";
@@ -13,7 +13,7 @@ function statusVariant(status: ServiceStatus): "success" | "destructive" | "outl
 
 export function AdminDashboardHome() {
     const { data, isLoading } = useAdminStats();
-    const stats = data?.data;
+    const stats = data;
 
     return (
         <div className="space-y-8">
@@ -67,17 +67,27 @@ export function AdminDashboardHome() {
                         System Health
                     </h2>
                     <ul className="space-y-3">
-                        {(stats?.systemHealth ?? []).map(({ service, status }) => (
-                            <li
-                                key={service}
-                                className="bg-secondary flex items-center justify-between rounded-xl px-4 py-3"
-                            >
-                                <span className="text-foreground text-sm font-medium">
-                                    {service}
-                                </span>
-                                <Badge variant={statusVariant(status)}>{status}</Badge>
-                            </li>
-                        ))}
+                        {(stats?.systemHealth ?? []).map(
+                            ({
+                                service,
+                                status,
+                            }: {
+                                service: string;
+                                status: ServiceStatus;
+                            }) => (
+                                <li
+                                    key={service}
+                                    className="bg-secondary flex items-center justify-between rounded-xl px-4 py-3"
+                                >
+                                    <span className="text-foreground text-sm font-medium">
+                                        {service}
+                                    </span>
+                                    <Badge variant={statusVariant(status)}>
+                                        {status}
+                                    </Badge>
+                                </li>
+                            ),
+                        )}
                     </ul>
                 </section>
 
@@ -90,18 +100,20 @@ export function AdminDashboardHome() {
                         Recent Activity
                     </h2>
                     <ul className="flex flex-col space-y-4 overflow-x-auto pb-2">
-                        {(stats?.recentActivity ?? []).map((item) => (
-                            <div
-                                key={item.id}
-                                className="bg-secondary min-w-[250px] shrink-0 rounded-xl p-3"
-                            >
-                                <ActivityItem
-                                    name={item.name}
-                                    action={item.action}
-                                    timeAgo={item.timeAgo}
-                                />
-                            </div>
-                        ))}
+                        {(stats?.recentActivity ?? []).map(
+                            (item: IAdminStatsResponse["recentActivity"][number]) => (
+                                <div
+                                    key={item.id}
+                                    className="bg-secondary min-w-62.5 shrink-0 rounded-xl p-3"
+                                >
+                                    <ActivityItem
+                                        name={item.name}
+                                        action={item.action}
+                                        timeAgo={item.timeAgo}
+                                    />
+                                </div>
+                            ),
+                        )}
                     </ul>
                 </section>
             </div>

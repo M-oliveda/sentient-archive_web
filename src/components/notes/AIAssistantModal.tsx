@@ -10,8 +10,11 @@ import {
 import { useAuthStore } from "@/stores/authStore";
 import { useAINoteActions } from "@/hooks/useAINoteActions";
 import { useUpdateNote } from "@/hooks/useNotesMutations";
+import { useClientConfig } from "@/hooks/useClientConfig";
 import { RAGQueryModal } from "@/components/ai/RAGQueryModal";
 import type { INote, IFlashcard } from "@/types/note";
+import type { ITokenCosts } from "@/types/config";
+import { DEFAULT_TOKEN_COSTS } from "@/types/config";
 
 function friendlyAiError(raw: string | null): string | null {
     if (!raw) return null;
@@ -20,13 +23,6 @@ function friendlyAiError(raw: string | null): string | null {
     }
     return "Something went wrong. Please try again.";
 }
-
-const TOKEN_COSTS = {
-    summarize: 2,
-    autoTag: 1,
-    flashcards: 3,
-    ragQuery: 4,
-} as const;
 
 function formatFlashcardsAsMarkdown(cards: IFlashcard[]): string {
     const lines = cards
@@ -52,6 +48,7 @@ export function AIAssistantModal({
 }: IAIAssistantModalProps) {
     const { user } = useAuthStore();
     const tokenBalance = user?.tokenBalance ?? 0;
+    const { features, tokenCosts } = useClientConfig();
     const { summarize, autoTag, flashcards } = useAINoteActions(note.id);
     const updateNote = useUpdateNote();
     const [isKnowledgeQAOpen, setIsKnowledgeQAOpen] = useState(false);
@@ -85,6 +82,11 @@ export function AIAssistantModal({
     };
 
     const isTagsPending = autoTag.isPending || updateNote.isPending;
+    const hasAnyFeature =
+        features.summarizeEnabled ||
+        features.autoTagEnabled ||
+        features.flashcardsEnabled ||
+        features.ragQueryEnabled;
 
     return (
         <>
@@ -97,45 +99,68 @@ export function AIAssistantModal({
                         </DialogTitle>
                     </DialogHeader>
 
-                    <SummaryCard
-                        summary={note.summary}
-                        tokenBalance={tokenBalance}
-                        isPending={summarize.isPending}
-                        error={friendlyAiError(summarize.error?.message ?? null)}
-                        onGenerate={() => summarize.mutate()}
-                        onInsert={handleInsertSummary}
-                    />
-                    <SuggestedTagsCard
-                        note={note}
-                        tokenBalance={tokenBalance}
-                        isPending={isTagsPending}
-                        error={friendlyAiError(autoTag.error?.message ?? null)}
-                        onGenerate={handleGenerateTags}
-                    />
-                    <GenerateFlashcardsCard
-                        hasFlashcards={!!note.flashcards?.length}
-                        tokenBalance={tokenBalance}
-                        isPending={flashcards.isPending}
-                        error={friendlyAiError(flashcards.error?.message ?? null)}
-                        onGenerate={handleGenerateFlashcards}
-                    />
-                    <KnowledgeQACard
-                        tokenBalance={tokenBalance}
-                        onOpen={() => setIsKnowledgeQAOpen(true)}
-                    />
+                    {!hasAnyFeature && (
+                        <p
+                            className="text-muted-foreground text-sm"
+                            data-testid="no-ai-features"
+                        >
+                            No AI features are currently available.
+                        </p>
+                    )}
+
+                    {features.summarizeEnabled && (
+                        <SummaryCard
+                            summary={note.summary}
+                            tokenBalance={tokenBalance}
+                            tokenCost={tokenCosts.summarize}
+                            isPending={summarize.isPending}
+                            error={friendlyAiError(summarize.error?.message ?? null)}
+                            onGenerate={() => summarize.mutate()}
+                            onInsert={handleInsertSummary}
+                        />
+                    )}
+                    {features.autoTagEnabled && (
+                        <SuggestedTagsCard
+                            note={note}
+                            tokenBalance={tokenBalance}
+                            tokenCost={tokenCosts.autoTag}
+                            isPending={isTagsPending}
+                            error={friendlyAiError(autoTag.error?.message ?? null)}
+                            onGenerate={handleGenerateTags}
+                        />
+                    )}
+                    {features.flashcardsEnabled && (
+                        <GenerateFlashcardsCard
+                            hasFlashcards={!!note.flashcards?.length}
+                            tokenBalance={tokenBalance}
+                            tokenCost={tokenCosts.flashcards}
+                            isPending={flashcards.isPending}
+                            error={friendlyAiError(flashcards.error?.message ?? null)}
+                            onGenerate={handleGenerateFlashcards}
+                        />
+                    )}
+                    {features.ragQueryEnabled && (
+                        <KnowledgeQACard
+                            tokenBalance={tokenBalance}
+                            tokenCost={tokenCosts.ragQuery}
+                            onOpen={() => setIsKnowledgeQAOpen(true)}
+                        />
+                    )}
                 </DialogContent>
             </Dialog>
 
-            <RAGQueryModal
-                noteId={note.id}
-                open={isKnowledgeQAOpen}
-                onOpenChange={setIsKnowledgeQAOpen}
-            />
+            {features.ragQueryEnabled && (
+                <RAGQueryModal
+                    noteId={note.id}
+                    open={isKnowledgeQAOpen}
+                    onOpenChange={setIsKnowledgeQAOpen}
+                />
+            )}
         </>
     );
 }
 
-function TokenBadge({ count }: { count: number }) {
+export function TokenBadge({ count }: { count: number }) {
     return (
         <span className="bg-foreground text-background rounded-full px-2.5 py-0.5 text-xs font-medium">
             {count} {count === 1 ? "token" : "tokens"}
@@ -170,6 +195,7 @@ function CardAction({
 interface ISummaryCardProps {
     summary: string | null;
     tokenBalance: number;
+    tokenCost: number;
     isPending: boolean;
     error: string | null;
     onGenerate: () => void;
@@ -179,18 +205,19 @@ interface ISummaryCardProps {
 function SummaryCard({
     summary,
     tokenBalance,
+    tokenCost,
     isPending,
     error,
     onGenerate,
     onInsert,
 }: ISummaryCardProps) {
-    const canAfford = tokenBalance >= TOKEN_COSTS.summarize;
+    const canAfford = tokenBalance >= tokenCost;
 
     return (
         <div className="bg-muted flex flex-col gap-3 rounded-xl p-4">
             <div className="flex items-center justify-between">
                 <span className="text-foreground text-sm font-bold">Summary</span>
-                <TokenBadge count={TOKEN_COSTS.summarize} />
+                <TokenBadge count={tokenCost} />
             </div>
             {summary !== null ? (
                 <>
@@ -221,6 +248,7 @@ function SummaryCard({
 interface ISuggestedTagsCardProps {
     note: INote;
     tokenBalance: number;
+    tokenCost: number;
     isPending: boolean;
     error: string | null;
     onGenerate: () => void;
@@ -229,11 +257,12 @@ interface ISuggestedTagsCardProps {
 function SuggestedTagsCard({
     note,
     tokenBalance,
+    tokenCost,
     isPending,
     error,
     onGenerate,
 }: ISuggestedTagsCardProps) {
-    const canAfford = tokenBalance >= TOKEN_COSTS.autoTag;
+    const canAfford = tokenBalance >= tokenCost;
     const hasTags = note.aiTags.length > 0;
 
     return (
@@ -242,7 +271,7 @@ function SuggestedTagsCard({
                 <span className="text-foreground text-sm font-bold">
                     Suggested Tags
                 </span>
-                <TokenBadge count={TOKEN_COSTS.autoTag} />
+                <TokenBadge count={tokenCost} />
             </div>
             {hasTags && (
                 <div className="flex flex-wrap gap-1.5">
@@ -280,6 +309,7 @@ function SuggestedTagsCard({
 interface IGenerateFlashcardsCardProps {
     hasFlashcards: boolean;
     tokenBalance: number;
+    tokenCost: number;
     isPending: boolean;
     error: string | null;
     onGenerate: () => void;
@@ -288,11 +318,12 @@ interface IGenerateFlashcardsCardProps {
 function GenerateFlashcardsCard({
     hasFlashcards,
     tokenBalance,
+    tokenCost,
     isPending,
     error,
     onGenerate,
 }: IGenerateFlashcardsCardProps) {
-    const canAfford = tokenBalance >= TOKEN_COSTS.flashcards;
+    const canAfford = tokenBalance >= tokenCost;
     const label = hasFlashcards ? "Regenerate" : "Generate";
 
     return (
@@ -316,7 +347,7 @@ function GenerateFlashcardsCard({
                         Generating…
                     </span>
                 ) : canAfford ? (
-                    `${label} (${TOKEN_COSTS.flashcards} tokens)`
+                    `${label} (${tokenCost} tokens)`
                 ) : (
                     "Not enough tokens"
                 )}
@@ -328,11 +359,12 @@ function GenerateFlashcardsCard({
 
 interface IKnowledgeQACardProps {
     tokenBalance: number;
+    tokenCost: number;
     onOpen: () => void;
 }
 
-function KnowledgeQACard({ tokenBalance, onOpen }: IKnowledgeQACardProps) {
-    const canAfford = tokenBalance >= TOKEN_COSTS.ragQuery;
+function KnowledgeQACard({ tokenBalance, tokenCost, onOpen }: IKnowledgeQACardProps) {
+    const canAfford = tokenBalance >= tokenCost;
 
     return (
         <div
@@ -348,9 +380,12 @@ function KnowledgeQACard({ tokenBalance, onOpen }: IKnowledgeQACardProps) {
             </p>
             <CardAction onClick={onOpen} disabled={!canAfford}>
                 {canAfford
-                    ? `Ask a Question (${TOKEN_COSTS.ragQuery} tokens)`
+                    ? `Ask a Question (${tokenCost} tokens)`
                     : "Not enough tokens"}
             </CardAction>
         </div>
     );
 }
+
+/** Prefer useClientConfig().tokenCosts in new code */
+export const TOKEN_COSTS: ITokenCosts = DEFAULT_TOKEN_COSTS;

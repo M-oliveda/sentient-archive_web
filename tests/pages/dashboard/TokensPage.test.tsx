@@ -1,8 +1,10 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { TokensPage } from "@/pages/dashboard/TokensPage";
 import { useAuthStore } from "@/stores/authStore";
+import { useTokenBalance } from "@/hooks/useTokenBalance";
 
 jest.mock("@/stores/authStore");
+jest.mock("@/hooks/useTokenBalance");
 jest.mock("@/components/tokens/TokenBalance", () => ({
     TokenBalance: ({ balance }: { balance: number }) => (
         <div data-testid="token-balance">{balance}</div>
@@ -42,6 +44,10 @@ describe("TokensPage", () => {
     beforeEach(() => {
         jest.clearAllMocks();
         (useAuthStore as unknown as jest.Mock).mockReturnValue({ user: mockUser });
+        (useTokenBalance as jest.Mock).mockReturnValue({
+            data: undefined,
+            isLoading: false,
+        });
     });
 
     it("renders the page header", () => {
@@ -68,6 +74,15 @@ describe("TokensPage", () => {
     it("renders TokenBalance with the user's token balance", () => {
         render(<TokensPage />);
         expect(screen.getByTestId("token-balance")).toHaveTextContent("750");
+    });
+
+    it("prefers the live token balance API value over the auth store", () => {
+        (useTokenBalance as jest.Mock).mockReturnValue({
+            data: { balance: 955, totalGranted: 5000, totalSpent: 4045 },
+            isLoading: false,
+        });
+        render(<TokensPage />);
+        expect(screen.getByTestId("token-balance")).toHaveTextContent("955");
     });
 
     it("renders TokenBalance with 0 when user is null", () => {

@@ -1,16 +1,16 @@
 import { render, screen } from "@testing-library/react";
 import { PendingRequests } from "@/components/tokens/PendingRequests";
-import { useTokenRequests } from "@/hooks/useTokenRequests";
-import type { ITokenRequest } from "@/types/transaction";
+import { useMyTokenRequests } from "@/hooks/useMyTokenRequests";
+import type { IMyTokenRequest } from "@/hooks/useMyTokenRequests";
 
-jest.mock("@/hooks/useTokenRequests");
+jest.mock("@/hooks/useMyTokenRequests");
 
-const mockRequest = (overrides: Partial<ITokenRequest> = {}): ITokenRequest => ({
+const mockRequest = (overrides: Partial<IMyTokenRequest> = {}): IMyTokenRequest => ({
     id: "req-1",
     userId: "user-1",
     amount: 500,
     status: "pending",
-    createdAt: new Date("2024-06-01T12:00:00Z"),
+    createdAt: "2024-06-01T12:00:00Z",
     ...overrides,
 });
 
@@ -20,7 +20,7 @@ describe("PendingRequests", () => {
     });
 
     it("shows loading skeleton when data is loading", () => {
-        (useTokenRequests as jest.Mock).mockReturnValue({
+        (useMyTokenRequests as jest.Mock).mockReturnValue({
             data: undefined,
             isLoading: true,
         });
@@ -30,13 +30,16 @@ describe("PendingRequests", () => {
     });
 
     it("renders nothing when there are no requests", () => {
-        (useTokenRequests as jest.Mock).mockReturnValue({ data: [], isLoading: false });
+        (useMyTokenRequests as jest.Mock).mockReturnValue({
+            data: [],
+            isLoading: false,
+        });
         const { container } = render(<PendingRequests />);
         expect(container).toBeEmptyDOMElement();
     });
 
     it("renders nothing when data is undefined and not loading", () => {
-        (useTokenRequests as jest.Mock).mockReturnValue({
+        (useMyTokenRequests as jest.Mock).mockReturnValue({
             data: undefined,
             isLoading: false,
         });
@@ -45,7 +48,7 @@ describe("PendingRequests", () => {
     });
 
     it("renders the table when requests are present", () => {
-        (useTokenRequests as jest.Mock).mockReturnValue({
+        (useMyTokenRequests as jest.Mock).mockReturnValue({
             data: [mockRequest()],
             isLoading: false,
         });
@@ -55,18 +58,56 @@ describe("PendingRequests", () => {
     });
 
     it("renders table column headers", () => {
-        (useTokenRequests as jest.Mock).mockReturnValue({
+        (useMyTokenRequests as jest.Mock).mockReturnValue({
             data: [mockRequest()],
             isLoading: false,
         });
         render(<PendingRequests />);
         expect(screen.getByText("Date")).toBeInTheDocument();
         expect(screen.getByText("Amount")).toBeInTheDocument();
+        expect(screen.getByText("Reason")).toBeInTheDocument();
         expect(screen.getByText("Status")).toBeInTheDocument();
     });
 
+    it("displays the justification in the Reason column", () => {
+        (useMyTokenRequests as jest.Mock).mockReturnValue({
+            data: [
+                mockRequest({
+                    justification: "Need tokens for embeddings",
+                }),
+            ],
+            isLoading: false,
+        });
+        render(<PendingRequests />);
+        expect(screen.getByText("Need tokens for embeddings")).toBeInTheDocument();
+    });
+
+    it("displays a dash when justification is missing", () => {
+        (useMyTokenRequests as jest.Mock).mockReturnValue({
+            data: [mockRequest({ justification: undefined })],
+            isLoading: false,
+        });
+        render(<PendingRequests />);
+        expect(screen.getByText("—")).toBeInTheDocument();
+    });
+
+    it("displays the rejection reason for rejected requests", () => {
+        (useMyTokenRequests as jest.Mock).mockReturnValue({
+            data: [
+                mockRequest({
+                    status: "rejected",
+                    justification: "Original ask",
+                    reason: "Insufficient justification",
+                }),
+            ],
+            isLoading: false,
+        });
+        render(<PendingRequests />);
+        expect(screen.getByText("Insufficient justification")).toBeInTheDocument();
+    });
+
     it("renders a row for each request", () => {
-        (useTokenRequests as jest.Mock).mockReturnValue({
+        (useMyTokenRequests as jest.Mock).mockReturnValue({
             data: [mockRequest({ id: "req-1" }), mockRequest({ id: "req-2" })],
             isLoading: false,
         });
@@ -75,7 +116,7 @@ describe("PendingRequests", () => {
     });
 
     it("displays the formatted amount with a plus sign", () => {
-        (useTokenRequests as jest.Mock).mockReturnValue({
+        (useMyTokenRequests as jest.Mock).mockReturnValue({
             data: [mockRequest({ amount: 500 })],
             isLoading: false,
         });
@@ -84,8 +125,8 @@ describe("PendingRequests", () => {
     });
 
     it("displays the formatted date", () => {
-        (useTokenRequests as jest.Mock).mockReturnValue({
-            data: [mockRequest({ createdAt: new Date("2024-06-01T12:00:00Z") })],
+        (useMyTokenRequests as jest.Mock).mockReturnValue({
+            data: [mockRequest({ createdAt: "2024-06-01T12:00:00Z" })],
             isLoading: false,
         });
         render(<PendingRequests />);
@@ -93,7 +134,7 @@ describe("PendingRequests", () => {
     });
 
     it("shows 'Pending' badge for pending status", () => {
-        (useTokenRequests as jest.Mock).mockReturnValue({
+        (useMyTokenRequests as jest.Mock).mockReturnValue({
             data: [mockRequest({ status: "pending" })],
             isLoading: false,
         });
@@ -102,7 +143,7 @@ describe("PendingRequests", () => {
     });
 
     it("shows 'Approved' badge for approved status", () => {
-        (useTokenRequests as jest.Mock).mockReturnValue({
+        (useMyTokenRequests as jest.Mock).mockReturnValue({
             data: [mockRequest({ status: "approved" })],
             isLoading: false,
         });
@@ -111,7 +152,7 @@ describe("PendingRequests", () => {
     });
 
     it("shows 'Rejected' badge for rejected status", () => {
-        (useTokenRequests as jest.Mock).mockReturnValue({
+        (useMyTokenRequests as jest.Mock).mockReturnValue({
             data: [mockRequest({ status: "rejected" })],
             isLoading: false,
         });
@@ -120,7 +161,7 @@ describe("PendingRequests", () => {
     });
 
     it("renders the section heading when requests are present", () => {
-        (useTokenRequests as jest.Mock).mockReturnValue({
+        (useMyTokenRequests as jest.Mock).mockReturnValue({
             data: [mockRequest()],
             isLoading: false,
         });

@@ -64,7 +64,12 @@ describe("DashboardLayout", () => {
             </DashboardLayout>,
         );
         expect(screen.getByText("Users")).toBeInTheDocument();
+        expect(screen.getByText("Analytics")).toBeInTheDocument();
         expect(screen.getByText("Token Economy")).toBeInTheDocument();
+        expect(screen.getByText("Settings").closest("a")).toHaveAttribute(
+            "href",
+            "/admin/settings",
+        );
         expect(screen.queryByText("My Notes")).not.toBeInTheDocument();
     });
 

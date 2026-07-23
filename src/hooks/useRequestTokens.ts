@@ -4,6 +4,7 @@ import type { IApiResponse } from "@/types/api";
 
 export interface IRequestTokensPayload {
     amount: number;
+    justification?: string;
 }
 
 export interface IRequestTokensData {

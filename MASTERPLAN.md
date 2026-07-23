@@ -2619,15 +2619,15 @@ UI (Phase 9 / later); admin system-wide ActivityLogs viewer (Phase 8).
 
 ### Phase 8: Admin Dashboard (Week 7)
 
-- [ ] Create AdminPage layout
-- [ ] Build UserManagementTable
-- [ ] Implement user filters and search
-- [ ] Create EditUserModal
-- [ ] Build AnalyticsChart components
-- [ ] Create ActivityLogs viewer
-- [ ] Build SystemConfigForm
-- [ ] Implement RBAC protection
-- [ ] Test admin features
+- [x] Create AdminPage layout
+- [x] Build UserManagementTable
+- [x] Implement user filters and search
+- [x] Create EditUserModal
+- [x] Build AnalyticsChart components
+- [x] Create ActivityLogs viewer
+- [x] Build SystemConfigForm
+- [x] Implement RBAC protection
+- [x] Test admin features
 
 ### Phase 9: Internationalization (Week 8)
 

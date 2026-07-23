@@ -1,4 +1,5 @@
 import {
+    BarChart3,
     Bot,
     Clock,
     Coins,
@@ -22,9 +23,11 @@ const CLIENT_NAV_ITEMS: INavItem[] = [
 
 const ADMIN_NAV_ITEMS: INavItem[] = [
     { label: "Dashboard", icon: LayoutDashboard, to: "/dashboard" },
+    { label: "Analytics", icon: BarChart3, to: "/admin/analytics" },
+    { label: "Activity Logs", icon: Clock, to: "/admin/activity-logs" },
     { label: "Users", icon: Users, to: "/admin/users" },
     { label: "Token Economy", icon: Coins, to: "/admin/token-economy" },
-    { label: "Settings", icon: Settings, to: "/settings" },
+    { label: "Settings", icon: Settings, to: "/admin/settings" },
 ];
 
 interface IDashboardLayoutProps {
@@ -41,7 +44,7 @@ export function DashboardLayout({ children }: IDashboardLayoutProps) {
             <DashboardNavbar />
             <div className="flex flex-1 overflow-hidden">
                 <DashboardSidebar navItems={navItems} showTokenWidget={!isAdmin} />
-                <main className="bg-background flex-1 overflow-y-auto p-6">
+                <main className="bg-background flex-1 overflow-y-auto p-4 md:p-6">
                     {children}
                 </main>
             </div>

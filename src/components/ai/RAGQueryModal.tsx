@@ -9,8 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { useAuthStore } from "@/stores/authStore";
 import { useAINoteActions } from "@/hooks/useAINoteActions";
-
-const TOKEN_COST = 4;
+import { useClientConfig } from "@/hooks/useClientConfig";
 
 function friendlyAiError(raw: string | null): string | null {
     if (!raw) return null;
@@ -28,8 +27,10 @@ interface IRAGQueryModalProps {
 
 export function RAGQueryModal({ noteId, open, onOpenChange }: IRAGQueryModalProps) {
     const { user } = useAuthStore();
+    const { tokenCosts } = useClientConfig();
+    const tokenCost = tokenCosts.ragQuery;
     const tokenBalance = user?.tokenBalance ?? 0;
-    const canAfford = tokenBalance >= TOKEN_COST;
+    const canAfford = tokenBalance >= tokenCost;
     const [question, setQuestion] = useState("");
     const [answer, setAnswer] = useState<string | null>(null);
     const { ragQuery } = useAINoteActions(noteId);
@@ -104,7 +105,7 @@ export function RAGQueryModal({ noteId, open, onOpenChange }: IRAGQueryModalProp
                         ) : canAfford ? (
                             <>
                                 <Send className="size-4" />
-                                Ask ({TOKEN_COST} tokens)
+                                Ask ({tokenCost} tokens)
                             </>
                         ) : (
                             "Not enough tokens"
