@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Coins } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
+import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { TokenBalance } from "@/components/tokens/TokenBalance";
 import { TransactionHistory } from "@/components/tokens/TransactionHistory";
 import { PendingRequests } from "@/components/tokens/PendingRequests";
@@ -8,7 +9,9 @@ import { RequestTokensModal } from "@/components/tokens/RequestTokensModal";
 
 export function TokensPage() {
     const { user } = useAuthStore();
+    const { data: tokenBalanceData } = useTokenBalance();
     const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
+    const balance = tokenBalanceData?.balance ?? user?.tokenBalance ?? 0;
 
     return (
         <>
@@ -40,7 +43,7 @@ export function TokensPage() {
 
                 {/* Balance card */}
                 <section className="bg-muted rounded-2xl p-6">
-                    <TokenBalance balance={user?.tokenBalance ?? 0} />
+                    <TokenBalance balance={balance} />
                 </section>
 
                 {/* Token requests */}
