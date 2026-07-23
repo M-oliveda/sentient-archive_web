@@ -8,8 +8,36 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
 import type { ISystemConfig } from "@/types/admin";
+import type { IApiResponse } from "@/types/api";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+
+/** Fallback defaults match backend DEFAULT_CONFIG (learning/demo anti-abuse) */
+const DEFAULT_AI: ISystemConfig["ai"] = {
+    model: "gemini-3.5-flash",
+    maxTokensPerRequest: 2048,
+    temperature: 1.0,
+    thinkingLevel: "low",
+    thinkingBudget: 0,
+};
+
+const DEFAULT_TOKENS: ISystemConfig["tokens"] = {
+    initialGrant: { production: 25, staging: 40, development: 50, local: 50 },
+    costs: { summarize: 5, autoTag: 3, flashcards: 8, ragQuery: 10 },
+};
+
+const DEFAULT_FEATURES: ISystemConfig["features"] = {
+    summarizeEnabled: true,
+    autoTagEnabled: true,
+    flashcardsEnabled: true,
+    ragQueryEnabled: true,
+    fileExtractionEnabled: true,
+};
+
+const DEFAULT_RATE_LIMITS: ISystemConfig["rateLimits"] = {
+    aiRequestsPerHour: 20,
+    fileExtractionsPerDay: 10,
+};
 
 // Active Gemini models as of July 2026
 // See: https://ai.google.dev/gemini-api/docs/models/gemini
@@ -85,8 +113,9 @@ export function AdminSystemConfigPage() {
     const { data: config, isLoading } = useQuery({
         queryKey: ["system-config"],
         queryFn: async () => {
-            const response = await apiRequest<ISystemConfig>("/v1/admin/config");
-            return response;
+            const response =
+                await apiRequest<IApiResponse<ISystemConfig>>("/v1/admin/config");
+            return response.data;
         },
     });
 
@@ -99,15 +128,19 @@ export function AdminSystemConfigPage() {
 
     const updateMutation = useMutation({
         mutationFn: async (updates: Partial<ISystemConfig>) => {
-            const response = await apiRequest<ISystemConfig>("/v1/admin/config", {
-                method: "POST",
-                body: JSON.stringify(updates),
-            });
-            return response;
+            const response = await apiRequest<IApiResponse<ISystemConfig>>(
+                "/v1/admin/config",
+                {
+                    method: "POST",
+                    body: JSON.stringify(updates),
+                },
+            );
+            return response.data;
         },
         onSuccess: (updated) => {
             toast.success("Configuration updated successfully");
             queryClient.invalidateQueries({ queryKey: ["system-config"] });
+            queryClient.invalidateQueries({ queryKey: ["client-config"] });
             setFormData(updated);
             setOriginalData(updated);
         },
@@ -134,14 +167,11 @@ export function AdminSystemConfigPage() {
         value: ISystemConfig["ai"][K],
     ) => {
         setFormData((prev) => {
-            const current = prev!;
-            const ai = current.ai ?? {
-                model: "gemini-1.5-flash",
-                maxTokensPerRequest: 0,
-                temperature: 0,
-            };
+            /* istanbul ignore next - defensive guard, prev is never null when form renders */
+            if (!prev) return prev;
+            const ai = prev.ai ?? DEFAULT_AI;
             return {
-                ...current,
+                ...prev,
                 ai: { ...ai, [key]: value },
             };
         });
@@ -152,13 +182,15 @@ export function AdminSystemConfigPage() {
         value: number,
     ) => {
         setFormData((prev) => {
-            if (!prev?.tokens) return prev;
+            /* istanbul ignore next - defensive guard, prev is never null when form renders */
+            if (!prev) return prev;
+            const tokens = prev.tokens ?? DEFAULT_TOKENS;
             return {
                 ...prev,
                 tokens: {
-                    ...prev.tokens,
+                    ...tokens,
                     costs: {
-                        ...prev.tokens.costs,
+                        ...tokens.costs,
                         [operation]: value,
                     },
                 },
@@ -171,13 +203,15 @@ export function AdminSystemConfigPage() {
         value: number,
     ) => {
         setFormData((prev) => {
-            if (!prev?.tokens) return prev;
+            /* istanbul ignore next - defensive guard, prev is never null when form renders */
+            if (!prev) return prev;
+            const tokens = prev.tokens ?? DEFAULT_TOKENS;
             return {
                 ...prev,
                 tokens: {
-                    ...prev.tokens,
+                    ...tokens,
                     initialGrant: {
-                        ...prev.tokens.initialGrant,
+                        ...tokens.initialGrant,
                         [env]: value,
                     },
                 },
@@ -190,11 +224,13 @@ export function AdminSystemConfigPage() {
         enabled: boolean,
     ) => {
         setFormData((prev) => {
-            if (!prev?.features) return prev;
+            /* istanbul ignore next - defensive guard, prev is never null when form renders */
+            if (!prev) return prev;
+            const features = prev.features ?? DEFAULT_FEATURES;
             return {
                 ...prev,
                 features: {
-                    ...prev.features,
+                    ...features,
                     [feature]: enabled,
                 },
             };
@@ -203,11 +239,13 @@ export function AdminSystemConfigPage() {
 
     const updateRateLimit = (key: keyof ISystemConfig["rateLimits"], value: number) => {
         setFormData((prev) => {
-            if (!prev?.rateLimits) return prev;
+            /* istanbul ignore next - defensive guard, prev is never null when form renders */
+            if (!prev) return prev;
+            const rateLimits = prev.rateLimits ?? DEFAULT_RATE_LIMITS;
             return {
                 ...prev,
                 rateLimits: {
-                    ...prev.rateLimits,
+                    ...rateLimits,
                     [key]: value,
                 },
             };
@@ -226,29 +264,10 @@ export function AdminSystemConfigPage() {
 
     const hasChanges = JSON.stringify(formData) !== JSON.stringify(originalData);
 
-    // Fallback defaults match backend DEFAULT_CONFIG (learning/demo anti-abuse)
-    const displayAi = formData.ai ?? {
-        model: "gemini-3.5-flash",
-        maxTokensPerRequest: 2048,
-        temperature: 1.0,
-        thinkingLevel: "low",
-        thinkingBudget: 0,
-    };
-    const displayTokens = formData.tokens ?? {
-        initialGrant: { production: 25, staging: 40, development: 50, local: 50 },
-        costs: { summarize: 5, autoTag: 3, flashcards: 8, ragQuery: 10 },
-    };
-    const displayFeatures = formData.features ?? {
-        summarizeEnabled: true,
-        autoTagEnabled: true,
-        flashcardsEnabled: true,
-        ragQueryEnabled: true,
-        fileExtractionEnabled: true,
-    };
-    const displayRateLimits = formData.rateLimits ?? {
-        aiRequestsPerHour: 20,
-        fileExtractionsPerDay: 10,
-    };
+    const displayAi = formData.ai ?? DEFAULT_AI;
+    const displayTokens = formData.tokens ?? DEFAULT_TOKENS;
+    const displayFeatures = formData.features ?? DEFAULT_FEATURES;
+    const displayRateLimits = formData.rateLimits ?? DEFAULT_RATE_LIMITS;
 
     const modelOptions = AI_MODELS.some((m) => m.value === displayAi.model)
         ? AI_MODELS

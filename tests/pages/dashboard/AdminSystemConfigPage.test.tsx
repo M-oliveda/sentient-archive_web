@@ -390,7 +390,7 @@ describe("AdminSystemConfigPage", () => {
         expect(screen.queryByText("admin@example.com")).not.toBeInTheDocument();
     });
 
-    it("ignores rate limit updates when rateLimits are missing", async () => {
+    it("initializes rate limits from defaults when rateLimits are missing", async () => {
         const mockUseQuery = tanstackQuery.useQuery as jest.MockedFunction<
             typeof tanstackQuery.useQuery
         >;
@@ -408,16 +408,17 @@ describe("AdminSystemConfigPage", () => {
 
         const hourly = screen.getByLabelText("Max Ops / User / Hour");
 
-        // Display falls back to backend default (20); updates are ignored
         expect(hourly).toHaveValue(20);
 
         await userEvent.clear(hourly);
         await userEvent.type(hourly, "55");
 
-        expect(hourly).toHaveValue(20);
+        await waitFor(() => {
+            expect(hourly).toHaveValue(55);
+        });
     });
 
-    it("ignores initial grant updates when tokens are missing", async () => {
+    it("initializes initial grants from defaults when tokens are missing", async () => {
         const mockUseQuery = tanstackQuery.useQuery as jest.MockedFunction<
             typeof tanstackQuery.useQuery
         >;
@@ -432,13 +433,14 @@ describe("AdminSystemConfigPage", () => {
 
         const productionGrant = screen.getByLabelText("Production");
 
-        // With backend defaults, production grant is 25; updates are ignored
         expect(productionGrant).toHaveValue(25);
 
         await userEvent.clear(productionGrant);
         await userEvent.type(productionGrant, "99");
 
-        expect(productionGrant).toHaveValue(25);
+        await waitFor(() => {
+            expect(productionGrant).toHaveValue(99);
+        });
     });
 
     it("falls back to default AI fields when ai is missing", async () => {
@@ -478,7 +480,11 @@ describe("AdminSystemConfigPage", () => {
         const mockApiRequest = apiClient.apiRequest as jest.MockedFunction<
             typeof apiClient.apiRequest
         >;
-        mockApiRequest.mockResolvedValue(mockConfig);
+        mockApiRequest.mockResolvedValue({
+            success: true,
+            data: mockConfig,
+            timestamp: "2026-07-22T10:00:00Z",
+        });
 
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
@@ -493,7 +499,11 @@ describe("AdminSystemConfigPage", () => {
         const mockApiRequest = apiClient.apiRequest as jest.MockedFunction<
             typeof apiClient.apiRequest
         >;
-        mockApiRequest.mockResolvedValue(mockConfig);
+        mockApiRequest.mockResolvedValue({
+            success: true,
+            data: mockConfig,
+            timestamp: "2026-07-22T10:00:00Z",
+        });
 
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
@@ -647,7 +657,7 @@ describe("AdminSystemConfigPage", () => {
         expect(screen.getByDisplayValue("custom-model-x")).toBeInTheDocument();
     });
 
-    it("ignores feature updates when features are missing", async () => {
+    it("initializes feature flags from defaults when features are missing", async () => {
         const mockUseQuery = tanstackQuery.useQuery as jest.MockedFunction<
             typeof tanstackQuery.useQuery
         >;
@@ -661,15 +671,28 @@ describe("AdminSystemConfigPage", () => {
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
         const switches = screen.getAllByTestId("feature-switch");
-        // With backend defaults, features are enabled; updates are ignored
         expect(switches[0]).toHaveAttribute("data-checked", "true");
 
         await userEvent.click(switches[0]!);
 
-        expect(switches[0]).toHaveAttribute("data-checked", "true");
+        await waitFor(() => {
+            expect(switches[0]).toHaveAttribute("data-checked", "false");
+        });
+
+        await userEvent.click(screen.getByText("Save Changes"));
+
+        await waitFor(() => {
+            expect(mutateAsync).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    features: expect.objectContaining({
+                        summarizeEnabled: false,
+                    }),
+                }),
+            );
+        });
     });
 
-    it("ignores token cost updates when tokens are missing", async () => {
+    it("initializes token costs from defaults when tokens are missing", async () => {
         const mockUseQuery = tanstackQuery.useQuery as jest.MockedFunction<
             typeof tanstackQuery.useQuery
         >;
@@ -686,13 +709,14 @@ describe("AdminSystemConfigPage", () => {
             name: "Summarization",
         });
 
-        // With backend defaults, summarize cost is 5; updates are ignored
         expect(summarizeInput).toHaveValue(5);
 
         await userEvent.clear(summarizeInput);
         await userEvent.type(summarizeInput, "99");
 
-        expect(summarizeInput).toHaveValue(5);
+        await waitFor(() => {
+            expect(summarizeInput).toHaveValue(99);
+        });
     });
 
     it("disables Save button when no changes are made", () => {
@@ -721,5 +745,439 @@ describe("AdminSystemConfigPage", () => {
         await waitFor(() => {
             expect(saveButton).not.toBeDisabled();
         });
+    });
+
+    it("updates development initial grant", async () => {
+        render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
+
+        const developmentGrant = screen.getByLabelText("Development");
+        await userEvent.clear(developmentGrant);
+        await userEvent.type(developmentGrant, "125");
+
+        await userEvent.click(screen.getByText("Save Changes"));
+
+        await waitFor(() => {
+            expect(mutateAsync).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    tokens: expect.objectContaining({
+                        initialGrant: expect.objectContaining({
+                            development: 125,
+                        }),
+                    }),
+                }),
+            );
+        });
+    });
+
+    it("uses default value 'medium' when thinkingLevel is null", () => {
+        const mockUseQuery = tanstackQuery.useQuery as jest.MockedFunction<
+            typeof tanstackQuery.useQuery
+        >;
+        mockUseQuery.mockReturnValue({
+            data: {
+                ...mockConfig,
+                ai: { ...mockConfig.ai, thinkingLevel: null },
+            } as unknown as ISystemConfig,
+            isLoading: false,
+            isError: false,
+            error: null,
+        } as unknown as UseQueryResult<ISystemConfig>);
+
+        render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
+
+        const thinkingLevelSelect = screen.getByLabelText("Thinking Level (Gemini 3+)");
+        expect(thinkingLevelSelect).toHaveValue("medium");
+    });
+
+    it("uses default value 'medium' when thinkingLevel is undefined", () => {
+        const mockUseQuery = tanstackQuery.useQuery as jest.MockedFunction<
+            typeof tanstackQuery.useQuery
+        >;
+        mockUseQuery.mockReturnValue({
+            data: {
+                ...mockConfig,
+                ai: { ...mockConfig.ai, thinkingLevel: undefined },
+            } as unknown as ISystemConfig,
+            isLoading: false,
+            isError: false,
+            error: null,
+        } as unknown as UseQueryResult<ISystemConfig>);
+
+        render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
+
+        const thinkingLevelSelect = screen.getByLabelText("Thinking Level (Gemini 3+)");
+        expect(thinkingLevelSelect).toHaveValue("medium");
+    });
+
+    it("updates thinkingLevel from default", async () => {
+        const mockUseQuery = tanstackQuery.useQuery as jest.MockedFunction<
+            typeof tanstackQuery.useQuery
+        >;
+        mockUseQuery.mockReturnValue({
+            data: {
+                ...mockConfig,
+                ai: { ...mockConfig.ai, thinkingLevel: null },
+            } as unknown as ISystemConfig,
+            isLoading: false,
+            isError: false,
+            error: null,
+        } as unknown as UseQueryResult<ISystemConfig>);
+
+        render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
+
+        await userEvent.selectOptions(
+            screen.getByLabelText("Thinking Level (Gemini 3+)"),
+            "minimal",
+        );
+
+        await userEvent.click(screen.getByText("Save Changes"));
+
+        await waitFor(() => {
+            expect(mutateAsync).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    ai: expect.objectContaining({
+                        thinkingLevel: "minimal",
+                    }),
+                }),
+            );
+        });
+    });
+
+    it("uses default value -1 when thinkingBudget is null", () => {
+        const mockUseQuery = tanstackQuery.useQuery as jest.MockedFunction<
+            typeof tanstackQuery.useQuery
+        >;
+        mockUseQuery.mockReturnValue({
+            data: {
+                ...mockConfig,
+                ai: { ...mockConfig.ai, thinkingBudget: null },
+            } as unknown as ISystemConfig,
+            isLoading: false,
+            isError: false,
+            error: null,
+        } as unknown as UseQueryResult<ISystemConfig>);
+
+        render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
+
+        const thinkingBudget = screen.getByLabelText("Thinking Budget (Gemini 2.5)");
+        expect(thinkingBudget).toHaveValue(-1);
+    });
+
+    it("uses default value -1 when thinkingBudget is undefined", () => {
+        const mockUseQuery = tanstackQuery.useQuery as jest.MockedFunction<
+            typeof tanstackQuery.useQuery
+        >;
+        mockUseQuery.mockReturnValue({
+            data: {
+                ...mockConfig,
+                ai: { ...mockConfig.ai, thinkingBudget: undefined },
+            } as unknown as ISystemConfig,
+            isLoading: false,
+            isError: false,
+            error: null,
+        } as unknown as UseQueryResult<ISystemConfig>);
+
+        render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
+
+        const thinkingBudget = screen.getByLabelText("Thinking Budget (Gemini 2.5)");
+        expect(thinkingBudget).toHaveValue(-1);
+    });
+
+    it("handles empty initial grant inputs as 0", async () => {
+        render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
+
+        const developmentGrant = screen.getByLabelText("Development");
+        await userEvent.clear(developmentGrant);
+
+        await userEvent.click(screen.getByText("Save Changes"));
+
+        await waitFor(() => {
+            expect(mutateAsync).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    tokens: expect.objectContaining({
+                        initialGrant: expect.objectContaining({
+                            development: 0,
+                        }),
+                    }),
+                }),
+            );
+        });
+    });
+
+    it("handles empty file extraction limit as 0", async () => {
+        render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
+
+        const extractionLimit = screen.getByLabelText("File Extractions / Day");
+        await userEvent.clear(extractionLimit);
+
+        await userEvent.click(screen.getByText("Save Changes"));
+
+        await waitFor(() => {
+            expect(mutateAsync).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    rateLimits: expect.objectContaining({
+                        fileExtractionsPerDay: 0,
+                    }),
+                }),
+            );
+        });
+    });
+
+    it("updates autoTag token cost", async () => {
+        render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
+
+        const autoTagInput = screen.getByRole("spinbutton", {
+            name: "Auto-tagging",
+        });
+        await userEvent.clear(autoTagInput);
+        await userEvent.type(autoTagInput, "15");
+
+        await userEvent.click(screen.getByText("Save Changes"));
+
+        await waitFor(() => {
+            expect(mutateAsync).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    tokens: expect.objectContaining({
+                        costs: expect.objectContaining({ autoTag: 15 }),
+                    }),
+                }),
+            );
+        });
+    });
+
+    it("updates flashcards token cost", async () => {
+        render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
+
+        const flashcardsInput = screen.getByRole("spinbutton", {
+            name: "Flashcards",
+        });
+        await userEvent.clear(flashcardsInput);
+        await userEvent.type(flashcardsInput, "20");
+
+        await userEvent.click(screen.getByText("Save Changes"));
+
+        await waitFor(() => {
+            expect(mutateAsync).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    tokens: expect.objectContaining({
+                        costs: expect.objectContaining({ flashcards: 20 }),
+                    }),
+                }),
+            );
+        });
+    });
+
+    it("updates ragQuery token cost", async () => {
+        render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
+
+        const ragQueryInput = screen.getByRole("spinbutton", {
+            name: "Q&A Query",
+        });
+        await userEvent.clear(ragQueryInput);
+        await userEvent.type(ragQueryInput, "12");
+
+        await userEvent.click(screen.getByText("Save Changes"));
+
+        await waitFor(() => {
+            expect(mutateAsync).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    tokens: expect.objectContaining({
+                        costs: expect.objectContaining({ ragQuery: 12 }),
+                    }),
+                }),
+            );
+        });
+    });
+
+    it("toggles autoTag feature flag", async () => {
+        render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
+
+        const switches = screen.getAllByTestId("feature-switch");
+        await userEvent.click(switches[1]!);
+
+        await userEvent.click(screen.getByText("Save Changes"));
+
+        await waitFor(() => {
+            expect(mutateAsync).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    features: expect.objectContaining({
+                        autoTagEnabled: false,
+                    }),
+                }),
+            );
+        });
+    });
+
+    it("toggles flashcards feature flag", async () => {
+        render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
+
+        const switches = screen.getAllByTestId("feature-switch");
+        await userEvent.click(switches[2]!);
+
+        await userEvent.click(screen.getByText("Save Changes"));
+
+        await waitFor(() => {
+            expect(mutateAsync).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    features: expect.objectContaining({
+                        flashcardsEnabled: false,
+                    }),
+                }),
+            );
+        });
+    });
+
+    it("toggles ragQuery feature flag", async () => {
+        render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
+
+        const switches = screen.getAllByTestId("feature-switch");
+        await userEvent.click(switches[3]!);
+
+        await userEvent.click(screen.getByText("Save Changes"));
+
+        await waitFor(() => {
+            expect(mutateAsync).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    features: expect.objectContaining({
+                        ragQueryEnabled: false,
+                    }),
+                }),
+            );
+        });
+    });
+
+    it("toggles fileExtraction feature flag", async () => {
+        render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
+
+        const switches = screen.getAllByTestId("feature-switch");
+        await userEvent.click(switches[4]!);
+
+        await userEvent.click(screen.getByText("Save Changes"));
+
+        await waitFor(() => {
+            expect(mutateAsync).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    features: expect.objectContaining({
+                        fileExtractionEnabled: true,
+                    }),
+                }),
+            );
+        });
+    });
+
+    it("shows loading when transitioning between data states", () => {
+        const mockUseQuery = tanstackQuery.useQuery as jest.MockedFunction<
+            typeof tanstackQuery.useQuery
+        >;
+
+        // Start with loading
+        mockUseQuery.mockReturnValue({
+            data: undefined,
+            isLoading: true,
+            isError: false,
+            error: null,
+        } as unknown as UseQueryResult<ISystemConfig>);
+
+        const { rerender } = render(<AdminSystemConfigPage />, {
+            wrapper: createWrapper(),
+        });
+
+        expect(screen.getByText("Loading system configuration...")).toBeInTheDocument();
+
+        // Transition to loaded data
+        mockUseQuery.mockReturnValue({
+            data: mockConfig,
+            isLoading: false,
+            isError: false,
+            error: null,
+        } as unknown as UseQueryResult<ISystemConfig>);
+
+        rerender(<AdminSystemConfigPage />);
+
+        expect(screen.getByText("System Configuration")).toBeInTheDocument();
+    });
+
+    it("updates all thinking level options", async () => {
+        render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
+
+        const thinkingLevelSelect = screen.getByLabelText("Thinking Level (Gemini 3+)");
+
+        // Test all thinking level options
+        for (const level of ["minimal", "low", "medium", "high"]) {
+            await userEvent.selectOptions(thinkingLevelSelect, level);
+            expect(thinkingLevelSelect).toHaveValue(level);
+        }
+    });
+
+    it("renders all AI model options correctly", () => {
+        render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
+
+        const modelSelect = screen.getByLabelText("Default Gemini Model");
+        const options = modelSelect.querySelectorAll("option");
+
+        // Should have all AI_MODELS options
+        expect(options.length).toBeGreaterThan(10);
+        expect(modelSelect).toHaveValue("gemini-3.5-flash");
+    });
+
+    it("displays all feature flags", () => {
+        render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
+
+        // Use getAllByText for labels that appear multiple times (feature flags + token costs)
+        const summarizationElements = screen.getAllByText("Summarization");
+        expect(summarizationElements.length).toBeGreaterThan(0);
+
+        expect(screen.getByText("Auto-Tagging")).toBeInTheDocument();
+
+        const flashcardsElements = screen.getAllByText("Flashcards");
+        expect(flashcardsElements.length).toBeGreaterThan(0);
+
+        expect(screen.getByText("Q&A / RAG Query")).toBeInTheDocument();
+        expect(screen.getByText("File Extraction")).toBeInTheDocument();
+    });
+
+    it("displays all token cost fields", () => {
+        render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
+
+        expect(
+            screen.getByRole("spinbutton", { name: "Auto-tagging" }),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByRole("spinbutton", { name: "Summarization" }),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByRole("spinbutton", { name: "Flashcards" }),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByRole("spinbutton", { name: "Q&A Query" }),
+        ).toBeInTheDocument();
+    });
+
+    it("displays all initial grant fields", () => {
+        render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
+
+        expect(screen.getByLabelText("Production")).toBeInTheDocument();
+        expect(screen.getByLabelText("Staging")).toBeInTheDocument();
+        expect(screen.getByLabelText("Development")).toBeInTheDocument();
+        expect(screen.getByLabelText("Local")).toBeInTheDocument();
+    });
+
+    it("disables inputs while mutation is pending", () => {
+        const mockUseMutation = tanstackQuery.useMutation as jest.Mock;
+        mockUseMutation.mockReturnValue({
+            mutate: jest.fn(),
+            mutateAsync,
+            isPending: true,
+        });
+
+        render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
+
+        const modelSelect = screen.getByLabelText("Default Gemini Model");
+        const maxTokens = screen.getByLabelText("Max tokens / Op");
+        const temperature = screen.getByLabelText("Temperature");
+
+        expect(modelSelect).toBeDisabled();
+        expect(maxTokens).toBeDisabled();
+        expect(temperature).toBeDisabled();
     });
 });
