@@ -76,7 +76,7 @@ describe("AdminDashboardHome", () => {
 
     it("renders stat values from API data", () => {
         (useAdminStats as jest.Mock).mockReturnValue({
-            data: { success: true, data: mockStats },
+            data: mockStats,
             isLoading: false,
         });
         render(<AdminDashboardHome />);
@@ -89,14 +89,11 @@ describe("AdminDashboardHome", () => {
     it("renders zeros when loaded data has zero counts", () => {
         (useAdminStats as jest.Mock).mockReturnValue({
             data: {
-                success: true,
-                data: {
-                    ...mockStats,
-                    totalUsers: 0,
-                    totalNotes: 0,
-                    totalTokens: 0,
-                    totalAIOperations: 0,
-                },
+                ...mockStats,
+                totalUsers: 0,
+                totalNotes: 0,
+                totalTokens: 0,
+                totalAIOperations: 0,
             },
             isLoading: false,
         });
@@ -107,7 +104,7 @@ describe("AdminDashboardHome", () => {
 
     it("renders System Health section with all statuses", () => {
         (useAdminStats as jest.Mock).mockReturnValue({
-            data: { success: true, data: mockStats },
+            data: mockStats,
             isLoading: false,
         });
         render(<AdminDashboardHome />);
@@ -134,7 +131,7 @@ describe("AdminDashboardHome", () => {
 
     it("renders Recent Activity section", () => {
         (useAdminStats as jest.Mock).mockReturnValue({
-            data: { success: true, data: mockStats },
+            data: mockStats,
             isLoading: false,
         });
         render(<AdminDashboardHome />);
