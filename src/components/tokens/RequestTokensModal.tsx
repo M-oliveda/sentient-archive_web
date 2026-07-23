@@ -21,15 +21,19 @@ interface IRequestTokensModalProps {
 export function RequestTokensModal({ open, onOpenChange }: IRequestTokensModalProps) {
     const { user } = useAuthStore();
     const [amount, setAmount] = useState("");
+    const [justification, setJustification] = useState("");
     const [succeeded, setSucceeded] = useState(false);
     const requestTokens = useRequestTokens();
 
     const parsedAmount = parseInt(amount, 10);
+    const trimmedJustification = justification.trim();
     const isValidAmount = !isNaN(parsedAmount) && parsedAmount > 0;
+    const isValidJustification = trimmedJustification.length >= 3;
+    const canSubmit = isValidAmount && isValidJustification;
 
     const handleSubmit = () => {
         requestTokens.mutate(
-            { amount: parsedAmount },
+            { amount: parsedAmount, justification: trimmedJustification },
             {
                 onSuccess: () => {
                     setSucceeded(true);
@@ -41,6 +45,7 @@ export function RequestTokensModal({ open, onOpenChange }: IRequestTokensModalPr
     const handleClose = (nextOpen: boolean) => {
         if (!nextOpen) {
             setAmount("");
+            setJustification("");
             setSucceeded(false);
             requestTokens.reset();
         }
@@ -101,6 +106,19 @@ export function RequestTokensModal({ open, onOpenChange }: IRequestTokensModalPr
                             />
                         </div>
 
+                        <div className="space-y-2">
+                            <Label htmlFor="token-reason">Reason</Label>
+                            <Input
+                                id="token-reason"
+                                value={justification}
+                                onChange={(e) => setJustification(e.target.value)}
+                                placeholder="Why do you need more tokens?"
+                                disabled={requestTokens.isPending}
+                                size="default"
+                                maxLength={500}
+                            />
+                        </div>
+
                         {requestTokens.isError && (
                             <p className="text-destructive text-sm">
                                 Something went wrong. Please try again.
@@ -122,7 +140,7 @@ export function RequestTokensModal({ open, onOpenChange }: IRequestTokensModalPr
                                 type="button"
                                 size="default"
                                 onClick={handleSubmit}
-                                disabled={!isValidAmount || requestTokens.isPending}
+                                disabled={!canSubmit || requestTokens.isPending}
                                 className="rounded-full"
                             >
                                 {requestTokens.isPending ? (

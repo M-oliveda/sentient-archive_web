@@ -37,7 +37,7 @@ beforeEach(() => {
 });
 
 describe("useRequestTokens", () => {
-    it("calls POST /v1/tokens/request with the amount payload", async () => {
+    it("calls POST /v1/tokens/request with the amount and justification payload", async () => {
         (apiRequest as jest.Mock).mockResolvedValue({
             success: true,
             data: { requestId: "req-1", message: "Request submitted" },
@@ -47,13 +47,19 @@ describe("useRequestTokens", () => {
             wrapper: createWrapper(),
         });
 
-        result.current.mutate({ amount: 500 });
+        result.current.mutate({
+            amount: 500,
+            justification: "Need tokens for embeddings",
+        });
 
         await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
         expect(apiRequest).toHaveBeenCalledWith("/v1/tokens/request", {
             method: "POST",
-            body: JSON.stringify({ amount: 500 }),
+            body: JSON.stringify({
+                amount: 500,
+                justification: "Need tokens for embeddings",
+            }),
         });
     });
 

@@ -91,6 +91,15 @@ describe("RequestTokensModal", () => {
         expect(screen.getByText(/0 Tokens/)).toBeInTheDocument();
     });
 
+    const fillValidForm = (amountValue = "500") => {
+        fireEvent.change(screen.getByPlaceholderText("e.g. 500"), {
+            target: { value: amountValue },
+        });
+        fireEvent.change(screen.getByPlaceholderText("Why do you need more tokens?"), {
+            target: { value: "Need tokens for embeddings" },
+        });
+    };
+
     it("submit button is disabled when amount is empty", () => {
         render(<RequestTokensModal open={true} onOpenChange={jest.fn()} />);
         expect(screen.getByRole("button", { name: /Submit Request/ })).toBeDisabled();
@@ -101,27 +110,37 @@ describe("RequestTokensModal", () => {
         fireEvent.change(screen.getByPlaceholderText("e.g. 500"), {
             target: { value: "0" },
         });
+        fireEvent.change(screen.getByPlaceholderText("Why do you need more tokens?"), {
+            target: { value: "Need tokens for embeddings" },
+        });
         expect(screen.getByRole("button", { name: /Submit Request/ })).toBeDisabled();
     });
 
-    it("submit button is enabled when amount is valid", () => {
+    it("submit button is disabled when reason is too short", () => {
         render(<RequestTokensModal open={true} onOpenChange={jest.fn()} />);
         fireEvent.change(screen.getByPlaceholderText("e.g. 500"), {
             target: { value: "500" },
         });
+        fireEvent.change(screen.getByPlaceholderText("Why do you need more tokens?"), {
+            target: { value: "ab" },
+        });
+        expect(screen.getByRole("button", { name: /Submit Request/ })).toBeDisabled();
+    });
+
+    it("submit button is enabled when amount and reason are valid", () => {
+        render(<RequestTokensModal open={true} onOpenChange={jest.fn()} />);
+        fillValidForm();
         expect(
             screen.getByRole("button", { name: /Submit Request/ }),
         ).not.toBeDisabled();
     });
 
-    it("calls mutate with parsed amount on submit", () => {
+    it("calls mutate with parsed amount and justification on submit", () => {
         render(<RequestTokensModal open={true} onOpenChange={jest.fn()} />);
-        fireEvent.change(screen.getByPlaceholderText("e.g. 500"), {
-            target: { value: "300" },
-        });
+        fillValidForm("300");
         fireEvent.click(screen.getByRole("button", { name: /Submit Request/ }));
         expect(mockMutate).toHaveBeenCalledWith(
-            { amount: 300 },
+            { amount: 300, justification: "Need tokens for embeddings" },
             expect.objectContaining({ onSuccess: expect.any(Function) }),
         );
     });
@@ -141,9 +160,7 @@ describe("RequestTokensModal", () => {
         });
 
         render(<RequestTokensModal open={true} onOpenChange={jest.fn()} />);
-        fireEvent.change(screen.getByPlaceholderText("e.g. 500"), {
-            target: { value: "200" },
-        });
+        fillValidForm("200");
         fireEvent.click(screen.getByRole("button", { name: /Submit Request/ }));
 
         await waitFor(() => {
@@ -160,9 +177,7 @@ describe("RequestTokensModal", () => {
         });
 
         render(<RequestTokensModal open={true} onOpenChange={onOpenChange} />);
-        fireEvent.change(screen.getByPlaceholderText("e.g. 500"), {
-            target: { value: "100" },
-        });
+        fillValidForm("100");
         fireEvent.click(screen.getByRole("button", { name: /Submit Request/ }));
 
         await waitFor(() => expect(screen.getByText("Done")).toBeInTheDocument());
