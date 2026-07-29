@@ -7,6 +7,10 @@ jest.mock("@/lib/auth-service", () => ({
     authService: { signOut: jest.fn() },
 }));
 
+jest.mock("@/components/layout/LanguageSwitcher", () => ({
+    LanguageSwitcher: () => <div data-testid="language-switcher">Language</div>,
+}));
+
 jest.mock("@tanstack/react-router", () => ({
     Link: ({ to, children }: { to: string; children: React.ReactNode }) => (
         <a href={to}>{children}</a>
@@ -48,10 +52,10 @@ describe("DashboardLayout", () => {
                 <div />
             </DashboardLayout>,
         );
-        expect(screen.getByText("My Notes")).toBeInTheDocument();
-        expect(screen.getByText("AI Features")).toBeInTheDocument();
-        expect(screen.getByText("Activity")).toBeInTheDocument();
-        expect(screen.queryByText("Users")).not.toBeInTheDocument();
+        expect(screen.getByText("notes")).toBeInTheDocument();
+        expect(screen.getByText("aiFeatures")).toBeInTheDocument();
+        expect(screen.getByText("activity")).toBeInTheDocument();
+        expect(screen.queryByText("users")).not.toBeInTheDocument();
     });
 
     it("renders admin nav items for admin role", () => {
@@ -63,14 +67,14 @@ describe("DashboardLayout", () => {
                 <div />
             </DashboardLayout>,
         );
-        expect(screen.getByText("Users")).toBeInTheDocument();
-        expect(screen.getByText("Analytics")).toBeInTheDocument();
-        expect(screen.getByText("Token Economy")).toBeInTheDocument();
-        expect(screen.getByText("Settings").closest("a")).toHaveAttribute(
+        expect(screen.getByText("users")).toBeInTheDocument();
+        expect(screen.getByText("analytics")).toBeInTheDocument();
+        expect(screen.getByText("tokenRequests")).toBeInTheDocument();
+        expect(screen.getByText("settings").closest("a")).toHaveAttribute(
             "href",
             "/admin/settings",
         );
-        expect(screen.queryByText("My Notes")).not.toBeInTheDocument();
+        expect(screen.queryByText("notes")).not.toBeInTheDocument();
     });
 
     it("shows token widget for client role", () => {

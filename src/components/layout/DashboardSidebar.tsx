@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { authService } from "@/lib/auth-service";
 import { useAuthStore } from "@/stores/authStore";
 import { TokenWidget } from "./TokenWidget";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 
 export interface INavItem {
     label: string;
@@ -64,6 +65,9 @@ export function DashboardSidebar({
                         <TokenWidget balance={user.tokenBalance ?? 0} />
                     </div>
                 )}
+                <div className="flex w-full justify-center md:justify-start">
+                    <LanguageSwitcher />
+                </div>
                 <button
                     onClick={handleLogout}
                     className="flex w-full items-center justify-center gap-3 rounded-lg px-2 py-2.5 text-sm font-medium text-[hsl(var(--error))] transition-colors hover:text-[hsl(var(--error))]/80 md:justify-start md:px-3"

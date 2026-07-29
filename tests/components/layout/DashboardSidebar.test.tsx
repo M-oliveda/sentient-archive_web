@@ -8,6 +8,10 @@ jest.mock("@/lib/auth-service", () => ({
     authService: { signOut: jest.fn().mockResolvedValue(undefined) },
 }));
 
+jest.mock("@/components/layout/LanguageSwitcher", () => ({
+    LanguageSwitcher: () => <div data-testid="language-switcher">Language</div>,
+}));
+
 const mockUseRouterState = jest.fn();
 jest.mock("@tanstack/react-router", () => ({
     Link: ({
