@@ -15,11 +15,12 @@ describe("LandingFooter", () => {
 
     it("renders the copyright notice", () => {
         render(<LandingFooter />);
-        expect(screen.getByText(/© 2025 SentientArchive/)).toBeInTheDocument();
+        expect(screen.getByText("footer.tagline")).toBeInTheDocument();
+        expect(screen.getByText("footer.author")).toBeInTheDocument();
     });
 
     it("renders the tagline", () => {
         render(<LandingFooter />);
-        expect(screen.getByText(/AI-Powered Knowledge OS/)).toBeInTheDocument();
+        expect(screen.getByText("footer.tagline")).toBeInTheDocument();
     });
 });

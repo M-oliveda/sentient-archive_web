@@ -16,26 +16,30 @@ describe("HowItWorksSection", () => {
 
     it("renders the section heading", () => {
         render(<HowItWorksSection />);
-        expect(screen.getByText("How It Works")).toBeInTheDocument();
+        expect(screen.getByText("howItWorks.title")).toBeInTheDocument();
     });
 
     it("renders all three steps", () => {
         render(<HowItWorksSection />);
-        expect(screen.getByText("Create Your Account")).toBeInTheDocument();
-        expect(screen.getByText("Capture Your Knowledge")).toBeInTheDocument();
-        expect(screen.getByText("Unlock AI Insights")).toBeInTheDocument();
+        expect(
+            screen.getByText("howItWorks.steps.createAccount.title"),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByText("howItWorks.steps.captureKnowledge.title"),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByText("howItWorks.steps.unlockInsights.title"),
+        ).toBeInTheDocument();
     });
 
     it("renders step numbers", () => {
         render(<HowItWorksSection />);
-        expect(screen.getByText("Step 1")).toBeInTheDocument();
-        expect(screen.getByText("Step 2")).toBeInTheDocument();
-        expect(screen.getByText("Step 3")).toBeInTheDocument();
+        expect(screen.getAllByText("howItWorks.stepLabel")).toHaveLength(3);
     });
 
     it("renders Start For Free CTA linking to /signup", () => {
         render(<HowItWorksSection />);
-        const link = screen.getByRole("link", { name: "Start For Free" });
+        const link = screen.getByRole("link", { name: "howItWorks.cta" });
         expect(link).toHaveAttribute("href", "/signup");
     });
 

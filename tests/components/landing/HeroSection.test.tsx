@@ -10,17 +10,17 @@ jest.mock("@tanstack/react-router", () => ({
 describe("HeroSection", () => {
     it("renders the version badge", () => {
         render(<HeroSection />);
-        expect(screen.getByText("v1.0 is now live")).toBeInTheDocument();
+        expect(screen.getByText("hero.badge")).toBeInTheDocument();
     });
 
     it("renders the headline", () => {
         render(<HeroSection />);
-        expect(screen.getByText(/Unlock the wisdom in/)).toBeInTheDocument();
+        expect(screen.getByText("hero.title")).toBeInTheDocument();
     });
 
     it("renders Start for Free CTA linking to /signup", () => {
         render(<HeroSection />);
-        const link = screen.getByRole("link", { name: "Start for Free" });
+        const link = screen.getByRole("link", { name: "hero.cta" });
         expect(link).toHaveAttribute("href", "/signup");
     });
 

@@ -1,15 +1,18 @@
 import { motion } from "framer-motion";
 import { BookOpen, CoinsIcon, FileText, MessageCircle, Tag } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
 
 const TOKEN_COSTS = [
-    { icon: Tag, label: "Auto-Tagging", cost: "1 token" },
-    { icon: FileText, label: "Summarization", cost: "2 tokens" },
-    { icon: BookOpen, label: "Flashcards", cost: "3 tokens" },
-    { icon: MessageCircle, label: "Q&A Chat", cost: "4 tokens per query" },
+    { id: "autoTagging", icon: Tag },
+    { id: "summarization", icon: FileText },
+    { id: "flashcards", icon: BookOpen },
+    { id: "qaChat", icon: MessageCircle },
 ];
 
 export function TokenSystemSection() {
+    const { t } = useTranslation("landing");
+
     return (
         <section id="token-system" className="px-4 py-20">
             <div className="mx-auto max-w-5xl">
@@ -30,7 +33,7 @@ export function TokenSystemSection() {
                         <CoinsIcon className="text-brand-300 size-12" />
                     </motion.div>
                     <h2 className="text-foreground text-4xl font-bold">
-                        Simple Token-Based System
+                        {t("tokens.title")}
                     </h2>
                 </motion.div>
 
@@ -54,20 +57,14 @@ export function TokenSystemSection() {
                     >
                         <ul className="text-brand-100 space-y-4 text-sm">
                             <li>
-                                Every new user starts with{" "}
+                                {t("tokens.freeStartBefore")}{" "}
                                 <span className="text-brand-300 font-bold underline">
-                                    20 free
+                                    {t("tokens.freeStartHighlight")}
                                 </span>{" "}
-                                tokens to explore all AI features.
+                                {t("tokens.freeStartAfter")}
                             </li>
-                            <li>
-                                Each AI operation costs a small number of tokens based
-                                on complexity.
-                            </li>
-                            <li>
-                                Need more? Simply request additional tokens from your
-                                dashboard.
-                            </li>
+                            <li>{t("tokens.operationCost")}</li>
+                            <li>{t("tokens.requestMore")}</li>
                         </ul>
                     </motion.div>
 
@@ -76,9 +73,9 @@ export function TokenSystemSection() {
                         variants={staggerContainer}
                         className="grid grid-cols-1 gap-4 sm:grid-cols-2"
                     >
-                        {TOKEN_COSTS.map(({ icon: Icon, label, cost }) => (
+                        {TOKEN_COSTS.map(({ id, icon: Icon }) => (
                             <motion.div
-                                key={label}
+                                key={id}
                                 variants={fadeInUp}
                                 whileHover="hovered"
                                 initial="rest"
@@ -117,10 +114,10 @@ export function TokenSystemSection() {
                                 </motion.div>
 
                                 <p className="text-foreground group-hover:text-brand-300 font-bold transition-colors duration-200">
-                                    {label}
+                                    {t(`tokens.costs.${id}.label`)}
                                 </p>
                                 <p className="text-muted-foreground mt-1 text-xs">
-                                    {cost}
+                                    {t(`tokens.costs.${id}.cost`)}
                                 </p>
                             </motion.div>
                         ))}

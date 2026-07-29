@@ -1,29 +1,26 @@
 import { motion } from "framer-motion";
 import { Brain, Link2, Shield } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
 
 const FEATURES = [
     {
+        id: "cognitiveSearch",
         icon: Brain,
-        title: "Cognitive Search",
-        description:
-            "Don't just match keywords. Our AI understands the intent behind your query and surfaces relevant concepts.",
     },
     {
+        id: "autoLinking",
         icon: Link2,
-        title: "Auto-Linking",
-        description:
-            "New entries are automatically connected to existing knowledge nodes, creating a web of insight without manual effort.",
     },
     {
+        id: "privateByDesign",
         icon: Shield,
-        title: "Private by Design",
-        description:
-            "Your knowledge base is encrypted locally. Not even our AI models train on your personal data without consent.",
     },
 ];
 
 export function WhySentientArchiveSection() {
+    const { t } = useTranslation("landing");
+
     return (
         <section className="px-4 py-20">
             <div className="mx-auto max-w-5xl">
@@ -35,12 +32,9 @@ export function WhySentientArchiveSection() {
                     className="mb-12 text-center"
                 >
                     <h2 className="text-foreground text-4xl font-bold">
-                        Why SentientArchive?
+                        {t("why.title")}
                     </h2>
-                    <p className="text-muted-foreground mt-4">
-                        Designed for researchers, writers, and knowledge workers who
-                        need more than just storage.
-                    </p>
+                    <p className="text-muted-foreground mt-4">{t("why.subtitle")}</p>
                 </motion.div>
 
                 <motion.div
@@ -50,18 +44,20 @@ export function WhySentientArchiveSection() {
                     viewport={{ once: true }}
                     className="grid grid-cols-1 gap-6 sm:grid-cols-3"
                 >
-                    {FEATURES.map(({ icon: Icon, title, description }) => (
+                    {FEATURES.map(({ id, icon: Icon }) => (
                         <motion.div
-                            key={title}
+                            key={id}
                             variants={fadeInUp}
                             className="bg-muted rounded-2xl p-6"
                         >
                             <div className="mb-4 flex size-10 items-center justify-center rounded-xl bg-[hsl(var(--brand-300))]/40">
                                 <Icon className="text-foreground size-5" />
                             </div>
-                            <h3 className="text-foreground mb-2 font-bold">{title}</h3>
+                            <h3 className="text-foreground mb-2 font-bold">
+                                {t(`why.items.${id}.title`)}
+                            </h3>
                             <p className="text-muted-foreground text-sm">
-                                {description}
+                                {t(`why.items.${id}.description`)}
                             </p>
                         </motion.div>
                     ))}
