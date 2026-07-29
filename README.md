@@ -201,10 +201,15 @@ docker compose up        # Start Docker dev environment
 # Build
 npm run build            # Production build
 npm run preview          # Preview production build
+npm run analyze          # Build + open bundle visualizer (dist/bundle-stats.html)
 
 # Testing
 npm run test             # Run unit tests
-npm run test:coverage    # Generate coverage report
+npm run test:coverage    # Generate coverage report (100% required)
+npm run test:e2e         # Playwright (local Vite + emulators)
+npm run test:e2e:public  # Public/auth smoke only (CI-friendly)
+npm run test:e2e:staging # Staging smoke (needs E2E_* env)
+npm run test:e2e:ui      # Playwright UI mode
 
 # Code Quality
 npm run lint             # Run ESLint
@@ -223,26 +228,62 @@ This project uses Husky to enforce quality standards:
 
 ## Testing
 
-We aim for **100% test coverage** on critical components.
+We enforce **100% Jest coverage** (branches/functions/lines/statements) in CI.
 
 ### Tools
 
-- **Jest:** Unit test runner
-- **React Testing Library:** Component testing
-- **MSW:** API mocking
+- **Jest** + **React Testing Library** — unit and component tests
+- **MSW** — API mocking in Jest
+- **Playwright** — browser E2E (local emulators + staging/preview)
+- **@axe-core/playwright** — accessibility checks on public pages
 
-### Running Tests
+### Unit / integration
 
 ```bash
-# Run all tests
 npm run test
-
-# Watch mode
 npm run test:watch
-
-# Coverage report
 npm run test:coverage
 ```
+
+Integration flows live under `tests/integration/` (auth gate, notes cache invalidation,
+admin RBAC).
+
+### Playwright E2E
+
+**Local (Firebase emulators):** Auth `9099`, Firestore `8081`, Storage `9199`, Functions
+`5001`. Start emulators (and the functions API) on the shared `sentient-network`, then:
+
+```bash
+docker compose up -d
+
+npm run test:e2e          # full local suite (auth specs skip if user not seeded)
+npm run test:e2e:public   # landing / login / protected redirects / a11y / i18n
+```
+
+Copy [`e2e/.env.example`](e2e/.env.example) to `e2e/.env.local` for credentials
+(`E2E_LOCAL_*`, or remote `E2E_*`). Playwright loads `e2e/.env.local` automatically;
+shell/CI exports still override file values.
+
+**Staging / preview:** protected by HTTP Basic Auth. `E2E_TARGET`, `E2E_BASE_URL`, and
+`E2E_BASIC_AUTH_*` are required (via `e2e/.env.local` or exports):
+
+```bash
+export E2E_TARGET=staging
+export E2E_BASE_URL=https://your-cloud-run-url
+export E2E_BASIC_AUTH_USER=...
+export E2E_BASIC_AUTH_PASSWORD=...
+export E2E_TEST_EMAIL=...
+export E2E_TEST_PASSWORD=...
+npm run test:e2e:staging
+```
+
+Manual GitHub Actions workflow: **E2E Staging** (`.github/workflows/e2e-staging.yml`).
+
+### Docs
+
+- [User guide](docs/user-guide.md)
+- [Component API](docs/components.md)
+- [Deployment runbook](docs/deployment.md)
 
 ---
 

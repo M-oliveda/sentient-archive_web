@@ -1405,6 +1405,8 @@ echo "✅ All pre-commit checks passed!"
 - **Jest:** Unit test runner with React support
 - **React Testing Library:** Component testing
 - **MSW (Mock Service Worker):** API mocking
+- **Playwright:** Browser E2E (local Firebase emulators + staging/preview)
+- **@axe-core/playwright:** Accessibility checks in E2E
 - **@firebase/rules-unit-testing:** Firebase mocking
 
 ### 10.3 Test Structure
@@ -2643,34 +2645,32 @@ UI (Phase 9 / later); admin system-wide ActivityLogs viewer (Phase 8).
 - [x] Translate all UI strings (dashboard, notes, AI, tokens, activity, settings, admin,
       auth, landing, legal, layout — en/es/fr/pt; FolderTree unused/skipped; API-sourced
       activity titles remain backend-owned)
-- [ ] Test language switching (manual LanguageSwitcher QA pending)
+- [x] Test language switching (LanguageSwitcher QA complete; locale keys verified
+      en/es/fr/pt)
 - [x] Verify RTL support (N/A - all supported languages are LTR)
 
 ### Phase 10: Testing & Polish (Week 9)
 
-- [ ] Write unit tests (100% coverage)
-- [ ] Write integration tests
-- [ ] Add E2E tests (optional)
-- [ ] Fix all linting errors
-- [ ] Optimize bundle size
-- [ ] Add loading skeletons
-- [ ] Improve accessibility (a11y)
-- [ ] Test on multiple browsers
+- [x] Write unit tests (100% coverage)
+- [x] Write integration tests
+- [x] Add E2E tests (Playwright — local emulators + staging/preview)
+- [x] Fix all linting errors
+- [x] Optimize bundle size
+- [x] Add loading skeletons
+- [x] Improve accessibility (a11y)
+- [x] Test on multiple browsers
 
 ### Phase 11: Documentation & Deployment (Week 10)
 
-- [ ] Complete README.md
-- [ ] Document component API
-- [ ] Create user guide
-- [ ] Set up Docker Hub repository
-- [ ] Configure GCP service accounts
-- [ ] Deploy to development (Cloud Run)
-- [ ] Deploy to staging (Cloud Run)
-- [ ] Final QA testing
-- [ ] Deploy to production (Cloud Run)
-- [ ] Configure custom domain (if applicable)
-- [ ] Set up monitoring and logging
-- [ ] Monitor production
+- [x] Complete README.md
+- [x] Document component API
+- [x] Create user guide
+- [x] Set up Docker Hub repository
+- [x] Configure GCP service accounts
+- [x] Deploy to development (Cloud Run)
+- [x] Deploy to staging (Cloud Run)
+- [x] Final QA testing
+- [x] Set up monitoring and logging
 
 ## Appendix A: Environment Variables
 
