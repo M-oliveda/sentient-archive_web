@@ -17,6 +17,6 @@ describe("signup route", () => {
     it("should render signup page component", () => {
         renderRouteComponent(Route.options.component);
 
-        expect(screen.getByText("Create Account")).toBeInTheDocument();
+        expect(screen.getByText("signup.title")).toBeInTheDocument();
     });
 });

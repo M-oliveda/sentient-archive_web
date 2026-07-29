@@ -18,17 +18,19 @@ describe("ForgotPasswordConfirmationCard", () => {
             />,
         );
 
-        expect(screen.getByText("Check your email")).toBeInTheDocument();
         expect(
-            screen.getByText(/We've sent a password reset link to/),
+            screen.getByText("forgotPassword.confirmationTitle"),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByText("forgotPassword.confirmationDescription"),
         ).toBeInTheDocument();
         expect(screen.getByText("test@example.com")).toBeInTheDocument();
         expect(
-            screen.getByRole("button", { name: "Back to Login" }),
+            screen.getByRole("button", { name: "forgotPassword.backToLoginButton" }),
         ).toBeInTheDocument();
-        expect(screen.getByText("Didn't receive the email?")).toBeInTheDocument();
-        expect(screen.getByText("Click to resend")).toBeInTheDocument();
-        expect(screen.getByText("SentientArchive")).toBeInTheDocument();
+        expect(screen.getByText("forgotPassword.didntReceive")).toBeInTheDocument();
+        expect(screen.getByText("forgotPassword.resendLink")).toBeInTheDocument();
+        expect(screen.getByText("shared.appName")).toBeInTheDocument();
     });
 
     test("displays checkmark icon", () => {
@@ -69,7 +71,7 @@ describe("ForgotPasswordConfirmationCard", () => {
             />,
         );
 
-        const resendButton = screen.getByText("Click to resend");
+        const resendButton = screen.getByText("forgotPassword.resendLink");
         fireEvent.click(resendButton);
 
         await waitFor(() => {
@@ -87,7 +89,7 @@ describe("ForgotPasswordConfirmationCard", () => {
             />,
         );
 
-        const resendButton = screen.getByText("Sending...");
+        const resendButton = screen.getByText("forgotPassword.resendingLink");
         expect(resendButton).toBeDisabled();
     });
 
@@ -101,8 +103,8 @@ describe("ForgotPasswordConfirmationCard", () => {
             />,
         );
 
-        expect(screen.getByText("Sending...")).toBeInTheDocument();
-        expect(screen.queryByText("Click to resend")).not.toBeInTheDocument();
+        expect(screen.getByText("forgotPassword.resendingLink")).toBeInTheDocument();
+        expect(screen.queryByText("forgotPassword.resendLink")).not.toBeInTheDocument();
     });
 
     test("handles resend errors gracefully", async () => {
@@ -119,7 +121,7 @@ describe("ForgotPasswordConfirmationCard", () => {
             />,
         );
 
-        const resendButton = screen.getByText("Click to resend");
+        const resendButton = screen.getByText("forgotPassword.resendLink");
         fireEvent.click(resendButton);
 
         await waitFor(() => {
@@ -127,6 +129,8 @@ describe("ForgotPasswordConfirmationCard", () => {
         });
 
         // Component should continue to function normally even if resend fails
-        expect(screen.getByText("Check your email")).toBeInTheDocument();
+        expect(
+            screen.getByText("forgotPassword.confirmationTitle"),
+        ).toBeInTheDocument();
     });
 });

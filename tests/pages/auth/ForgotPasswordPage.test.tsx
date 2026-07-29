@@ -17,8 +17,8 @@ describe("ForgotPasswordPage", () => {
     test("renders request card initially", () => {
         render(<ForgotPasswordPage />);
 
-        expect(screen.getByText("Reset Your Password")).toBeInTheDocument();
-        expect(screen.getByLabelText("Email address")).toBeInTheDocument();
+        expect(screen.getByText("forgotPassword.requestTitle")).toBeInTheDocument();
+        expect(screen.getByLabelText("forgotPassword.emailLabel")).toBeInTheDocument();
     });
 
     test("shows confirmation card after successful email submission", async () => {
@@ -27,11 +27,11 @@ describe("ForgotPasswordPage", () => {
 
         render(<ForgotPasswordPage />);
 
-        const emailInput = screen.getByLabelText("Email address");
+        const emailInput = screen.getByLabelText("forgotPassword.emailLabel");
         fireEvent.change(emailInput, { target: { value: "test@example.com" } });
 
         const submitButton = screen.getByRole("button", {
-            name: "Send Reset Link",
+            name: "forgotPassword.submitButton",
         });
         fireEvent.click(submitButton);
 
@@ -40,7 +40,9 @@ describe("ForgotPasswordPage", () => {
         });
 
         await waitFor(() => {
-            expect(screen.getByText("Check your email")).toBeInTheDocument();
+            expect(
+                screen.getByText("forgotPassword.confirmationTitle"),
+            ).toBeInTheDocument();
             expect(screen.getByText("test@example.com")).toBeInTheDocument();
         });
     });
@@ -53,21 +55,21 @@ describe("ForgotPasswordPage", () => {
 
         render(<ForgotPasswordPage />);
 
-        const emailInput = screen.getByLabelText("Email address");
+        const emailInput = screen.getByLabelText("forgotPassword.emailLabel");
         fireEvent.change(emailInput, { target: { value: "notfound@example.com" } });
 
         const submitButton = screen.getByRole("button", {
-            name: "Send Reset Link",
+            name: "forgotPassword.submitButton",
         });
         fireEvent.click(submitButton);
 
         await waitFor(() => {
-            expect(
-                screen.getByText("No account found with this email"),
-            ).toBeInTheDocument();
+            expect(screen.getByText("errors.userNotFound")).toBeInTheDocument();
         });
 
-        expect(screen.queryByText("Check your email")).not.toBeInTheDocument();
+        expect(
+            screen.queryByText("forgotPassword.confirmationTitle"),
+        ).not.toBeInTheDocument();
     });
 
     test("allows resending email from confirmation card", async () => {
@@ -76,19 +78,21 @@ describe("ForgotPasswordPage", () => {
 
         render(<ForgotPasswordPage />);
 
-        const emailInput = screen.getByLabelText("Email address");
+        const emailInput = screen.getByLabelText("forgotPassword.emailLabel");
         fireEvent.change(emailInput, { target: { value: "test@example.com" } });
 
         const submitButton = screen.getByRole("button", {
-            name: "Send Reset Link",
+            name: "forgotPassword.submitButton",
         });
         fireEvent.click(submitButton);
 
         await waitFor(() => {
-            expect(screen.getByText("Check your email")).toBeInTheDocument();
+            expect(
+                screen.getByText("forgotPassword.confirmationTitle"),
+            ).toBeInTheDocument();
         });
 
-        const resendButton = screen.getByText("Click to resend");
+        const resendButton = screen.getByText("forgotPassword.resendLink");
         fireEvent.click(resendButton);
 
         await waitFor(() => {
@@ -110,19 +114,21 @@ describe("ForgotPasswordPage", () => {
 
         render(<ForgotPasswordPage />);
 
-        const emailInput = screen.getByLabelText("Email address");
+        const emailInput = screen.getByLabelText("forgotPassword.emailLabel");
         fireEvent.change(emailInput, { target: { value: "test@example.com" } });
 
         const submitButton = screen.getByRole("button", {
-            name: "Send Reset Link",
+            name: "forgotPassword.submitButton",
         });
         fireEvent.click(submitButton);
 
         await waitFor(() => {
-            expect(screen.getByText("Check your email")).toBeInTheDocument();
+            expect(
+                screen.getByText("forgotPassword.confirmationTitle"),
+            ).toBeInTheDocument();
         });
 
-        const resendButton = screen.getByText("Click to resend");
+        const resendButton = screen.getByText("forgotPassword.resendLink");
         fireEvent.click(resendButton);
 
         await waitFor(() => {
@@ -140,18 +146,16 @@ describe("ForgotPasswordPage", () => {
 
         render(<ForgotPasswordPage />);
 
-        const emailInput = screen.getByLabelText("Email address");
+        const emailInput = screen.getByLabelText("forgotPassword.emailLabel");
         fireEvent.change(emailInput, { target: { value: "test@example.com" } });
 
         const submitButton = screen.getByRole("button", {
-            name: "Send Reset Link",
+            name: "forgotPassword.submitButton",
         });
         fireEvent.click(submitButton);
 
         await waitFor(() => {
-            expect(
-                screen.getByText("An error occurred. Please try again"),
-            ).toBeInTheDocument();
+            expect(screen.getByText("errors.generic")).toBeInTheDocument();
         });
     });
 
@@ -165,19 +169,23 @@ describe("ForgotPasswordPage", () => {
 
         render(<ForgotPasswordPage />);
 
-        const emailInput = screen.getByLabelText("Email address");
+        const emailInput = screen.getByLabelText("forgotPassword.emailLabel");
         fireEvent.change(emailInput, { target: { value: "test@example.com" } });
 
         const submitButton = screen.getByRole("button", {
-            name: "Send Reset Link",
+            name: "forgotPassword.submitButton",
         });
         fireEvent.click(submitButton);
 
-        expect(screen.getByRole("button", { name: "Sending..." })).toBeInTheDocument();
+        expect(
+            screen.getByRole("button", { name: "forgotPassword.submittingButton" }),
+        ).toBeInTheDocument();
         expect(emailInput).toBeDisabled();
 
         await waitFor(() => {
-            expect(screen.getByText("Check your email")).toBeInTheDocument();
+            expect(
+                screen.getByText("forgotPassword.confirmationTitle"),
+            ).toBeInTheDocument();
         });
     });
 });

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -15,6 +16,7 @@ import {
     SentientInput,
     SentientInputPassword,
     defaultPasswordRules,
+    type IPasswordRule,
 } from "@/components/branding";
 import { authService } from "@/lib/auth-service";
 import { getAuthErrorMessage } from "@/lib/auth-errors";
@@ -24,9 +26,20 @@ import { Label } from "@/components/ui/label";
 import GoogleIcon from "@/components/branding/google-icon";
 
 export function SignupPage() {
+    const { t } = useTranslation("auth");
     const navigate = useNavigate();
     const { isAuthenticated } = useAuthStore();
     const [step, setStep] = useState(1);
+
+    // Translate password rules
+    const translatedPasswordRules: IPasswordRule[] = useMemo(
+        () =>
+            defaultPasswordRules.map((rule) => ({
+                ...rule,
+                label: t(`signup.passwordRules.${rule.key}`),
+            })),
+        [t],
+    );
     const [displayName, setDisplayName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -84,15 +97,15 @@ export function SignupPage() {
         let hasErrors = false;
 
         if (!displayName.trim()) {
-            setDisplayNameError("Please enter your display name");
+            setDisplayNameError(t("signup.validation.displayNameRequired"));
             hasErrors = true;
         }
 
         if (!email.trim()) {
-            setEmailError("Please enter your email address");
+            setEmailError(t("signup.validation.emailRequired"));
             hasErrors = true;
         } else if (!validateEmail(email)) {
-            setEmailError("Please enter a valid email address");
+            setEmailError(t("signup.validation.emailInvalid"));
             hasErrors = true;
         }
 
@@ -134,7 +147,7 @@ export function SignupPage() {
         }
 
         if (!passwordsMatch) {
-            setConfirmPasswordError("Passwords do not match");
+            setConfirmPasswordError(t("signup.validation.passwordsMismatch"));
             hasErrors = true;
         }
 
@@ -159,13 +172,15 @@ export function SignupPage() {
 
     return (
         <div className="bg-background flex min-h-screen items-center justify-center p-4">
-            <Card className="h-[620px] w-full max-w-sm justify-between gap-2">
+            <Card className="h-155 w-full max-w-sm justify-between gap-2">
                 <CardHeader className="text-center">
-                    <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
+                    <CardTitle className="text-2xl font-bold">
+                        {t("signup.title")}
+                    </CardTitle>
                     <CardDescription>
                         {step === 1
-                            ? "Step 1 of 2: Enter your details"
-                            : "Step 2 of 2: Create a password"}
+                            ? t("signup.step1Description")
+                            : t("signup.step2Description")}
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-2">
@@ -177,9 +192,9 @@ export function SignupPage() {
                             >
                                 <SentientInput
                                     id="signup-display-name"
-                                    label="Display Name"
+                                    label={t("signup.displayNameLabel")}
                                     type="text"
-                                    placeholder="John Doe"
+                                    placeholder={t("signup.displayNamePlaceholder")}
                                     value={displayName}
                                     onChange={(e) => {
                                         setDisplayName(e.target.value);
@@ -192,10 +207,10 @@ export function SignupPage() {
                                 />
                                 <SentientInput
                                     id="signup-email"
-                                    label="Email"
+                                    label={t("signup.emailLabel")}
                                     type="text"
                                     inputMode="email"
-                                    placeholder="jhondoe@example.com"
+                                    placeholder={t("signup.emailPlaceholder")}
                                     value={email}
                                     onChange={(e) => {
                                         setEmail(e.target.value);
@@ -210,14 +225,14 @@ export function SignupPage() {
                                     className="w-full"
                                     disabled={!isStep1Valid}
                                 >
-                                    Next
+                                    {t("signup.nextButton")}
                                 </Button>
                             </form>
 
                             <div className="flex items-center gap-2">
                                 <Separator className="flex-1" />
                                 <span className="text-muted-foreground text-sm">
-                                    Or
+                                    {t("shared.or")}
                                 </span>
                                 <Separator className="flex-1" />
                             </div>
@@ -230,7 +245,7 @@ export function SignupPage() {
                                 disabled={isLoading}
                             >
                                 <GoogleIcon />
-                                Continue with Google
+                                {t("shared.continueWithGoogle")}
                             </Button>
                         </>
                     ) : (
@@ -245,8 +260,8 @@ export function SignupPage() {
                             )}
                             <SentientInputPassword
                                 id="signup-password"
-                                label="Password"
-                                placeholder="********"
+                                label={t("signup.passwordLabel")}
+                                placeholder={t("signup.passwordPlaceholder")}
                                 value={password}
                                 onChange={(e) => {
                                     setPassword(e.target.value);
@@ -261,12 +276,13 @@ export function SignupPage() {
                                         ? "error"
                                         : "idle"
                                 }
+                                rules={translatedPasswordRules}
                             />
                             <SentientInput
                                 id="signup-confirm-password"
-                                label="Confirm Password"
+                                label={t("signup.confirmPasswordLabel")}
                                 type="password"
-                                placeholder="********"
+                                placeholder={t("signup.confirmPasswordPlaceholder")}
                                 value={confirmPassword}
                                 onChange={(e) => {
                                     setConfirmPassword(e.target.value);
@@ -281,7 +297,7 @@ export function SignupPage() {
                                 errorMessage={
                                     confirmPasswordError ||
                                     (confirmPassword && !passwordsMatch
-                                        ? "Passwords do not match"
+                                        ? t("signup.validation.passwordsMismatch")
                                         : undefined)
                                 }
                                 disabled={isLoading}
@@ -290,7 +306,7 @@ export function SignupPage() {
                             <div className="flex items-center gap-2">
                                 <Checkbox
                                     id="signup-terms-of-service"
-                                    aria-label="I agree to the terms of service"
+                                    aria-label={t("signup.termsPrefix")}
                                     checked={termsAccepted}
                                     onCheckedChange={(checked) =>
                                         setTermsAccepted(checked === true)
@@ -298,16 +314,18 @@ export function SignupPage() {
                                 />
                                 <Label
                                     htmlFor="signup-terms-of-service"
-                                    className="flex-wrap text-sm text-nowrap md:flex-nowrap md:gap-1"
+                                    className="flex-wrap text-sm md:flex-nowrap md:gap-3"
                                 >
-                                    I agree to the
+                                    <span className="text-nowrap">
+                                        {t("signup.termsPrefix")}{" "}
+                                    </span>
                                     <Link
                                         to="/terms-and-privacy"
                                         className="text-primary font-medium underline-offset-4 hover:underline"
                                         target="_blank"
                                         rel="noopener noreferrer"
                                     >
-                                        terms of service and privacy policy
+                                        {t("signup.termsLink")}
                                     </Link>
                                 </Label>
                             </div>
@@ -320,14 +338,16 @@ export function SignupPage() {
                                     onClick={handleBackStep}
                                     disabled={isLoading}
                                 >
-                                    Back
+                                    {t("signup.backButton")}
                                 </Button>
                                 <Button
                                     type="submit"
                                     className="flex-1"
                                     disabled={isLoading || !isStep2Valid}
                                 >
-                                    {isLoading ? "Creating account..." : "Sign Up"}
+                                    {isLoading
+                                        ? t("signup.submittingButton")
+                                        : t("signup.submitButton")}
                                 </Button>
                             </div>
                         </form>
@@ -335,12 +355,12 @@ export function SignupPage() {
                 </CardContent>
                 <CardFooter className="flex flex-col gap-2">
                     <p className="text-muted-foreground text-center text-sm">
-                        Already have an account?{" "}
+                        {t("signup.alreadyHaveAccount")}{" "}
                         <Link
                             to="/login"
                             className="text-primary font-medium underline-offset-4 hover:underline"
                         >
-                            Sign In
+                            {t("signup.signInLink")}
                         </Link>
                     </p>
                     <div className="flex items-center justify-center gap-2">
@@ -352,7 +372,7 @@ export function SignupPage() {
                             className="size-9"
                         />
                         <span className="text-foreground text-lg font-bold">
-                            SentientArchive
+                            {t("shared.appName")}
                         </span>
                     </div>
                 </CardFooter>

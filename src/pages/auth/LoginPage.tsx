@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -17,6 +18,7 @@ import { useAuthStore } from "@/stores/authStore";
 import GoogleIcon from "@/components/branding/google-icon";
 
 export function LoginPage() {
+    const { t } = useTranslation("auth");
     const navigate = useNavigate();
     const { isAuthenticated } = useAuthStore();
     const [email, setEmail] = useState("");
@@ -59,15 +61,15 @@ export function LoginPage() {
         let hasErrors = false;
 
         if (!email.trim()) {
-            setEmailError("Please enter your email address");
+            setEmailError(t("login.validation.emailRequired"));
             hasErrors = true;
         } else if (!validateEmail(email)) {
-            setEmailError("Please enter a valid email address");
+            setEmailError(t("login.validation.emailInvalid"));
             hasErrors = true;
         }
 
         if (!password) {
-            setPasswordError("Please enter your password");
+            setPasswordError(t("login.validation.passwordRequired"));
             hasErrors = true;
         }
 
@@ -92,19 +94,21 @@ export function LoginPage() {
 
     return (
         <div className="bg-background flex min-h-screen items-center justify-center p-4">
-            <Card className="h-[620px] w-full max-w-sm justify-between gap-2">
+            <Card className="h-155 w-full max-w-sm justify-between gap-2">
                 <CardHeader className="text-center">
-                    <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
-                    <CardDescription>Sign in to your knowledge base</CardDescription>
+                    <CardTitle className="text-2xl font-bold">
+                        {t("login.title")}
+                    </CardTitle>
+                    <CardDescription>{t("login.description")}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <form onSubmit={handleEmailSignIn}>
                         <SentientInput
                             id="login-email"
-                            label="Email address"
+                            label={t("login.emailLabel")}
                             type="text"
                             inputMode="email"
-                            placeholder="jhondoe@example.com"
+                            placeholder={t("login.emailPlaceholder")}
                             value={email}
                             onChange={(e) => {
                                 setEmail(e.target.value);
@@ -117,9 +121,9 @@ export function LoginPage() {
                         <div className="relative">
                             <SentientInput
                                 id="login-password"
-                                label="Password"
+                                label={t("login.passwordLabel")}
                                 type="password"
-                                placeholder="********"
+                                placeholder={t("login.passwordPlaceholder")}
                                 value={password}
                                 onChange={(e) => {
                                     setPassword(e.target.value);
@@ -135,7 +139,7 @@ export function LoginPage() {
                                     to="/forgot-password"
                                     className="text-primary text-xs font-medium underline-offset-4 hover:underline"
                                 >
-                                    Forgot Password?
+                                    {t("login.forgotPasswordLink")}
                                 </Link>
                             </p>
                         </div>
@@ -145,13 +149,17 @@ export function LoginPage() {
                             className="w-full"
                             disabled={isLoading || !isFormValid}
                         >
-                            {isLoading ? "Signing in..." : "Sign In"}
+                            {isLoading
+                                ? t("login.submittingButton")
+                                : t("login.submitButton")}
                         </Button>
                     </form>
 
                     <div className="flex items-center gap-2">
                         <Separator className="flex-1" />
-                        <span className="text-muted-foreground text-sm">Or</span>
+                        <span className="text-muted-foreground text-sm">
+                            {t("shared.or")}
+                        </span>
                         <Separator className="flex-1" />
                     </div>
 
@@ -163,17 +171,17 @@ export function LoginPage() {
                         disabled={isLoading}
                     >
                         <GoogleIcon />
-                        Continue with Google
+                        {t("shared.continueWithGoogle")}
                     </Button>
                 </CardContent>
                 <CardFooter className="flex flex-col gap-4">
                     <p className="text-muted-foreground text-center text-sm">
-                        Don&apos;t have an account?{" "}
+                        {t("login.dontHaveAccount")}{" "}
                         <Link
                             to="/signup"
                             className="text-primary font-medium underline-offset-4 hover:underline"
                         >
-                            Sign Up
+                            {t("login.signUpLink")}
                         </Link>
                     </p>
                     <div className="flex items-center justify-center gap-2">
@@ -185,7 +193,7 @@ export function LoginPage() {
                             className="size-9"
                         />
                         <span className="text-foreground text-lg font-bold">
-                            SentientArchive
+                            {t("shared.appName")}
                         </span>
                     </div>
                 </CardFooter>
