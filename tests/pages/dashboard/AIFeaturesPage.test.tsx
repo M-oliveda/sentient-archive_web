@@ -68,8 +68,8 @@ describe("AIFeaturesPage", () => {
 
     it("renders the hero badge and heading", () => {
         render(<AIFeaturesPage />);
-        expect(screen.getByText("AI Features Hub")).toBeInTheDocument();
-        expect(screen.getByText("Supercharge Your Knowledge")).toBeInTheDocument();
+        expect(screen.getByText("hub.badge")).toBeInTheDocument();
+        expect(screen.getByText("hub.title")).toBeInTheDocument();
     });
 
     it("falls back to the auth store balance when hook has no data yet", () => {
@@ -93,20 +93,16 @@ describe("AIFeaturesPage", () => {
     it("renders 0 as balance when user is null and hook has no data", () => {
         (useAuthStore as unknown as jest.Mock).mockReturnValue({ user: null });
         render(<AIFeaturesPage />);
-        expect(screen.getByText("Available Balance")).toBeInTheDocument();
+        expect(screen.getByText("hub.availableBalance")).toBeInTheDocument();
         expect(screen.queryByText(/450/)).not.toBeInTheDocument();
     });
 
     it("renders all 4 AI feature cards", () => {
         render(<AIFeaturesPage />);
-        expect(
-            screen.getByTestId("feature-card-Smart Summarization"),
-        ).toBeInTheDocument();
-        expect(
-            screen.getByTestId("feature-card-Semantic Auto-Tagging"),
-        ).toBeInTheDocument();
-        expect(screen.getByTestId("feature-card-Flash Generator")).toBeInTheDocument();
-        expect(screen.getByTestId("feature-card-Knowledge Q&A")).toBeInTheDocument();
+        expect(screen.getByTestId("feature-card-summarize")).toBeInTheDocument();
+        expect(screen.getByTestId("feature-card-autoTag")).toBeInTheDocument();
+        expect(screen.getByTestId("feature-card-flashcards")).toBeInTheDocument();
+        expect(screen.getByTestId("feature-card-ragQuery")).toBeInTheDocument();
     });
 
     it("hides disabled feature cards", () => {
@@ -123,15 +119,9 @@ describe("AIFeaturesPage", () => {
 
         render(<AIFeaturesPage />);
 
-        expect(
-            screen.getByTestId("feature-card-Smart Summarization"),
-        ).toBeInTheDocument();
-        expect(
-            screen.queryByTestId("feature-card-Flash Generator"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("feature-card-Knowledge Q&A"),
-        ).not.toBeInTheDocument();
+        expect(screen.getByTestId("feature-card-summarize")).toBeInTheDocument();
+        expect(screen.queryByTestId("feature-card-flashcards")).not.toBeInTheDocument();
+        expect(screen.queryByTestId("feature-card-ragQuery")).not.toBeInTheDocument();
     });
 
     it("shows empty state when all AI features are disabled", () => {
@@ -151,22 +141,20 @@ describe("AIFeaturesPage", () => {
         render(<AIFeaturesPage />);
 
         expect(screen.getByTestId("no-ai-features")).toBeInTheDocument();
+        expect(screen.getByText("hub.noFeatures")).toBeInTheDocument();
     });
 
     it("renders token cost on each feature card", () => {
         render(<AIFeaturesPage />);
-        expect(screen.getByText("5 tokens")).toBeInTheDocument();
-        expect(screen.getByText("3 tokens")).toBeInTheDocument();
-        expect(screen.getByText("8 tokens")).toBeInTheDocument();
-        expect(screen.getByText("10 tokens")).toBeInTheDocument();
+        expect(screen.getAllByText("hub.tokenCost")).toHaveLength(4);
     });
 
     it("renders How Tokens Work section with 3 steps", () => {
         render(<AIFeaturesPage />);
-        expect(screen.getByText("How Tokens Work")).toBeInTheDocument();
-        expect(screen.getByText(/1. Select a Feature/)).toBeInTheDocument();
-        expect(screen.getByText(/2. Spend Tokens/)).toBeInTheDocument();
-        expect(screen.getByText(/3. Get Insights/)).toBeInTheDocument();
+        expect(screen.getByText("hub.howTokensWork")).toBeInTheDocument();
+        expect(screen.getByText(/1\. hub\.steps\.select\.title/)).toBeInTheDocument();
+        expect(screen.getByText(/2\. hub\.steps\.spend\.title/)).toBeInTheDocument();
+        expect(screen.getByText(/3\. hub\.steps\.insights\.title/)).toBeInTheDocument();
     });
 
     it("Top Up Tokens button opens RequestTokensModal", () => {

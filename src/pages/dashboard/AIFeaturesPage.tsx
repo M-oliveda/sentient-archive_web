@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import {
     FileText,
     Tag,
@@ -20,72 +21,59 @@ import { RequestTokensModal } from "@/components/tokens/RequestTokensModal";
 import type { IFeatureFlags, ITokenCosts } from "@/types/config";
 
 interface IAIFeatureCard {
+    id: "summarize" | "autoTag" | "flashcards" | "ragQuery";
     key: keyof IFeatureFlags;
     icon: typeof FileText;
-    name: string;
-    description: string;
     costKey: keyof ITokenCosts;
 }
 
 const AI_FEATURES: IAIFeatureCard[] = [
     {
+        id: "summarize",
         key: "summarizeEnabled",
         icon: FileText,
-        name: "Smart Summarization",
-        description:
-            "Use AI to generate a concise and useful summarization of any note.",
         costKey: "summarize",
     },
     {
+        id: "autoTag",
         key: "autoTagEnabled",
         icon: Tag,
-        name: "Semantic Auto-Tagging",
-        description:
-            "Automatically organize your notes. The AI analyzes context and appends relevant tags to improve search ability.",
         costKey: "autoTag",
     },
     {
+        id: "flashcards",
         key: "flashcardsEnabled",
         icon: Layers,
-        name: "Flash Generator",
-        description:
-            "Turn your study notes or technical documentation into active recall flashcards instantly.",
         costKey: "flashcards",
     },
     {
+        id: "ragQuery",
         key: "ragQueryEnabled",
         icon: Brain,
-        name: "Knowledge Q&A",
-        description:
-            "Ask questions across your entire archive. The AI retrieves relevant notes and generates a contextual answer.",
         costKey: "ragQuery",
     },
 ];
 
 const HOW_IT_WORKS = [
     {
+        id: "select",
         icon: HandCoins,
         step: "1",
-        title: "Select a Feature",
-        description:
-            "Open any note, click the AI assistant button, and choose the AI tool that fits your current task from the hub.",
     },
     {
+        id: "spend",
         icon: Zap,
         step: "2",
-        title: "Spend Tokens",
-        description:
-            "Tokens are deducted from your wallet based on the complexity of the operation.",
     },
     {
+        id: "insights",
         icon: Lightbulb,
         step: "3",
-        title: "Get Insights",
-        description: "Receive instant results generated directly from your archives.",
     },
 ] as const;
 
 export function AIFeaturesPage() {
+    const { t } = useTranslation("ai");
     const { user } = useAuthStore();
     const tokenBalance = useTokenBalance();
     const { features, tokenCosts } = useClientConfig();
@@ -105,14 +93,13 @@ export function AIFeaturesPage() {
                 <section className="space-y-3">
                     <div className="bg-secondary text-foreground inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium">
                         <Sparkles className="text-primary size-4" />
-                        AI Features Hub
+                        {t("hub.badge")}
                     </div>
                     <h1 className="text-foreground text-3xl leading-tight font-bold md:text-4xl">
-                        Supercharge Your Knowledge
+                        {t("hub.title")}
                     </h1>
                     <p className="text-muted-foreground max-w-2xl text-base leading-relaxed">
-                        Unlock deep insights, generate summaries, and organize your
-                        chaotic thoughts instantly with our AI-powered toolset.
+                        {t("hub.subtitle")}
                     </p>
                 </section>
 
@@ -121,12 +108,12 @@ export function AIFeaturesPage() {
                     <div className="bg-primary text-primary-foreground flex flex-col gap-4 rounded-3xl p-6 sm:flex-row sm:items-center sm:justify-between">
                         <div className="space-y-1">
                             <p className="text-primary-foreground/60 text-sm font-medium tracking-wider uppercase">
-                                Available Balance
+                                {t("hub.availableBalance")}
                             </p>
                             <p className="text-4xl font-bold tabular-nums">
                                 {balance.toLocaleString()}{" "}
                                 <span className="text-primary-foreground/60 text-2xl font-normal">
-                                    tokens
+                                    {t("hub.tokens")}
                                 </span>
                             </p>
                             <button
@@ -134,7 +121,7 @@ export function AIFeaturesPage() {
                                 className="bg-secondary text-secondary-foreground hover:bg-secondary/80 mt-3 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors"
                                 data-testid="top-up-tokens-button"
                             >
-                                Top Up Tokens
+                                {t("hub.topUp")}
                                 <ArrowRight className="size-4" />
                             </button>
                         </div>
@@ -151,20 +138,19 @@ export function AIFeaturesPage() {
                             className="text-muted-foreground text-sm"
                             data-testid="no-ai-features"
                         >
-                            No AI features are currently available. Please check back
-                            later.
+                            {t("hub.noFeatures")}
                         </p>
                     ) : (
                         <div
                             className="-mx-6 flex gap-4 overflow-x-auto px-6 pb-2 md:mx-0 md:grid md:grid-cols-2 md:overflow-visible md:px-0 lg:grid-cols-4"
-                            aria-label="AI features"
+                            aria-label={t("hub.featuresAriaLabel")}
                         >
                             {visibleFeatures.map((feature) => (
                                 <Link
-                                    key={feature.name}
+                                    key={feature.id}
                                     to="/notes"
                                     className="bg-brand-500 text-brand-50 flex min-w-62.5 flex-col justify-between gap-4 rounded-3xl p-4 transition-opacity hover:opacity-90 md:min-w-0"
-                                    data-testid={`feature-card-${feature.name}`}
+                                    data-testid={`feature-card-${feature.id}`}
                                 >
                                     <div className="space-y-3">
                                         <div className="flex items-start justify-between">
@@ -172,21 +158,25 @@ export function AIFeaturesPage() {
                                                 <feature.icon className="text-brand-50 size-5" />
                                             </div>
                                             <span className="bg-brand-900/30 text-brand-100 rounded-full px-2.5 py-1 text-xs font-semibold">
-                                                {tokenCosts[feature.costKey]} tokens
+                                                {t("hub.tokenCost", {
+                                                    count: tokenCosts[feature.costKey],
+                                                })}
                                             </span>
                                         </div>
                                         <div>
                                             <p className="text-brand-50 text-lg font-bold">
-                                                {feature.name}
+                                                {t(`hub.features.${feature.id}.name`)}
                                             </p>
                                             <p className="text-brand-100 mt-1 text-sm leading-relaxed">
-                                                {feature.description}
+                                                {t(
+                                                    `hub.features.${feature.id}.description`,
+                                                )}
                                             </p>
                                         </div>
                                     </div>
                                     <div className="text-brand-100/60 flex items-center gap-1.5 text-xs">
                                         <Clock className="size-3.5" />
-                                        Open a note to use
+                                        {t("hub.openNote")}
                                     </div>
                                 </Link>
                             ))}
@@ -197,20 +187,20 @@ export function AIFeaturesPage() {
                 {/* How Tokens Work */}
                 <section className="space-y-5">
                     <h2 className="text-brand-500 text-xl font-bold">
-                        How Tokens Work
+                        {t("hub.howTokensWork")}
                     </h2>
                     <div className="grid gap-6 md:grid-cols-3">
                         {HOW_IT_WORKS.map((step) => (
-                            <div key={step.title} className="flex gap-4">
+                            <div key={step.id} className="flex gap-4">
                                 <div className="text-primary mt-0.5 shrink-0">
                                     <step.icon className="size-6" />
                                 </div>
                                 <div className="space-y-1">
                                     <p className="text-foreground font-semibold">
-                                        {step.step}. {step.title}
+                                        {step.step}. {t(`hub.steps.${step.id}.title`)}
                                     </p>
                                     <p className="text-muted-foreground text-sm leading-relaxed">
-                                        {step.description}
+                                        {t(`hub.steps.${step.id}.description`)}
                                     </p>
                                 </div>
                             </div>
