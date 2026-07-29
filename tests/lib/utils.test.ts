@@ -1,5 +1,21 @@
 import { cn, formatTimeAgo, formatTokenAmount } from "@/lib/utils";
 
+// Mock i18n
+jest.mock("@/lib/i18n", () => ({
+    __esModule: true,
+    default: {
+        t: (key: string, options?: { ns?: string; count?: number; amount?: number | string }) => {
+            if (key === "timeAgo.seconds") return `${options?.count}s ago`;
+            if (key === "timeAgo.minutes") return `${options?.count}m ago`;
+            if (key === "timeAgo.hours") return `${options?.count}h ago`;
+            if (key === "timeAgo.days") return `${options?.count}d ago`;
+            if (key === "tokens.unit") return `${options?.amount} TKN`;
+            if (key === "tokens.unitCompact") return `${options?.amount}k TKN`;
+            return key;
+        },
+    },
+}));
+
 describe("cn", () => {
     it("merges class names correctly", () => {
         expect(cn("foo", "bar")).toBe("foo bar");
