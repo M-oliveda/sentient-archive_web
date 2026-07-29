@@ -10,5 +10,8 @@
   "tokenRequests": "Token Requests",
   "analytics": "Analytics",
   "systemConfig": "System Config",
-  "activityLogs": "Activity Logs"
+  "activityLogs": "Activity Logs",
+  "logout": "Log Out",
+  "selectLanguage": "Select language",
+  "mainNavigation": "Main navigation"
 }

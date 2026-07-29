@@ -103,13 +103,13 @@ describe("DashboardSidebar", () => {
 
     it("calls authService.signOut when Log Out is clicked", async () => {
         render(<DashboardSidebar navItems={mockNavItems} showTokenWidget={false} />);
-        fireEvent.click(screen.getByText("Log Out"));
+        fireEvent.click(screen.getByText("logout"));
         expect(authService.signOut).toHaveBeenCalledTimes(1);
     });
 
     it("renders Log Out button", () => {
         render(<DashboardSidebar navItems={mockNavItems} showTokenWidget={false} />);
-        expect(screen.getByRole("button", { name: /Log Out/ })).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: /logout/i })).toBeInTheDocument();
     });
 
     it("defaults to hiding TokenWidget when showTokenWidget prop is omitted", () => {

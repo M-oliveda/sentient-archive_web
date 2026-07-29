@@ -105,7 +105,7 @@ describe("LanguageSwitcher", () => {
 
     test("renders language switcher button", () => {
         render(<LanguageSwitcher />);
-        const button = screen.getByRole("button", { name: /select language/i });
+        const button = screen.getByRole("button", { name: /selectLanguage/i });
         expect(button).toBeInTheDocument();
     });
 
