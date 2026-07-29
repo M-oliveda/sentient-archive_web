@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { RecentNoteCard } from "@/components/dashboard/RecentNoteCard";
 import { FileExtractor } from "@/components/notes/FileExtractor";
@@ -132,6 +133,11 @@ export function ClientDashboardHome() {
                     <p className="text-muted-foreground text-sm">
                         {t("client.recentNotes.empty")}
                     </p>
+                ) : isLoading ? (
+                    <div className="space-y-4" data-testid="recent-notes-loading">
+                        <Skeleton className="h-28 w-full rounded-2xl" />
+                        <Skeleton className="h-28 w-full rounded-2xl" />
+                    </div>
                 ) : (
                     <div className="space-y-4">
                         {recentNotes.map((note) => (

@@ -158,7 +158,7 @@ describe("AdminUsersTable", () => {
     it("shows loading state", () => {
         render(<AdminUsersTable data={[]} isLoading={true} {...mockHandlers} />);
 
-        expect(screen.getByText("users.loading")).toBeInTheDocument();
+        expect(screen.getByTestId("admin-users-loading")).toBeInTheDocument();
     });
 
     it("shows empty state", () => {

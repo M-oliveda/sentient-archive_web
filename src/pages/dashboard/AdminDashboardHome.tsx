@@ -1,6 +1,7 @@
 import { Bot, Coins, FileText, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { ActivityItem } from "@/components/dashboard/ActivityItem";
 import { useAdminStats } from "@/hooks/useAdminStats";
@@ -39,30 +40,38 @@ export function AdminDashboardHome() {
                 className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4"
                 aria-label={t("admin.stats.ariaLabel")}
             >
-                <StatsCard
-                    icon={Users}
-                    label={t("admin.stats.totalUsers")}
-                    value={isLoading ? "—" : (stats?.totalUsers ?? 0)}
-                    variant="accent"
-                />
-                <StatsCard
-                    icon={FileText}
-                    label={t("admin.stats.totalNotes")}
-                    value={isLoading ? "—" : (stats?.totalNotes ?? 0)}
-                    variant="accent"
-                />
-                <StatsCard
-                    icon={Coins}
-                    label={t("admin.stats.totalTokens")}
-                    value={isLoading ? "—" : (stats?.totalTokens ?? 0)}
-                    variant="accent"
-                />
-                <StatsCard
-                    icon={Bot}
-                    label={t("admin.stats.totalAiOps")}
-                    value={isLoading ? "—" : (stats?.totalAIOperations ?? 0)}
-                    variant="accent"
-                />
+                {isLoading ? (
+                    Array.from({ length: 4 }).map((_, i) => (
+                        <Skeleton key={i} className="h-28 rounded-2xl" />
+                    ))
+                ) : (
+                    <>
+                        <StatsCard
+                            icon={Users}
+                            label={t("admin.stats.totalUsers")}
+                            value={stats?.totalUsers ?? 0}
+                            variant="accent"
+                        />
+                        <StatsCard
+                            icon={FileText}
+                            label={t("admin.stats.totalNotes")}
+                            value={stats?.totalNotes ?? 0}
+                            variant="accent"
+                        />
+                        <StatsCard
+                            icon={Coins}
+                            label={t("admin.stats.totalTokens")}
+                            value={stats?.totalTokens ?? 0}
+                            variant="accent"
+                        />
+                        <StatsCard
+                            icon={Bot}
+                            label={t("admin.stats.totalAiOps")}
+                            value={stats?.totalAIOperations ?? 0}
+                            variant="accent"
+                        />
+                    </>
+                )}
             </section>
 
             {/* Lower panels */}

@@ -75,7 +75,7 @@ describe("NotesList", () => {
 
     it("shows a spinner when isLoading is true", () => {
         render(<NotesList {...BASE_PROPS} isLoading={true} />);
-        expect(document.querySelector("svg")).toBeInTheDocument();
+        expect(screen.getByTestId("notes-grid-loading")).toBeInTheDocument();
     });
 
     it("calls onSearchChange when the search input changes", () => {

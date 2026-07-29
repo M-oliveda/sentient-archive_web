@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
     Table,
     TableBody,
@@ -119,8 +120,13 @@ export function AdminUsersTable({
 
     if (isLoading) {
         return (
-            <div className="border-border flex items-center justify-center rounded-3xl border py-16">
-                <p className="text-muted-foreground text-sm">{t("users.loading")}</p>
+            <div
+                className="border-border space-y-3 rounded-3xl border p-6"
+                data-testid="admin-users-loading"
+            >
+                {Array.from({ length: 5 }).map((_, i) => (
+                    <Skeleton key={i} className="h-12 w-full rounded-xl" />
+                ))}
             </div>
         );
     }

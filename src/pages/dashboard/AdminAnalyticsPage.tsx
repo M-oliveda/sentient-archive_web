@@ -32,6 +32,7 @@ import {
     ResponsiveContainer,
     Legend,
 } from "recharts";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function AdminAnalyticsPage() {
     const { t, i18n } = useTranslation("admin");
@@ -51,8 +52,17 @@ export function AdminAnalyticsPage() {
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center py-12">
-                <div className="text-muted-foreground">{t("analytics.loading")}</div>
+            <div className="space-y-8" data-testid="admin-analytics-loading">
+                <div className="space-y-2">
+                    <Skeleton className="h-10 w-64" />
+                    <Skeleton className="h-5 w-96 max-w-full" />
+                </div>
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                    {Array.from({ length: 4 }).map((_, i) => (
+                        <Skeleton key={i} className="h-28 rounded-2xl" />
+                    ))}
+                </div>
+                <Skeleton className="h-72 w-full rounded-2xl" />
             </div>
         );
     }
