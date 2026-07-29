@@ -24,9 +24,9 @@ describe("ActivityStatsCards", () => {
     it("renders all three stat cards", () => {
         render(<ActivityStatsCards stats={stats} />);
         expect(screen.getByTestId("activity-stats-cards")).toBeInTheDocument();
-        expect(screen.getByText("Actions today")).toBeInTheDocument();
-        expect(screen.getByText("AI Ops This Week")).toBeInTheDocument();
-        expect(screen.getByText("Total Actions")).toBeInTheDocument();
+        expect(screen.getByText("stats.actionsToday")).toBeInTheDocument();
+        expect(screen.getByText("stats.aiOpsThisWeek")).toBeInTheDocument();
+        expect(screen.getByText("stats.totalActions")).toBeInTheDocument();
         expect(screen.getByText("24")).toBeInTheDocument();
         expect(screen.getByText("10")).toBeInTheDocument();
         expect(screen.getByText("11,240")).toBeInTheDocument();
