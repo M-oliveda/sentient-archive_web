@@ -145,7 +145,9 @@ describe("NotesPage", () => {
 
     it("renders the 'My Notes' heading", () => {
         render(<NotesPage />);
-        expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("My Notes");
+        expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+            "list.title",
+        );
     });
 
     it("shows plural 'notes total' when there are multiple notes", () => {
@@ -154,28 +156,30 @@ describe("NotesPage", () => {
             isLoading: false,
         });
         render(<NotesPage />);
-        expect(screen.getByText("2 notes total")).toBeInTheDocument();
+        expect(screen.getByText("list.notesTotal")).toBeInTheDocument();
     });
 
     it("shows singular 'note total' when there is one note", () => {
         render(<NotesPage />);
-        expect(screen.getByText("1 note total")).toBeInTheDocument();
+        expect(screen.getByText("list.noteTotal")).toBeInTheDocument();
     });
 
     it("renders the New Note button", () => {
         render(<NotesPage />);
-        expect(screen.getByRole("button", { name: /New Note/ })).toBeInTheDocument();
+        expect(
+            screen.getByRole("button", { name: /list\.newNote/ }),
+        ).toBeInTheDocument();
     });
 
     it("disables the New Note button when createNote is pending", () => {
         mockCreateNote.isPending = true;
         render(<NotesPage />);
-        expect(screen.getByRole("button", { name: /New Note/ })).toBeDisabled();
+        expect(screen.getByRole("button", { name: /list\.newNote/ })).toBeDisabled();
     });
 
     it("clicking New Note calls createNote.mutateAsync with null folderId", async () => {
         render(<NotesPage />);
-        fireEvent.click(screen.getByRole("button", { name: /New Note/ }));
+        fireEvent.click(screen.getByRole("button", { name: /list\.newNote/ }));
         await waitFor(() =>
             expect(mockCreateNote.mutateAsync).toHaveBeenCalledWith(null),
         );
@@ -183,7 +187,7 @@ describe("NotesPage", () => {
 
     it("clicking New Note navigates to /notes/$noteId in edit mode", async () => {
         render(<NotesPage />);
-        fireEvent.click(screen.getByRole("button", { name: /New Note/ }));
+        fireEvent.click(screen.getByRole("button", { name: /list\.newNote/ }));
         await waitFor(() =>
             expect(mockNavigate).toHaveBeenCalledWith({
                 to: "/notes/$noteId",
@@ -196,7 +200,7 @@ describe("NotesPage", () => {
     it("clicking New Note passes active folderId to createNote.mutateAsync", async () => {
         setupQueryState({ folderId: "folder-x" });
         render(<NotesPage />);
-        fireEvent.click(screen.getByRole("button", { name: /New Note/ }));
+        fireEvent.click(screen.getByRole("button", { name: /list\.newNote/ }));
         await waitFor(() =>
             expect(mockCreateNote.mutateAsync).toHaveBeenCalledWith("folder-x"),
         );

@@ -109,14 +109,12 @@ describe("MarkdownEditor", () => {
 
     it("uses default placeholder when none provided", () => {
         render(<MarkdownEditor initialContent="" onChange={jest.fn()} />);
-        expect(
-            screen.getByText("Start writing… (markdown shortcuts supported)"),
-        ).toBeInTheDocument();
+        expect(screen.getByText("editor.placeholder")).toBeInTheDocument();
     });
 
     it("renders the content-editable area with aria-label", () => {
         render(<MarkdownEditor initialContent="" onChange={jest.fn()} />);
-        expect(screen.getByLabelText("Note content")).toBeInTheDocument();
+        expect(screen.getByLabelText("editor.contentAriaLabel")).toBeInTheDocument();
     });
 
     it("calls $convertFromMarkdownString with initialContent on mount", () => {
@@ -174,7 +172,7 @@ describe("MarkdownEditor", () => {
 
     it("works without onChange prop when readOnly is true", () => {
         render(<MarkdownEditor initialContent="# Hello" readOnly />);
-        expect(screen.getByLabelText("Note content")).toBeInTheDocument();
+        expect(screen.getByLabelText("editor.contentAriaLabel")).toBeInTheDocument();
     });
 
     it("renders MarkdownFormattingToolbar when showToolbar is true and not readOnly", () => {

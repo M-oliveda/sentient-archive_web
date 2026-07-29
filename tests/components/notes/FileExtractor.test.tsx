@@ -53,14 +53,14 @@ describe("FileExtractor", () => {
 
     it("renders the Upload Document button", () => {
         render(<FileExtractor onNoteCreated={onNoteCreated} />);
-        expect(screen.getByText("Upload Document")).toBeInTheDocument();
+        expect(screen.getByText("extractor.button")).toBeInTheDocument();
     });
 
     it("clicking the button triggers the hidden file input", () => {
         render(<FileExtractor onNoteCreated={onNoteCreated} />);
         const input = document.querySelector("input[type=file]") as HTMLInputElement;
         const clickSpy = jest.spyOn(input, "click").mockImplementation(() => {});
-        fireEvent.click(screen.getByText("Upload Document"));
+        fireEvent.click(screen.getByText("extractor.button"));
         expect(clickSpy).toHaveBeenCalledTimes(1);
         clickSpy.mockRestore();
     });
@@ -71,7 +71,7 @@ describe("FileExtractor", () => {
             isPending: true,
         });
         render(<FileExtractor onNoteCreated={onNoteCreated} />);
-        expect(screen.getByText("Uploading…")).toBeInTheDocument();
+        expect(screen.getByText("extractor.stages.uploading")).toBeInTheDocument();
     });
 
     it("advances to the next stage after the interval elapses", () => {
@@ -81,11 +81,11 @@ describe("FileExtractor", () => {
             isPending: true,
         });
         render(<FileExtractor onNoteCreated={onNoteCreated} />);
-        expect(screen.getByText("Uploading…")).toBeInTheDocument();
+        expect(screen.getByText("extractor.stages.uploading")).toBeInTheDocument();
         act(() => {
             jest.advanceTimersByTime(1200);
         });
-        expect(screen.getByText("Parsing content…")).toBeInTheDocument();
+        expect(screen.getByText("extractor.stages.parsing")).toBeInTheDocument();
         jest.useRealTimers();
     });
 
@@ -101,9 +101,7 @@ describe("FileExtractor", () => {
         const input = document.querySelector("input[type=file]") as HTMLInputElement;
         const file = makeFile("report.docx", "application/msword");
         fireEvent.change(input, { target: { files: [file] } });
-        expect(toast.error).toHaveBeenCalledWith(
-            "Only PDF, TXT, and MD files are supported.",
-        );
+        expect(toast.error).toHaveBeenCalledWith("extractor.errors.unsupportedType");
         expect(mockMutateAsync).not.toHaveBeenCalled();
     });
 
@@ -125,7 +123,7 @@ describe("FileExtractor", () => {
         const input = document.querySelector("input[type=file]") as HTMLInputElement;
         const oversizedFile = makeFile("big.pdf", "application/pdf", 11 * 1024 * 1024);
         fireEvent.change(input, { target: { files: [oversizedFile] } });
-        expect(toast.error).toHaveBeenCalledWith("File must be smaller than 10 MB.");
+        expect(toast.error).toHaveBeenCalledWith("extractor.errors.tooLarge");
         expect(mockMutateAsync).not.toHaveBeenCalled();
     });
 
@@ -140,7 +138,7 @@ describe("FileExtractor", () => {
         fireEvent.change(input, { target: { files: [file] } });
 
         await waitFor(() => expect(mockMutateAsync).toHaveBeenCalledWith(file));
-        expect(toast.success).toHaveBeenCalledWith('"Doc Title" created from doc.pdf');
+        expect(toast.success).toHaveBeenCalledWith("extractor.success");
         expect(onNoteCreated).toHaveBeenCalledWith("note-42");
     });
 

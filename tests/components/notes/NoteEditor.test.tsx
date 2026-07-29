@@ -339,7 +339,7 @@ describe("NoteEditor", () => {
 
     it("renders the tag input field", () => {
         render(<NoteEditor noteId="n1" onDeleted={jest.fn()} />);
-        expect(screen.getByLabelText("Add tag")).toBeInTheDocument();
+        expect(screen.getByLabelText("editor.addTag")).toBeInTheDocument();
     });
 
     it("renders existing tags from the note", () => {
@@ -355,7 +355,7 @@ describe("NoteEditor", () => {
 
     it("adds a new tag when Enter is pressed in the tag input", async () => {
         render(<NoteEditor noteId="n1" onDeleted={jest.fn()} />);
-        const input = screen.getByLabelText("Add tag");
+        const input = screen.getByLabelText("editor.addTag");
         fireEvent.change(input, { target: { value: "newtag" } });
         fireEvent.keyDown(input, { key: "Enter" });
 
@@ -374,7 +374,7 @@ describe("NoteEditor", () => {
             isError: false,
         });
         render(<NoteEditor noteId="n1" onDeleted={jest.fn()} />);
-        fireEvent.click(screen.getByLabelText("Remove react tag"));
+        fireEvent.click(screen.getByLabelText("editor.removeTag"));
 
         await waitFor(() =>
             expect(mockMutateAsync).toHaveBeenCalledWith({
@@ -386,7 +386,7 @@ describe("NoteEditor", () => {
 
     it("does not add a tag when a non-Enter key is pressed", async () => {
         render(<NoteEditor noteId="n1" onDeleted={jest.fn()} />);
-        const input = screen.getByLabelText("Add tag");
+        const input = screen.getByLabelText("editor.addTag");
         fireEvent.change(input, { target: { value: "newtag" } });
         fireEvent.keyDown(input, { key: "Space" });
 
@@ -406,7 +406,7 @@ describe("NoteEditor", () => {
             isError: false,
         });
         render(<NoteEditor noteId="n1" onDeleted={jest.fn()} />);
-        const input = screen.getByLabelText("Add tag");
+        const input = screen.getByLabelText("editor.addTag");
         fireEvent.change(input, { target: { value: "react" } });
         fireEvent.keyDown(input, { key: "Enter" });
 

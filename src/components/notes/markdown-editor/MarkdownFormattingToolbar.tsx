@@ -25,6 +25,7 @@ import {
     ListOrdered,
     Quote,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 
 interface IFormatState {
@@ -50,6 +51,7 @@ const INITIAL_FORMAT: IFormatState = {
 };
 
 export function MarkdownFormattingToolbar() {
+    const { t } = useTranslation("notes");
     const [editor] = useLexicalComposerContext();
     const [fmt, setFmt] = useState<IFormatState>(INITIAL_FORMAT);
 
@@ -134,66 +136,66 @@ export function MarkdownFormattingToolbar() {
     }, [editor]);
 
     const insertLink = useCallback(() => {
-        const url = window.prompt("Enter URL:");
+        const url = window.prompt(t("editor.enterUrl"));
         if (url) {
             editor.dispatchCommand(TOGGLE_LINK_COMMAND, { url });
         }
-    }, [editor]);
+    }, [editor, t]);
 
     const buttons = [
         {
             icon: Bold,
-            label: "Bold",
+            label: t("editor.format.bold"),
             active: fmt.bold,
             onClick: () => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold"),
         },
         {
             icon: Italic,
-            label: "Italic",
+            label: t("editor.format.italic"),
             active: fmt.italic,
             onClick: () => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic"),
         },
         {
             icon: Heading1,
-            label: "Heading 1",
+            label: t("editor.format.h1"),
             active: fmt.h1,
             onClick: () => applyHeading("h1"),
         },
         {
             icon: Heading2,
-            label: "Heading 2",
+            label: t("editor.format.h2"),
             active: fmt.h2,
             onClick: () => applyHeading("h2"),
         },
         {
             icon: List,
-            label: "Bullet list",
+            label: t("editor.format.bulletList"),
             active: fmt.bulletList,
             onClick: () =>
                 editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined),
         },
         {
             icon: ListOrdered,
-            label: "Numbered list",
+            label: t("editor.format.numberedList"),
             active: fmt.orderedList,
             onClick: () =>
                 editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined),
         },
         {
             icon: Link,
-            label: "Link",
+            label: t("editor.format.link"),
             active: false,
             onClick: insertLink,
         },
         {
             icon: Quote,
-            label: "Blockquote",
+            label: t("editor.format.blockquote"),
             active: fmt.quote,
             onClick: applyQuote,
         },
         {
             icon: Code,
-            label: "Code block",
+            label: t("editor.format.codeBlock"),
             active: fmt.code,
             onClick: applyCode,
         },

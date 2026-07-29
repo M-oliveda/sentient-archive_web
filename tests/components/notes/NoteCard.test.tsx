@@ -33,7 +33,7 @@ describe("NoteCard", () => {
 
     it("renders 'Untitled' when title is empty", () => {
         render(<NoteCard note={{ ...BASE_NOTE, title: "" }} onClick={jest.fn()} />);
-        expect(screen.getByText("Untitled")).toBeInTheDocument();
+        expect(screen.getByText("card.untitled")).toBeInTheDocument();
     });
 
     it("renders the excerpt", () => {
@@ -60,12 +60,12 @@ describe("NoteCard", () => {
 
     it("renders 'Unfiled' when folderName is not provided", () => {
         render(<NoteCard note={BASE_NOTE} onClick={jest.fn()} />);
-        expect(screen.getByText("Unfiled")).toBeInTheDocument();
+        expect(screen.getByText("card.unfiled")).toBeInTheDocument();
     });
 
     it("renders word count from countWords", () => {
         render(<NoteCard note={BASE_NOTE} onClick={jest.fn()} />);
-        expect(screen.getByText("42 words")).toBeInTheDocument();
+        expect(screen.getByText("card.words")).toBeInTheDocument();
     });
 
     it("calls onClick with the note id when clicked", () => {

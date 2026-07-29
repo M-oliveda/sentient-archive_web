@@ -1,4 +1,5 @@
 import { Folder } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { formatTimeAgo } from "@/lib/utils";
 import { countWords } from "@/lib/notes-utils";
@@ -13,6 +14,7 @@ interface INoteCardProps {
 }
 
 export function NoteCard({ note, folderName, onClick }: INoteCardProps) {
+    const { t } = useTranslation("notes");
     const wordCount = countWords(note.content);
     const visibleTags = note.tags.slice(0, MAX_VISIBLE_TAGS);
     const hiddenCount = note.tags.length - MAX_VISIBLE_TAGS;
@@ -26,7 +28,7 @@ export function NoteCard({ note, folderName, onClick }: INoteCardProps) {
             )}
         >
             <h3 className="text-foreground mb-2 line-clamp-2 text-lg leading-snug font-bold">
-                {note.title || "Untitled"}
+                {note.title || t("card.untitled")}
             </h3>
 
             {note.excerpt && (
@@ -56,10 +58,10 @@ export function NoteCard({ note, folderName, onClick }: INoteCardProps) {
             <div className="text-muted-foreground flex items-center gap-3 text-xs">
                 <span className="flex items-center gap-1">
                     <Folder className="size-3.5" />
-                    {folderName ?? "Unfiled"}
+                    {folderName ?? t("card.unfiled")}
                 </span>
                 <span>{formatTimeAgo(note.updatedAt)}</span>
-                <span>{wordCount} words</span>
+                <span>{t("card.words", { count: wordCount })}</span>
             </div>
         </button>
     );

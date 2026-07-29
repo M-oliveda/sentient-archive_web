@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { NoteCard } from "@/components/notes/NoteCard";
 import { Spinner } from "@/components/ui/spinner";
 import type { INote } from "@/types/note";
@@ -17,6 +18,8 @@ export function NotesGrid({
     folderMap,
     onNoteClick,
 }: INotesGridProps) {
+    const { t } = useTranslation("notes");
+
     if (isLoading) {
         return (
             <div className="flex min-h-0 flex-1 items-center justify-center">
@@ -29,7 +32,7 @@ export function NotesGrid({
         return (
             <div className="flex min-h-0 flex-1 items-center justify-center">
                 <p className="text-muted-foreground text-center text-sm">
-                    {search ? "No notes match your search." : "No notes yet."}
+                    {search ? t("list.emptySearch") : t("list.empty")}
                 </p>
             </div>
         );

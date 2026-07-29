@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useNote } from "@/hooks/useNote";
 import { useUpdateNote, useDeleteNote } from "@/hooks/useNotesMutations";
 import { Spinner } from "@/components/ui/spinner";
@@ -29,6 +30,7 @@ function LexicalNoteEditor({
     onDeleted,
     editorHandleRef,
 }: ILexicalNoteEditorProps) {
+    const { t } = useTranslation("notes");
     const updateNote = useUpdateNote();
     const deleteNote = useDeleteNote();
 
@@ -145,7 +147,7 @@ function LexicalNoteEditor({
                             type="button"
                             onClick={() => void handleRemoveTag(tag)}
                             className="hover:opacity-70"
-                            aria-label={`Remove ${tag} tag`}
+                            aria-label={t("editor.removeTag", { tag })}
                         >
                             <X className="size-3" />
                         </button>
@@ -156,9 +158,9 @@ function LexicalNoteEditor({
                     value={tagInput}
                     onChange={(e) => setTagInput(e.target.value)}
                     onKeyDown={handleTagKeyDown}
-                    placeholder="Add tag…"
+                    placeholder={t("editor.addTagPlaceholder")}
                     className="text-muted-foreground placeholder:text-muted-foreground min-w-24 bg-transparent text-sm outline-none"
-                    aria-label="Add tag"
+                    aria-label={t("editor.addTag")}
                 />
             </div>
         </div>
