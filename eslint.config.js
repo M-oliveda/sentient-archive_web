@@ -91,12 +91,23 @@ export default defineConfig([
         },
     },
 
+    // Playwright fixtures use a `use` callback that is not a React Hook
+    {
+        files: ["e2e/**/*.{ts,tsx}", "playwright.config.ts"],
+        rules: {
+            "react-hooks/rules-of-hooks": "off",
+            "react-refresh/only-export-components": "off",
+        },
+    },
+
     // Ignore patterns
     {
         ignores: [
             "node_modules/**",
             "dist/**",
             "coverage/**",
+            "playwright-report/**",
+            "test-results/**",
             "*.config.js",
             "*.config.cjs",
             ".husky/**",
