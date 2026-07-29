@@ -1,3 +1,9 @@
+export interface IUserPreferences {
+    language: "en" | "es" | "fr" | "pt";
+    theme: "light" | "dark";
+    notificationsEnabled: boolean;
+}
+
 export interface IUser {
     uid: string;
     email: string;
@@ -6,6 +12,7 @@ export interface IUser {
     role: "client" | "admin";
     isActive: boolean;
     tokenBalance: number;
+    preferences?: IUserPreferences;
 }
 
 export type User = IUser;
