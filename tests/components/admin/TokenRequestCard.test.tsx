@@ -38,8 +38,8 @@ describe("TokenRequestCard", () => {
 
         expect(screen.getByText("Alice Chen")).toBeInTheDocument();
         expect(screen.getByText("alice.c@sentient.ai")).toBeInTheDocument();
-        expect(screen.getByText("50k TKN")).toBeInTheDocument();
-        expect(screen.getByText("955 TKN")).toBeInTheDocument();
+        expect(screen.getByText("tokens.unitCompact")).toBeInTheDocument();
+        expect(screen.getByText("tokens.unit")).toBeInTheDocument();
     });
 
     it("does not render an online status indicator on the avatar", () => {
@@ -53,7 +53,7 @@ describe("TokenRequestCard", () => {
     it("shows the urgent badge for urgent pending requests", () => {
         render(<TokenRequestCard request={baseRequest} {...mockHandlers} />);
 
-        expect(screen.getByText("Urgent!")).toBeInTheDocument();
+        expect(screen.getByText("tokenRequests.card.urgent")).toBeInTheDocument();
     });
 
     it("does not show the urgent badge for standard pending requests", () => {
@@ -64,13 +64,15 @@ describe("TokenRequestCard", () => {
             />,
         );
 
-        expect(screen.queryByText("Urgent!")).not.toBeInTheDocument();
+        expect(screen.queryByText("tokenRequests.card.urgent")).not.toBeInTheDocument();
     });
 
     it("renders the justification quote when provided", () => {
         render(<TokenRequestCard request={baseRequest} {...mockHandlers} />);
 
-        expect(screen.getByText("Justification:")).toBeInTheDocument();
+        expect(
+            screen.getByText("tokenRequests.card.justification"),
+        ).toBeInTheDocument();
         expect(screen.getByText(/Critical: Running large vector/)).toBeInTheDocument();
     });
 
@@ -82,13 +84,15 @@ describe("TokenRequestCard", () => {
             />,
         );
 
-        expect(screen.queryByText("Justification:")).not.toBeInTheDocument();
+        expect(
+            screen.queryByText("tokenRequests.card.justification"),
+        ).not.toBeInTheDocument();
     });
 
     it("renders the last grant timestamp when provided", () => {
         render(<TokenRequestCard request={baseRequest} {...mockHandlers} />);
 
-        expect(screen.getByText(/Last grant:/)).toBeInTheDocument();
+        expect(screen.getByText(/tokenRequests\.card\.lastGrant/)).toBeInTheDocument();
     });
 
     it("does not render the last grant row when absent", () => {
@@ -99,7 +103,9 @@ describe("TokenRequestCard", () => {
             />,
         );
 
-        expect(screen.queryByText(/Last grant:/)).not.toBeInTheDocument();
+        expect(
+            screen.queryByText(/tokenRequests\.card\.lastGrant/),
+        ).not.toBeInTheDocument();
     });
 
     it("falls back to userDisplayName then userEmail then a default label", () => {
@@ -138,16 +144,16 @@ describe("TokenRequestCard", () => {
                 {...mockHandlers}
             />,
         );
-        expect(screen.getByText("Unknown User")).toBeInTheDocument();
+        expect(screen.getByText("tokenRequests.card.unknownUser")).toBeInTheDocument();
     });
 
     it("calls onApprove and onReject when the footer buttons are clicked", async () => {
         render(<TokenRequestCard request={baseRequest} {...mockHandlers} />);
 
-        await userEvent.click(screen.getByText("Approve"));
+        await userEvent.click(screen.getByText("tokenRequests.card.approve"));
         expect(mockHandlers.onApprove).toHaveBeenCalledWith(baseRequest);
 
-        await userEvent.click(screen.getByText("Reject"));
+        await userEvent.click(screen.getByText("tokenRequests.card.reject"));
         expect(mockHandlers.onReject).toHaveBeenCalledWith(baseRequest);
     });
 
@@ -156,8 +162,12 @@ describe("TokenRequestCard", () => {
             <TokenRequestCard request={baseRequest} {...mockHandlers} isProcessing />,
         );
 
-        expect(screen.getByText("Approve").closest("button")).toBeDisabled();
-        expect(screen.getByText("Reject").closest("button")).toBeDisabled();
+        expect(
+            screen.getByText("tokenRequests.card.approve").closest("button"),
+        ).toBeDisabled();
+        expect(
+            screen.getByText("tokenRequests.card.reject").closest("button"),
+        ).toBeDisabled();
     });
 
     it("shows a status badge instead of action buttons for resolved requests", () => {
@@ -168,9 +178,11 @@ describe("TokenRequestCard", () => {
             />,
         );
 
-        expect(screen.getByText("approved")).toBeInTheDocument();
-        expect(screen.queryByText("Approve")).not.toBeInTheDocument();
-        expect(screen.queryByText("Reject")).not.toBeInTheDocument();
+        expect(screen.getByText("tokenRequests.card.approved")).toBeInTheDocument();
+        expect(
+            screen.queryByText("tokenRequests.card.approve"),
+        ).not.toBeInTheDocument();
+        expect(screen.queryByText("tokenRequests.card.reject")).not.toBeInTheDocument();
     });
 
     it("shows a 'Denied' badge for rejected requests", () => {
@@ -181,7 +193,7 @@ describe("TokenRequestCard", () => {
             />,
         );
 
-        expect(screen.getByText("Denied")).toBeInTheDocument();
+        expect(screen.getByText("tokenRequests.card.denied")).toBeInTheDocument();
     });
 
     it("defaults current balance to 0 when undefined", () => {
@@ -192,6 +204,6 @@ describe("TokenRequestCard", () => {
             />,
         );
 
-        expect(screen.getByText("0 TKN")).toBeInTheDocument();
+        expect(screen.getByText("tokens.unit")).toBeInTheDocument();
     });
 });

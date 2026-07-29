@@ -1,4 +1,5 @@
 import { Coins, MoreVertical, Pencil, Shield, User } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -41,6 +42,7 @@ function getInitials(name: string): string {
 }
 
 function RoleBadge({ role }: { role: IAdminUser["role"] }) {
+    const { t } = useTranslation("admin");
     const isAdmin = role === "admin";
 
     return (
@@ -57,7 +59,7 @@ function RoleBadge({ role }: { role: IAdminUser["role"] }) {
             ) : (
                 <User className="size-3 opacity-80" aria-hidden="true" />
             )}
-            {isAdmin ? "Admin" : "Client"}
+            {isAdmin ? t("users.table.admin") : t("users.table.client")}
         </span>
     );
 }
@@ -71,6 +73,9 @@ function RowActionsMenu({
     onEditUser: (user: IAdminUser) => void;
     onToggleAdmin: (user: IAdminUser) => void;
 }) {
+    const { t } = useTranslation("admin");
+    const displayName = user.displayName || user.email;
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger
@@ -80,7 +85,7 @@ function RowActionsMenu({
                         variant="ghost"
                         size="icon"
                         className="size-8"
-                        aria-label={`Actions for ${user.displayName || user.email}`}
+                        aria-label={t("users.table.actionsFor", { name: displayName })}
                     />
                 }
             >
@@ -89,11 +94,13 @@ function RowActionsMenu({
             <DropdownMenuContent align="end" className="min-w-36">
                 <DropdownMenuItem onClick={() => onEditUser(user)}>
                     <Pencil className="size-3.5" aria-hidden="true" />
-                    Edit
+                    {t("users.table.edit")}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onToggleAdmin(user)}>
                     <Shield className="size-3.5" aria-hidden="true" />
-                    {user.role === "admin" ? "Revoke Admin" : "Grant Admin"}
+                    {user.role === "admin"
+                        ? t("users.table.revokeAdmin")
+                        : t("users.table.grantAdmin")}
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
@@ -108,10 +115,12 @@ export function AdminUsersTable({
     onToggleAdmin,
     isUpdating = false,
 }: AdminUsersTableProps) {
+    const { t } = useTranslation("admin");
+
     if (isLoading) {
         return (
             <div className="border-border flex items-center justify-center rounded-3xl border py-16">
-                <p className="text-muted-foreground text-sm">Loading users...</p>
+                <p className="text-muted-foreground text-sm">{t("users.loading")}</p>
             </div>
         );
     }
@@ -119,7 +128,7 @@ export function AdminUsersTable({
     if (data.length === 0) {
         return (
             <Alert className="rounded-3xl">
-                <AlertDescription>No users found.</AlertDescription>
+                <AlertDescription>{t("users.empty")}</AlertDescription>
             </Alert>
         );
     }
@@ -132,22 +141,22 @@ export function AdminUsersTable({
             <TableHeader>
                 <TableRow className="hover:bg-transparent">
                     <TableHead className="text-muted-foreground px-3 py-4 font-bold sm:px-4 sm:py-6">
-                        User
+                        {t("users.table.user")}
                     </TableHead>
                     <TableHead className="text-muted-foreground w-24 px-3 py-4 font-bold sm:w-28 sm:px-4 sm:py-6">
-                        Role
+                        {t("users.table.role")}
                     </TableHead>
                     <TableHead className="text-muted-foreground hidden w-40 px-4 py-6 font-bold whitespace-nowrap md:table-cell">
-                        Token Balance
+                        {t("users.table.tokenBalance")}
                     </TableHead>
                     <TableHead className="text-muted-foreground hidden w-28 px-4 py-6 font-bold whitespace-nowrap lg:table-cell">
-                        Last Active
+                        {t("users.table.lastActive")}
                     </TableHead>
                     <TableHead className="text-muted-foreground hidden w-16 py-6 pr-1 pl-4 font-bold whitespace-nowrap md:table-cell">
-                        Status
+                        {t("users.table.status")}
                     </TableHead>
                     <TableHead className="w-12 px-1 py-4 sm:py-6">
-                        <span className="sr-only">Actions</span>
+                        <span className="sr-only">{t("users.table.actions")}</span>
                     </TableHead>
                 </TableRow>
             </TableHeader>
@@ -204,7 +213,7 @@ export function AdminUsersTable({
                                     </span>
                                     {isLowBalance && (
                                         <span className="border-error/20 bg-error/10 text-error dark:border-error/30 dark:bg-error/15 rounded-md border px-1.5 py-0.5 text-xs font-medium dark:text-red-300/90">
-                                            Low
+                                            {t("users.table.low")}
                                         </span>
                                     )}
                                 </div>
@@ -217,7 +226,9 @@ export function AdminUsersTable({
                                     checked={user.isActive}
                                     disabled={isUpdating}
                                     onCheckedChange={() => onToggleActive(user)}
-                                    aria-label={`Toggle active status for ${displayName}`}
+                                    aria-label={t("users.table.toggleActive", {
+                                        name: displayName,
+                                    })}
                                     className="data-checked:bg-brand-700 dark:data-checked:bg-brand-400"
                                 />
                             </TableCell>

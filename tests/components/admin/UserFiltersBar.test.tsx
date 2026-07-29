@@ -23,14 +23,14 @@ describe("UserFiltersBar", () => {
         render(<UserFiltersBar {...handlers} />);
 
         expect(
-            screen.getByPlaceholderText("Search by email or name..."),
+            screen.getByPlaceholderText("users.filters.searchPlaceholder"),
         ).toBeInTheDocument();
-        expect(screen.getByText("All Roles")).toBeInTheDocument();
-        expect(screen.getByText("Clients")).toBeInTheDocument();
-        expect(screen.getByText("Admins")).toBeInTheDocument();
-        expect(screen.getByText("All Statuses")).toBeInTheDocument();
-        expect(screen.getByText("Active")).toBeInTheDocument();
-        expect(screen.getByText("Inactive")).toBeInTheDocument();
+        expect(screen.getByText("users.filters.allRoles")).toBeInTheDocument();
+        expect(screen.getByText("users.filters.clients")).toBeInTheDocument();
+        expect(screen.getByText("users.filters.admins")).toBeInTheDocument();
+        expect(screen.getByText("users.filters.allStatuses")).toBeInTheDocument();
+        expect(screen.getByText("users.filters.active")).toBeInTheDocument();
+        expect(screen.getByText("users.filters.inactive")).toBeInTheDocument();
     });
 
     it("debounces search input changes", async () => {
@@ -38,7 +38,7 @@ describe("UserFiltersBar", () => {
         render(<UserFiltersBar {...handlers} />);
 
         await user.type(
-            screen.getByPlaceholderText("Search by email or name..."),
+            screen.getByPlaceholderText("users.filters.searchPlaceholder"),
             "alice",
         );
 
@@ -55,13 +55,13 @@ describe("UserFiltersBar", () => {
         const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
         render(<UserFiltersBar {...handlers} />);
 
-        await user.click(screen.getByText("Admins"));
+        await user.click(screen.getByText("users.filters.admins"));
         expect(handlers.onRoleChange).toHaveBeenCalledWith("admin");
 
-        await user.click(screen.getByText("Clients"));
+        await user.click(screen.getByText("users.filters.clients"));
         expect(handlers.onRoleChange).toHaveBeenCalledWith("client");
 
-        await user.click(screen.getByText("All Roles"));
+        await user.click(screen.getByText("users.filters.allRoles"));
         expect(handlers.onRoleChange).toHaveBeenCalledWith("all");
     });
 
@@ -69,13 +69,13 @@ describe("UserFiltersBar", () => {
         const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
         render(<UserFiltersBar {...handlers} />);
 
-        await user.click(screen.getByText("Active"));
+        await user.click(screen.getByText("users.filters.active"));
         expect(handlers.onStatusChange).toHaveBeenCalledWith(true);
 
-        await user.click(screen.getByText("Inactive"));
+        await user.click(screen.getByText("users.filters.inactive"));
         expect(handlers.onStatusChange).toHaveBeenCalledWith(false);
 
-        await user.click(screen.getByText("All Statuses"));
+        await user.click(screen.getByText("users.filters.allStatuses"));
         expect(handlers.onStatusChange).toHaveBeenCalledWith("all");
     });
 
@@ -83,22 +83,22 @@ describe("UserFiltersBar", () => {
         const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
         render(<UserFiltersBar {...handlers} />);
 
-        expect(screen.queryByText("Clear")).not.toBeInTheDocument();
+        expect(screen.queryByText("users.filters.clear")).not.toBeInTheDocument();
 
-        await user.click(screen.getByText("Admins"));
-        expect(screen.getByText("Clear")).toBeInTheDocument();
+        await user.click(screen.getByText("users.filters.admins"));
+        expect(screen.getByText("users.filters.clear")).toBeInTheDocument();
 
-        await user.click(screen.getByText("Clear"));
+        await user.click(screen.getByText("users.filters.clear"));
 
         expect(handlers.onReset).toHaveBeenCalled();
-        expect(screen.queryByText("Clear")).not.toBeInTheDocument();
+        expect(screen.queryByText("users.filters.clear")).not.toBeInTheDocument();
     });
 
     it("disables search input when loading", () => {
         render(<UserFiltersBar {...handlers} isLoading={true} />);
 
         expect(
-            screen.getByPlaceholderText("Search by email or name..."),
+            screen.getByPlaceholderText("users.filters.searchPlaceholder"),
         ).toBeDisabled();
     });
 });
