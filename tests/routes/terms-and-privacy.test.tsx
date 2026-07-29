@@ -11,12 +11,14 @@ jest.mock("@tanstack/react-router", () => ({
     ),
 }));
 
+jest.mock("@/components/layout/LanguageSwitcher", () => ({
+    LanguageSwitcher: () => <div data-testid="language-switcher">Language</div>,
+}));
+
 describe("terms-and-privacy route", () => {
     it("should render terms and privacy page component", () => {
         renderRouteComponent(Route.options.component);
 
-        expect(
-            screen.getByText("Terms of Service & Privacy Policy"),
-        ).toBeInTheDocument();
+        expect(screen.getByText("page.title")).toBeInTheDocument();
     });
 });
