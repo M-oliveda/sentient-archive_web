@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Coins, ArrowRight, CheckCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import {
     Dialog,
     DialogContent,
@@ -19,6 +20,7 @@ interface IRequestTokensModalProps {
 }
 
 export function RequestTokensModal({ open, onOpenChange }: IRequestTokensModalProps) {
+    const { t } = useTranslation("tokens");
     const { user } = useAuthStore();
     const [amount, setAmount] = useState("");
     const [justification, setJustification] = useState("");
@@ -58,16 +60,18 @@ export function RequestTokensModal({ open, onOpenChange }: IRequestTokensModalPr
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2 text-lg font-semibold">
                         <Coins className="size-5" />
-                        Request Tokens
+                        {t("modal.title")}
                     </DialogTitle>
                 </DialogHeader>
 
                 {succeeded ? (
                     <div className="flex flex-col items-center gap-4 py-4 text-center">
                         <CheckCircle className="text-success size-12" />
-                        <p className="text-foreground font-medium">Request sent!</p>
+                        <p className="text-foreground font-medium">
+                            {t("modal.successTitle")}
+                        </p>
                         <p className="text-muted-foreground text-sm">
-                            An admin will review your request and grant tokens shortly.
+                            {t("modal.successDescription")}
                         </p>
                         <Button
                             variant="secondary"
@@ -75,23 +79,27 @@ export function RequestTokensModal({ open, onOpenChange }: IRequestTokensModalPr
                             onClick={() => handleClose(false)}
                             className="mt-2 rounded-full px-6"
                         >
-                            Done
+                            {t("modal.done")}
                         </Button>
                     </div>
                 ) : (
                     <div className="space-y-5">
                         <div className="bg-muted rounded-xl px-5 py-4">
                             <p className="text-muted-foreground mb-1 text-xs font-medium tracking-widest uppercase">
-                                Current Balance
+                                {t("modal.currentBalance")}
                             </p>
                             <p className="text-foreground text-2xl font-bold">
-                                {(user?.tokenBalance ?? 0).toLocaleString()} Tokens
+                                {t("modal.tokensLabel", {
+                                    formatted: (
+                                        user?.tokenBalance ?? 0
+                                    ).toLocaleString(),
+                                })}
                             </p>
                         </div>
 
                         <div className="space-y-2">
                             <Label htmlFor="token-amount">
-                                How many tokens do you need?
+                                {t("modal.amountLabel")}
                             </Label>
                             <Input
                                 id="token-amount"
@@ -99,7 +107,7 @@ export function RequestTokensModal({ open, onOpenChange }: IRequestTokensModalPr
                                 min={1}
                                 value={amount}
                                 onChange={(e) => setAmount(e.target.value)}
-                                placeholder="e.g. 500"
+                                placeholder={t("modal.amountPlaceholder")}
                                 disabled={requestTokens.isPending}
                                 size="default"
                                 className="[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
@@ -107,12 +115,14 @@ export function RequestTokensModal({ open, onOpenChange }: IRequestTokensModalPr
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="token-reason">Reason</Label>
+                            <Label htmlFor="token-reason">
+                                {t("modal.reasonLabel")}
+                            </Label>
                             <Input
                                 id="token-reason"
                                 value={justification}
                                 onChange={(e) => setJustification(e.target.value)}
-                                placeholder="Why do you need more tokens?"
+                                placeholder={t("modal.reasonPlaceholder")}
                                 disabled={requestTokens.isPending}
                                 size="default"
                                 maxLength={500}
@@ -121,7 +131,7 @@ export function RequestTokensModal({ open, onOpenChange }: IRequestTokensModalPr
 
                         {requestTokens.isError && (
                             <p className="text-destructive text-sm">
-                                Something went wrong. Please try again.
+                                {t("modal.error")}
                             </p>
                         )}
 
@@ -134,7 +144,7 @@ export function RequestTokensModal({ open, onOpenChange }: IRequestTokensModalPr
                                 disabled={requestTokens.isPending}
                                 className="rounded-full"
                             >
-                                Cancel
+                                {t("modal.cancel")}
                             </Button>
                             <Button
                                 type="button"
@@ -146,11 +156,11 @@ export function RequestTokensModal({ open, onOpenChange }: IRequestTokensModalPr
                                 {requestTokens.isPending ? (
                                     <>
                                         <Spinner className="size-4" />
-                                        Submitting…
+                                        {t("modal.submitting")}
                                     </>
                                 ) : (
                                     <>
-                                        Submit Request
+                                        {t("modal.submit")}
                                         <ArrowRight className="size-4" />
                                     </>
                                 )}

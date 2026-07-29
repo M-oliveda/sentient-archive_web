@@ -35,6 +35,7 @@ describe("TransactionHistory", () => {
         (useTransactions as jest.Mock).mockReturnValue({ data: [], isLoading: false });
         render(<TransactionHistory />);
         expect(screen.getByTestId("transaction-history-empty")).toBeInTheDocument();
+        expect(screen.getByText("history.empty")).toBeInTheDocument();
     });
 
     it("shows empty state when data is undefined and not loading", () => {
@@ -61,10 +62,10 @@ describe("TransactionHistory", () => {
             isLoading: false,
         });
         render(<TransactionHistory />);
-        expect(screen.getByText("Date")).toBeInTheDocument();
-        expect(screen.getByText("Action")).toBeInTheDocument();
-        expect(screen.getByText("Change")).toBeInTheDocument();
-        expect(screen.getByText("Balance")).toBeInTheDocument();
+        expect(screen.getByText("history.date")).toBeInTheDocument();
+        expect(screen.getByText("history.action")).toBeInTheDocument();
+        expect(screen.getByText("history.change")).toBeInTheDocument();
+        expect(screen.getByText("history.balance")).toBeInTheDocument();
     });
 
     it("displays human-readable reason label for ai_summarize", () => {
@@ -73,7 +74,7 @@ describe("TransactionHistory", () => {
             isLoading: false,
         });
         render(<TransactionHistory />);
-        expect(screen.getByText("AI Summary")).toBeInTheDocument();
+        expect(screen.getByText("history.reasons.aiSummarize")).toBeInTheDocument();
     });
 
     it("displays human-readable reason labels for all reasons", () => {
@@ -90,12 +91,12 @@ describe("TransactionHistory", () => {
             isLoading: false,
         });
         render(<TransactionHistory />);
-        expect(screen.getByText("AI Summary")).toBeInTheDocument();
-        expect(screen.getByText("AI Auto-Tag")).toBeInTheDocument();
-        expect(screen.getByText("AI Flashcards")).toBeInTheDocument();
-        expect(screen.getByText("AI Q&A")).toBeInTheDocument();
-        expect(screen.getByText("Admin Grant")).toBeInTheDocument();
-        expect(screen.getByText("Welcome Bonus")).toBeInTheDocument();
+        expect(screen.getByText("history.reasons.aiSummarize")).toBeInTheDocument();
+        expect(screen.getByText("history.reasons.aiAutotag")).toBeInTheDocument();
+        expect(screen.getByText("history.reasons.aiFlashcards")).toBeInTheDocument();
+        expect(screen.getByText("history.reasons.aiRagquery")).toBeInTheDocument();
+        expect(screen.getByText("history.reasons.adminGrant")).toBeInTheDocument();
+        expect(screen.getByText("history.reasons.initialGrant")).toBeInTheDocument();
     });
 
     it("shows debit amount with minus sign in error color", () => {
@@ -140,7 +141,7 @@ describe("TransactionHistory", () => {
         expect(screen.getByText(/Jun 1, 2024/)).toBeInTheDocument();
     });
 
-    it("falls back to the raw reason string when reason is not in REASON_LABELS", () => {
+    it("falls back to the raw reason string when reason is not in REASON_KEYS", () => {
         (useTransactions as jest.Mock).mockReturnValue({
             data: [
                 mockTransaction({

@@ -5,12 +5,12 @@ describe("TokenBalance", () => {
     it("renders balance and max balance", () => {
         render(<TokenBalance balance={1500} />);
         expect(screen.getByTestId("token-balance-value")).toHaveTextContent("1,500");
-        expect(screen.getByText(/5,000 tokens/)).toBeInTheDocument();
+        expect(screen.getByText("balanceCard.ofMax")).toBeInTheDocument();
     });
 
     it("renders custom maxBalance", () => {
         render(<TokenBalance balance={100} maxBalance={1000} />);
-        expect(screen.getByText(/1,000 tokens/)).toBeInTheDocument();
+        expect(screen.getByText("balanceCard.ofMax")).toBeInTheDocument();
     });
 
     it("applies error color class when balance is below lowThreshold", () => {
@@ -33,17 +33,18 @@ describe("TokenBalance", () => {
 
     it("shows critically low warning message when balance is below lowThreshold", () => {
         render(<TokenBalance balance={5} />);
-        expect(screen.getByText(/Balance critically low/)).toBeInTheDocument();
+        expect(screen.getByText("balanceCard.criticallyLow")).toBeInTheDocument();
     });
 
     it("shows running low warning message when balance is in warning range", () => {
         render(<TokenBalance balance={50} />);
-        expect(screen.getByText(/Balance running low/)).toBeInTheDocument();
+        expect(screen.getByText("balanceCard.runningLow")).toBeInTheDocument();
     });
 
     it("shows no warning message when balance is healthy", () => {
         render(<TokenBalance balance={500} />);
-        expect(screen.queryByText(/low/i)).not.toBeInTheDocument();
+        expect(screen.queryByText("balanceCard.criticallyLow")).not.toBeInTheDocument();
+        expect(screen.queryByText("balanceCard.runningLow")).not.toBeInTheDocument();
     });
 
     it("respects custom lowThreshold", () => {

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Coins } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useAuthStore } from "@/stores/authStore";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { TokenBalance } from "@/components/tokens/TokenBalance";
@@ -8,6 +9,7 @@ import { PendingRequests } from "@/components/tokens/PendingRequests";
 import { RequestTokensModal } from "@/components/tokens/RequestTokensModal";
 
 export function TokensPage() {
+    const { t } = useTranslation("tokens");
     const { user } = useAuthStore();
     const { data: tokenBalanceData } = useTokenBalance();
     const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
@@ -22,14 +24,14 @@ export function TokensPage() {
                         <div className="text-muted-foreground mb-2 flex items-center gap-2">
                             <Coins className="size-5" />
                             <span className="text-sm font-medium tracking-wider uppercase">
-                                Token Management
+                                {t("page.eyebrow")}
                             </span>
                         </div>
                         <h1 className="text-foreground text-3xl font-bold">
-                            Token Balance
+                            {t("page.title")}
                         </h1>
                         <p className="text-muted-foreground text-sm">
-                            Track your token usage and request more when needed.
+                            {t("page.subtitle")}
                         </p>
                     </div>
                     <button
@@ -37,7 +39,7 @@ export function TokensPage() {
                         className="bg-primary text-primary-foreground hover:bg-primary/90 w-full rounded-full px-5 py-2.5 text-sm font-medium transition-colors sm:w-auto sm:shrink-0"
                         data-testid="request-tokens-button"
                     >
-                        Request More Tokens
+                        {t("page.requestMore")}
                     </button>
                 </section>
 
@@ -52,7 +54,7 @@ export function TokensPage() {
                 {/* Transaction history */}
                 <section className="space-y-4">
                     <h2 className="text-foreground text-xl font-bold">
-                        Transaction History
+                        {t("page.transactionHistory")}
                     </h2>
                     <TransactionHistory />
                 </section>

@@ -52,13 +52,14 @@ describe("TokensPage", () => {
 
     it("renders the page header", () => {
         render(<TokensPage />);
-        expect(screen.getByText("Token Balance")).toBeInTheDocument();
-        expect(screen.getByText("Token Management")).toBeInTheDocument();
+        expect(screen.getByText("page.title")).toBeInTheDocument();
+        expect(screen.getByText("page.eyebrow")).toBeInTheDocument();
     });
 
     it("renders the Request More Tokens button", () => {
         render(<TokensPage />);
         expect(screen.getByTestId("request-tokens-button")).toBeInTheDocument();
+        expect(screen.getByText("page.requestMore")).toBeInTheDocument();
     });
 
     it("clicking Request More Tokens opens the modal", () => {
@@ -93,7 +94,7 @@ describe("TokensPage", () => {
 
     it("renders Transaction History section", () => {
         render(<TokensPage />);
-        expect(screen.getByText("Transaction History")).toBeInTheDocument();
+        expect(screen.getByText("page.transactionHistory")).toBeInTheDocument();
         expect(screen.getByTestId("transaction-history")).toBeInTheDocument();
     });
 
