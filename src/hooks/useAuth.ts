@@ -4,6 +4,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { useAuthStore } from "@/stores/authStore";
 import { authService } from "@/lib/auth-service";
+import i18n from "@/lib/i18n";
 
 export function useAuth() {
     const { setUser, setLoading, logout } = useAuthStore();
@@ -23,7 +24,7 @@ export function useAuth() {
                     const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
                     const userData = userDoc.data();
 
-                    setUser({
+                    const user = {
                         uid: firebaseUser.uid,
                         email: firebaseUser.email!,
                         displayName:
@@ -32,7 +33,18 @@ export function useAuth() {
                         role: userData?.role || "client",
                         isActive: userData?.isActive ?? true,
                         tokenBalance: userData?.tokenBalance || 0,
-                    });
+                        preferences: userData?.preferences,
+                    };
+
+                    setUser(user);
+
+                    // Sync stored language preference with i18n
+                    if (
+                        user.preferences?.language &&
+                        user.preferences.language !== i18n.language
+                    ) {
+                        await i18n.changeLanguage(user.preferences.language);
+                    }
                 } catch (error) {
                     console.error("Error fetching user data:", error);
                     logout();
