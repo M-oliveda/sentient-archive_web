@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import {
     ArrowRight,
     Bot,
@@ -21,9 +22,11 @@ import { formatTimeAgo } from "@/lib/utils";
 const LOW_BALANCE_THRESHOLD = 20;
 
 export function ClientDashboardHome() {
+    const { t } = useTranslation("dashboard");
     const navigate = useNavigate();
     const { user } = useAuthStore();
-    const firstName = user?.displayName?.trim().split(/\s+/)[0] ?? "there";
+    const firstName =
+        user?.displayName?.trim().split(/\s+/)[0] ?? t("client.welcomeFallback");
     const { data, isLoading } = useRecentNotes();
     const createNote = useCreateNote();
 
@@ -53,14 +56,14 @@ export function ClientDashboardHome() {
                 <Alert variant="destructive" data-testid="low-balance-alert">
                     <TriangleAlert className="size-4" />
                     <AlertDescription>
-                        Your token balance is low.{" "}
+                        {t("client.lowBalance.message")}{" "}
                         <Link
                             to="/tokens"
                             className="font-semibold underline underline-offset-2"
                         >
-                            Request more tokens
+                            {t("client.lowBalance.link")}
                         </Link>{" "}
-                        to keep using AI features.
+                        {t("client.lowBalance.suffix")}
                     </AlertDescription>
                 </Alert>
             )}
@@ -69,11 +72,9 @@ export function ClientDashboardHome() {
             <section>
                 <Bot className="text-muted-foreground mb-2 size-8" />
                 <h1 className="text-foreground text-4xl font-bold">
-                    Welcome back, {firstName}
+                    {t("client.welcome", { firstName })}
                 </h1>
-                <p className="text-muted-foreground mt-2">
-                    Your knowledge base is organized and ready for insights.
-                </p>
+                <p className="text-muted-foreground mt-2">{t("client.subtitle")}</p>
                 <div className="mt-6 flex flex-wrap gap-3">
                     <Button
                         size="default"
@@ -81,7 +82,7 @@ export function ClientDashboardHome() {
                         disabled={createNote.isPending}
                     >
                         <FilePlus className="size-4" />
-                        New Note
+                        {t("client.actions.newNote")}
                     </Button>
                     <FileExtractor
                         onNoteCreated={handleNoteCreated}
@@ -93,25 +94,25 @@ export function ClientDashboardHome() {
             {/* Stats row */}
             <section
                 className="flex gap-4 overflow-x-auto pb-2"
-                aria-label="Stats overview"
+                aria-label={t("client.stats.ariaLabel")}
             >
                 <StatsCard
                     icon={FileText}
-                    label="Notes"
+                    label={t("client.stats.notes")}
                     value={isLoading ? "—" : totalCount}
                 />
                 <StatsCard
                     icon={Coins}
-                    label="Tokens"
+                    label={t("client.stats.tokens")}
                     value={user?.tokenBalance ?? 0}
                     action={{
-                        label: "Request More",
+                        label: t("client.stats.requestMore"),
                         onClick: () => void navigate({ to: "/tokens" }),
                     }}
                 />
                 <StatsCard
                     icon={FileText}
-                    label="Last Edited"
+                    label={t("client.stats.lastEdited")}
                     value={isLoading ? "—" : lastEdited}
                 />
             </section>
@@ -119,22 +120,27 @@ export function ClientDashboardHome() {
             {/* Recent notes */}
             <section>
                 <div className="mb-4 flex items-center justify-between">
-                    <h2 className="text-foreground text-xl font-bold">Recent Notes</h2>
+                    <h2 className="text-foreground text-xl font-bold">
+                        {t("client.recentNotes.title")}
+                    </h2>
                     <button className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-sm font-medium">
-                        Show More
+                        {t("client.recentNotes.showMore")}
                         <ArrowRight className="size-4" />
                     </button>
                 </div>
                 {!isLoading && recentNotes.length === 0 ? (
                     <p className="text-muted-foreground text-sm">
-                        No notes yet. Create your first note!
+                        {t("client.recentNotes.empty")}
                     </p>
                 ) : (
                     <div className="space-y-4">
                         {recentNotes.map((note) => (
                             <RecentNoteCard
                                 key={note.id}
-                                folder={note.folderId ?? "Notes"}
+                                folder={
+                                    note.folderId ??
+                                    t("client.recentNotes.folderFallback")
+                                }
                                 title={note.title}
                                 excerpt={note.excerpt}
                                 tags={note.tags}

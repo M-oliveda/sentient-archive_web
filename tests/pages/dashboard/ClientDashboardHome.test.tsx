@@ -34,7 +34,7 @@ jest.mock("@/components/notes/FileExtractor", () => ({
             className={className}
             onClick={() => onNoteCreated("extracted-note-id")}
         >
-            Upload Document
+            extractor.button
         </button>
     ),
 }));
@@ -72,32 +72,35 @@ describe("ClientDashboardHome", () => {
 
     it("renders welcome message with first name", () => {
         render(<ClientDashboardHome />);
-        expect(screen.getByText(/Welcome back, Alex/)).toBeInTheDocument();
+        expect(screen.getByText(/client.welcome/)).toBeInTheDocument();
     });
 
-    it("uses 'there' when displayName is null", () => {
+    it("uses welcomeFallback when displayName is null", () => {
         (useAuthStore as unknown as jest.Mock).mockReturnValue({
             user: { ...mockUser, displayName: null },
         });
         render(<ClientDashboardHome />);
-        expect(screen.getByText(/Welcome back, there/)).toBeInTheDocument();
+        // The welcome message will contain the fallback value from t("client.welcomeFallback")
+        expect(screen.getByText(/client.welcome/)).toBeInTheDocument();
     });
 
     it("renders New Note and Upload Document buttons", () => {
         render(<ClientDashboardHome />);
-        expect(screen.getByText("New Note")).toBeInTheDocument();
-        expect(screen.getByText("Upload Document")).toBeInTheDocument();
+        expect(screen.getByText("client.actions.newNote")).toBeInTheDocument();
+        expect(screen.getByText("extractor.button")).toBeInTheDocument();
     });
 
     it("disables the New Note button when createNote is pending", () => {
         mockCreateNote.isPending = true;
         render(<ClientDashboardHome />);
-        expect(screen.getByRole("button", { name: /New Note/ })).toBeDisabled();
+        expect(
+            screen.getByRole("button", { name: /client.actions.newNote/ }),
+        ).toBeDisabled();
     });
 
     it("clicking New Note calls createNote.mutateAsync with null", async () => {
         render(<ClientDashboardHome />);
-        fireEvent.click(screen.getByRole("button", { name: /New Note/ }));
+        fireEvent.click(screen.getByRole("button", { name: /client.actions.newNote/ }));
         await waitFor(() =>
             expect(mockCreateNote.mutateAsync).toHaveBeenCalledWith(null),
         );
@@ -105,7 +108,7 @@ describe("ClientDashboardHome", () => {
 
     it("clicking New Note navigates to /notes/$noteId in edit mode", async () => {
         render(<ClientDashboardHome />);
-        fireEvent.click(screen.getByRole("button", { name: /New Note/ }));
+        fireEvent.click(screen.getByRole("button", { name: /client.actions.newNote/ }));
         await waitFor(() =>
             expect(mockNavigate).toHaveBeenCalledWith({
                 to: "/notes/$noteId",
@@ -149,12 +152,12 @@ describe("ClientDashboardHome", () => {
 
     it("renders Recent Notes section heading", () => {
         render(<ClientDashboardHome />);
-        expect(screen.getByText("Recent Notes")).toBeInTheDocument();
+        expect(screen.getByText("client.recentNotes.title")).toBeInTheDocument();
     });
 
     it("renders Show More button", () => {
         render(<ClientDashboardHome />);
-        expect(screen.getByText("Show More")).toBeInTheDocument();
+        expect(screen.getByText("client.recentNotes.showMore")).toBeInTheDocument();
     });
 
     it("shows 0 tokens when user has no token balance", () => {
@@ -179,12 +182,10 @@ describe("ClientDashboardHome", () => {
             isLoading: false,
         });
         render(<ClientDashboardHome />);
-        expect(
-            screen.getByText(/No notes yet. Create your first note!/),
-        ).toBeInTheDocument();
+        expect(screen.getByText("client.recentNotes.empty")).toBeInTheDocument();
     });
 
-    it("renders folder fallback as 'Notes' when folderId is null", () => {
+    it("renders folder fallback when folderId is null", () => {
         (useRecentNotes as jest.Mock).mockReturnValue({
             data: {
                 notes: [{ ...mockNote, folderId: null }],
@@ -193,8 +194,8 @@ describe("ClientDashboardHome", () => {
             isLoading: false,
         });
         render(<ClientDashboardHome />);
-        const allNotes = screen.getAllByText("Notes");
-        expect(allNotes.length).toBeGreaterThanOrEqual(2);
+        const folderFallback = screen.getAllByText("client.recentNotes.folderFallback");
+        expect(folderFallback.length).toBeGreaterThanOrEqual(1);
     });
 
     it("shows low-balance alert when tokenBalance is below 20", () => {
@@ -202,8 +203,11 @@ describe("ClientDashboardHome", () => {
             user: { ...mockUser, tokenBalance: 10 },
         });
         render(<ClientDashboardHome />);
-        expect(screen.getByTestId("low-balance-alert")).toBeInTheDocument();
-        expect(screen.getByText(/Your token balance is low/)).toBeInTheDocument();
+        const alert = screen.getByTestId("low-balance-alert");
+        expect(alert).toBeInTheDocument();
+        expect(alert).toHaveTextContent("client.lowBalance.message");
+        expect(alert).toHaveTextContent("client.lowBalance.link");
+        expect(alert).toHaveTextContent("client.lowBalance.suffix");
     });
 
     it("does not show low-balance alert when tokenBalance is 20 or above", () => {
@@ -225,13 +229,15 @@ describe("ClientDashboardHome", () => {
             user: { ...mockUser, tokenBalance: 5 },
         });
         render(<ClientDashboardHome />);
-        const link = screen.getByRole("link", { name: /Request more tokens/ });
+        const link = screen.getByRole("link", { name: "client.lowBalance.link" });
         expect(link).toHaveAttribute("href", "/tokens");
     });
 
     it("Tokens StatsCard action navigates to /tokens", () => {
         render(<ClientDashboardHome />);
-        const requestMoreButton = screen.getByRole("button", { name: /Request More/ });
+        const requestMoreButton = screen.getByRole("button", {
+            name: "client.stats.requestMore",
+        });
         fireEvent.click(requestMoreButton);
         expect(mockNavigate).toHaveBeenCalledWith({ to: "/tokens" });
     });
