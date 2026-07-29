@@ -138,8 +138,12 @@ describe("AdminUsersTable", () => {
         expect(screen.getByText("user1@example.com")).toBeInTheDocument();
         expect(screen.getByText("admin@example.com")).toBeInTheDocument();
         expect(screen.getByText("User One")).toBeInTheDocument();
-        expect(screen.getByRole("columnheader", { name: "User" })).toBeInTheDocument();
-        expect(screen.getByRole("columnheader", { name: "Role" })).toBeInTheDocument();
+        expect(
+            screen.getByRole("columnheader", { name: "users.table.user" }),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByRole("columnheader", { name: "users.table.role" }),
+        ).toBeInTheDocument();
     });
 
     it("displays role badges correctly", () => {
@@ -147,20 +151,20 @@ describe("AdminUsersTable", () => {
             <AdminUsersTable data={mockUsers} isLoading={false} {...mockHandlers} />,
         );
 
-        expect(screen.getByText("Client")).toBeInTheDocument();
-        expect(screen.getByText("Admin")).toBeInTheDocument();
+        expect(screen.getByText("users.table.client")).toBeInTheDocument();
+        expect(screen.getByText("users.table.admin")).toBeInTheDocument();
     });
 
     it("shows loading state", () => {
         render(<AdminUsersTable data={[]} isLoading={true} {...mockHandlers} />);
 
-        expect(screen.getByText("Loading users...")).toBeInTheDocument();
+        expect(screen.getByText("users.loading")).toBeInTheDocument();
     });
 
     it("shows empty state", () => {
         render(<AdminUsersTable data={[]} isLoading={false} {...mockHandlers} />);
 
-        expect(screen.getByText("No users found.")).toBeInTheDocument();
+        expect(screen.getByText("users.empty")).toBeInTheDocument();
     });
 
     it("shows Low badge for low token balances", () => {
@@ -168,7 +172,7 @@ describe("AdminUsersTable", () => {
             <AdminUsersTable data={mockUsers} isLoading={false} {...mockHandlers} />,
         );
 
-        expect(screen.getByText("Low")).toBeInTheDocument();
+        expect(screen.getByText("users.table.low")).toBeInTheDocument();
         expect(screen.getByText("100")).toBeInTheDocument();
         expect(screen.getByText("5,000")).toBeInTheDocument();
     });
@@ -180,9 +184,9 @@ describe("AdminUsersTable", () => {
         );
 
         await user.click(
-            screen.getByRole("switch", {
-                name: "Toggle active status for User One",
-            }),
+            screen.getAllByRole("switch", {
+                name: "users.table.toggleActive",
+            })[0]!,
         );
 
         expect(mockHandlers.onToggleActive).toHaveBeenCalledWith(mockUsers[0]);
@@ -194,7 +198,9 @@ describe("AdminUsersTable", () => {
             <AdminUsersTable data={mockUsers} isLoading={false} {...mockHandlers} />,
         );
 
-        await user.click(screen.getAllByRole("menuitem", { name: "Edit" })[0]!);
+        await user.click(
+            screen.getAllByRole("menuitem", { name: "users.table.edit" })[0]!,
+        );
 
         expect(mockHandlers.onEditUser).toHaveBeenCalledWith(mockUsers[0]);
     });
@@ -205,10 +211,14 @@ describe("AdminUsersTable", () => {
             <AdminUsersTable data={mockUsers} isLoading={false} {...mockHandlers} />,
         );
 
-        await user.click(screen.getByRole("menuitem", { name: "Grant Admin" }));
+        await user.click(
+            screen.getByRole("menuitem", { name: "users.table.grantAdmin" }),
+        );
         expect(mockHandlers.onToggleAdmin).toHaveBeenCalledWith(mockUsers[0]);
 
-        await user.click(screen.getByRole("menuitem", { name: "Revoke Admin" }));
+        await user.click(
+            screen.getByRole("menuitem", { name: "users.table.revokeAdmin" }),
+        );
         expect(mockHandlers.onToggleAdmin).toHaveBeenCalledWith(mockUsers[1]);
     });
 
@@ -236,9 +246,9 @@ describe("AdminUsersTable", () => {
         );
 
         expect(
-            screen.getByRole("switch", {
-                name: "Toggle active status for User One",
-            }),
+            screen.getAllByRole("switch", {
+                name: "users.table.toggleActive",
+            })[0],
         ).toBeDisabled();
     });
 

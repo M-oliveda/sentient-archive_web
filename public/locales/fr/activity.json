@@ -1,0 +1,27 @@
+{
+  "page": {
+    "eyebrow": "Activité",
+    "title": "Journal d'activité",
+    "subtitle": "Suivez toutes vos actions, opérations IA et l'historique d'utilisation des jetons."
+  },
+  "stats": {
+    "actionsToday": "Actions aujourd'hui",
+    "aiOpsThisWeek": "Ops IA cette semaine",
+    "totalActions": "Actions totales"
+  },
+  "filters": {
+    "searchPlaceholder": "Rechercher dans les journaux...",
+    "searchAriaLabel": "Rechercher dans les journaux",
+    "all": "Tout",
+    "ai": "Ops IA",
+    "tokens": "Jetons",
+    "notes": "Notes",
+    "folders": "Dossiers"
+  },
+  "timeline": {
+    "today": "Aujourd'hui, {{date}}",
+    "error": "Impossible de charger l'activité. Veuillez réessayer.",
+    "empty": "Aucune activité pour le moment. Les notes, dossiers et opérations IA apparaîtront ici."
+  },
+  "recent": "Activité récente"
+}

@@ -63,7 +63,9 @@ describe("ActivityPage", () => {
 
     it("renders page header and sections", () => {
         render(<ActivityPage />);
-        expect(screen.getByText("Activity Log")).toBeInTheDocument();
+        expect(screen.getByText("page.title")).toBeInTheDocument();
+        expect(screen.getByText("page.eyebrow")).toBeInTheDocument();
+        expect(screen.getByText("page.subtitle")).toBeInTheDocument();
         expect(screen.getByTestId("activity-stats-cards")).toBeInTheDocument();
         expect(screen.getByTestId("activity-filter-bar")).toBeInTheDocument();
         expect(screen.getByTestId("activity-timeline")).toBeInTheDocument();

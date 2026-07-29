@@ -320,11 +320,12 @@ sentient-archive_web/
 │   │   ├── activity.ts
 │   │   └── api.ts
 │   │
-│   ├── locales/
-│   │   ├── en/
-│   │   │   └── translation.json
-│   │   └── es/
-│   │       └── translation.json
+│   ├── public/
+│   │   └── locales/
+│   │       ├── en/ (common.json, auth.json, layout.json, dashboard.json, notes.json, ai.json, tokens.json, activity.json, settings.json, admin.json, landing.json, legal.json)
+│   │       ├── es/ (Spanish translations)
+│   │       ├── fr/ (French translations)
+│   │       └── pt/ (Portuguese translations)
 │   │
 │   ├── routes/
 │   │   ├── __root.tsx               # TanStack Router root
@@ -2631,12 +2632,19 @@ UI (Phase 9 / later); admin system-wide ActivityLogs viewer (Phase 8).
 
 ### Phase 9: Internationalization (Week 8)
 
-- [ ] Set up i18next
-- [ ] Create translation files (en, es)
-- [ ] Implement LanguageSwitcher component
-- [ ] Translate all UI strings
-- [ ] Test language switching
-- [ ] Verify RTL support (if needed)
+- [x] Set up i18next with HttpBackend and LanguageDetector
+- [x] Create translation files (en, es, fr, pt) with namespaced JSON structure
+- [x] Implement LanguageSwitcher component in PublicNavbar and DashboardSidebar
+- [x] Wire i18n infrastructure (src/lib/i18n.ts, Suspense in main.tsx)
+- [x] Create useLanguage and useUpdateLanguage hooks
+- [x] Update backend to support language preference (en/es/fr/pt)
+- [x] Sync language preference on login via useAuth
+- [x] Update IUser type to include preferences
+- [x] Translate all UI strings (dashboard, notes, AI, tokens, activity, settings, admin,
+      auth, landing, legal, layout — en/es/fr/pt; FolderTree unused/skipped; API-sourced
+      activity titles remain backend-owned)
+- [ ] Test language switching (manual LanguageSwitcher QA pending)
+- [x] Verify RTL support (N/A - all supported languages are LTR)
 
 ### Phase 10: Testing & Polish (Week 9)
 

@@ -17,6 +17,6 @@ describe("login route", () => {
     it("should render login page component", () => {
         renderRouteComponent(Route.options.component);
 
-        expect(screen.getByText("Welcome Back")).toBeInTheDocument();
+        expect(screen.getByText("login.title")).toBeInTheDocument();
     });
 });

@@ -1,0 +1,21 @@
+{
+  "page": {
+    "eyebrow": "Compte",
+    "title": "Paramètres",
+    "subtitle": "Gérez les paramètres de votre compte, vos préférences et la facturation."
+  },
+  "profile": "Profil",
+  "preferences": "Préférences",
+  "card": {
+    "fullName": "Nom complet",
+    "username": "Nom d'utilisateur",
+    "save": "Enregistrer les modifications",
+    "saving": "Enregistrement...",
+    "updateSuccess": "Profil mis à jour",
+    "updateError": "Échec de la mise à jour du profil"
+  },
+  "validation": {
+    "displayNameRequired": "Le nom complet est requis",
+    "displayNameTooLong": "Le nom complet ne peut pas dépasser 80 caractères"
+  }
+}

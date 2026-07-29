@@ -61,13 +61,13 @@ describe("RequestTokensModal", () => {
     it("renders dialog title when open", () => {
         render(<RequestTokensModal open={true} onOpenChange={jest.fn()} />);
         expect(screen.getByTestId("dialog")).toBeInTheDocument();
-        expect(screen.getByText("Request Tokens")).toBeInTheDocument();
+        expect(screen.getByText("modal.title")).toBeInTheDocument();
     });
 
     it("does not render dialog content when closed", () => {
         render(<RequestTokensModal open={false} onOpenChange={jest.fn()} />);
         expect(screen.queryByTestId("dialog")).not.toBeInTheDocument();
-        expect(screen.queryByText("Request Tokens")).not.toBeInTheDocument();
+        expect(screen.queryByText("modal.title")).not.toBeInTheDocument();
     });
 
     it("handleClose with true passes through without resetting state", () => {
@@ -82,63 +82,63 @@ describe("RequestTokensModal", () => {
 
     it("shows the current token balance", () => {
         render(<RequestTokensModal open={true} onOpenChange={jest.fn()} />);
-        expect(screen.getByText(/150 Tokens/)).toBeInTheDocument();
+        expect(screen.getByText("modal.tokensLabel")).toBeInTheDocument();
     });
 
     it("shows 0 tokens when user is null", () => {
         (useAuthStore as unknown as jest.Mock).mockReturnValue({ user: null });
         render(<RequestTokensModal open={true} onOpenChange={jest.fn()} />);
-        expect(screen.getByText(/0 Tokens/)).toBeInTheDocument();
+        expect(screen.getByText("modal.tokensLabel")).toBeInTheDocument();
     });
 
     const fillValidForm = (amountValue = "500") => {
-        fireEvent.change(screen.getByPlaceholderText("e.g. 500"), {
+        fireEvent.change(screen.getByPlaceholderText("modal.amountPlaceholder"), {
             target: { value: amountValue },
         });
-        fireEvent.change(screen.getByPlaceholderText("Why do you need more tokens?"), {
+        fireEvent.change(screen.getByPlaceholderText("modal.reasonPlaceholder"), {
             target: { value: "Need tokens for embeddings" },
         });
     };
 
     it("submit button is disabled when amount is empty", () => {
         render(<RequestTokensModal open={true} onOpenChange={jest.fn()} />);
-        expect(screen.getByRole("button", { name: /Submit Request/ })).toBeDisabled();
+        expect(screen.getByRole("button", { name: /modal\.submit/ })).toBeDisabled();
     });
 
     it("submit button is disabled when amount is 0", () => {
         render(<RequestTokensModal open={true} onOpenChange={jest.fn()} />);
-        fireEvent.change(screen.getByPlaceholderText("e.g. 500"), {
+        fireEvent.change(screen.getByPlaceholderText("modal.amountPlaceholder"), {
             target: { value: "0" },
         });
-        fireEvent.change(screen.getByPlaceholderText("Why do you need more tokens?"), {
+        fireEvent.change(screen.getByPlaceholderText("modal.reasonPlaceholder"), {
             target: { value: "Need tokens for embeddings" },
         });
-        expect(screen.getByRole("button", { name: /Submit Request/ })).toBeDisabled();
+        expect(screen.getByRole("button", { name: /modal\.submit/ })).toBeDisabled();
     });
 
     it("submit button is disabled when reason is too short", () => {
         render(<RequestTokensModal open={true} onOpenChange={jest.fn()} />);
-        fireEvent.change(screen.getByPlaceholderText("e.g. 500"), {
+        fireEvent.change(screen.getByPlaceholderText("modal.amountPlaceholder"), {
             target: { value: "500" },
         });
-        fireEvent.change(screen.getByPlaceholderText("Why do you need more tokens?"), {
+        fireEvent.change(screen.getByPlaceholderText("modal.reasonPlaceholder"), {
             target: { value: "ab" },
         });
-        expect(screen.getByRole("button", { name: /Submit Request/ })).toBeDisabled();
+        expect(screen.getByRole("button", { name: /modal\.submit/ })).toBeDisabled();
     });
 
     it("submit button is enabled when amount and reason are valid", () => {
         render(<RequestTokensModal open={true} onOpenChange={jest.fn()} />);
         fillValidForm();
         expect(
-            screen.getByRole("button", { name: /Submit Request/ }),
+            screen.getByRole("button", { name: /modal\.submit/ }),
         ).not.toBeDisabled();
     });
 
     it("calls mutate with parsed amount and justification on submit", () => {
         render(<RequestTokensModal open={true} onOpenChange={jest.fn()} />);
         fillValidForm("300");
-        fireEvent.click(screen.getByRole("button", { name: /Submit Request/ }));
+        fireEvent.click(screen.getByRole("button", { name: /modal\.submit/ }));
         expect(mockMutate).toHaveBeenCalledWith(
             { amount: 300, justification: "Need tokens for embeddings" },
             expect.objectContaining({ onSuccess: expect.any(Function) }),
@@ -147,7 +147,7 @@ describe("RequestTokensModal", () => {
 
     it("does not call mutate when amount is invalid", () => {
         render(<RequestTokensModal open={true} onOpenChange={jest.fn()} />);
-        fireEvent.click(screen.getByRole("button", { name: /Submit Request/ }));
+        fireEvent.click(screen.getByRole("button", { name: /modal\.submit/ }));
         expect(mockMutate).not.toHaveBeenCalled();
     });
 
@@ -161,10 +161,10 @@ describe("RequestTokensModal", () => {
 
         render(<RequestTokensModal open={true} onOpenChange={jest.fn()} />);
         fillValidForm("200");
-        fireEvent.click(screen.getByRole("button", { name: /Submit Request/ }));
+        fireEvent.click(screen.getByRole("button", { name: /modal\.submit/ }));
 
         await waitFor(() => {
-            expect(screen.getByText("Request sent!")).toBeInTheDocument();
+            expect(screen.getByText("modal.successTitle")).toBeInTheDocument();
         });
     });
 
@@ -178,11 +178,11 @@ describe("RequestTokensModal", () => {
 
         render(<RequestTokensModal open={true} onOpenChange={onOpenChange} />);
         fillValidForm("100");
-        fireEvent.click(screen.getByRole("button", { name: /Submit Request/ }));
+        fireEvent.click(screen.getByRole("button", { name: /modal\.submit/ }));
 
-        await waitFor(() => expect(screen.getByText("Done")).toBeInTheDocument());
+        await waitFor(() => expect(screen.getByText("modal.done")).toBeInTheDocument());
 
-        fireEvent.click(screen.getByRole("button", { name: "Done" }));
+        fireEvent.click(screen.getByRole("button", { name: "modal.done" }));
         expect(onOpenChange).toHaveBeenCalledWith(false);
         expect(mockReset).toHaveBeenCalled();
     });
@@ -190,7 +190,7 @@ describe("RequestTokensModal", () => {
     it("Cancel button closes modal", () => {
         const onOpenChange = jest.fn();
         render(<RequestTokensModal open={true} onOpenChange={onOpenChange} />);
-        fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+        fireEvent.click(screen.getByRole("button", { name: "modal.cancel" }));
         expect(onOpenChange).toHaveBeenCalledWith(false);
     });
 
@@ -201,7 +201,7 @@ describe("RequestTokensModal", () => {
         });
 
         render(<RequestTokensModal open={true} onOpenChange={jest.fn()} />);
-        expect(screen.getByText(/Something went wrong/)).toBeInTheDocument();
+        expect(screen.getByText("modal.error")).toBeInTheDocument();
     });
 
     it("shows spinner and disables buttons while pending", () => {
@@ -211,7 +211,7 @@ describe("RequestTokensModal", () => {
         });
 
         render(<RequestTokensModal open={true} onOpenChange={jest.fn()} />);
-        expect(screen.getByText(/Submitting/)).toBeInTheDocument();
-        expect(screen.getByRole("button", { name: "Cancel" })).toBeDisabled();
+        expect(screen.getByText("modal.submitting")).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: "modal.cancel" })).toBeDisabled();
     });
 });

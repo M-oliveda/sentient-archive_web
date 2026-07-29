@@ -1,0 +1,118 @@
+{
+  "newNote": "Nova Nota",
+  "allNotes": "Todas as Notas",
+  "noNotes": "Ainda não há notas",
+  "untitled": "Nota sem título",
+  "list": {
+    "title": "Minhas Notas",
+    "noteTotal": "{{count}} nota no total",
+    "notesTotal": "{{count}} notas no total",
+    "newNote": "Nova Nota",
+    "searchPlaceholder": "Pesquisar notas…",
+    "searchAriaLabel": "Pesquisar notas",
+    "empty": "Ainda não há notas.",
+    "emptySearch": "Nenhuma nota corresponde à sua pesquisa.",
+    "showing": "Mostrando {{start}}–{{end}} de {{total}} notas",
+    "prevPage": "Página anterior",
+    "nextPage": "Próxima página",
+    "sort": {
+      "updatedAt": "Última edição",
+      "createdAt": "Criação",
+      "title": "Título"
+    }
+  },
+  "card": {
+    "untitled": "Sem título",
+    "unfiled": "Sem pasta",
+    "words": "{{count}} palavras"
+  },
+  "detail": {
+    "breadcrumb": "Trilha de navegação",
+    "home": "Início",
+    "allNotes": "Todas as Notas",
+    "untitled": "Sem título",
+    "edit": "Editar",
+    "words": "{{count}} palavras",
+    "aiInsight": "Insight de IA"
+  },
+  "editor": {
+    "untitled": "Sem título",
+    "titleAriaLabel": "Título da nota",
+    "back": "Voltar",
+    "toggleAI": "Alternar ferramentas de IA",
+    "saving": "Salvando",
+    "saved": "Salvo",
+    "deleteNote": "Excluir nota",
+    "deleteConfirmTitle": "Excluir nota?",
+    "deleteConfirmDescription": "Esta ação não pode ser desfeita. A nota será excluída permanentemente.",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "addTag": "Adicionar tag",
+    "addTagPlaceholder": "Adicionar tag…",
+    "removeTag": "Remover tag {{tag}}",
+    "placeholder": "Comece a escrever… (atalhos de markdown suportados)",
+    "contentAriaLabel": "Conteúdo da nota",
+    "enterUrl": "Digite a URL:",
+    "format": {
+      "bold": "Negrito",
+      "italic": "Itálico",
+      "h1": "Título 1",
+      "h2": "Título 2",
+      "bulletList": "Lista com marcadores",
+      "numberedList": "Lista numerada",
+      "link": "Link",
+      "blockquote": "Citação",
+      "codeBlock": "Bloco de código"
+    }
+  },
+  "assistant": {
+    "title": "Assistente de IA",
+    "noFeatures": "Nenhum recurso de IA está disponível no momento.",
+    "token": "{{count}} token",
+    "tokens": "{{count}} tokens",
+    "notEnoughTokens": "Tokens insuficientes",
+    "generating": "Gerando…",
+    "regenerating": "Regenerando…",
+    "errors": {
+      "unavailable": "O serviço de IA está temporariamente indisponível. Tente novamente mais tarde.",
+      "generic": "Algo deu errado. Tente novamente."
+    },
+    "summary": {
+      "title": "Resumo",
+      "generate": "Gerar resumo",
+      "insert": "Inserir no topo",
+      "markdownHeading": "Resumo"
+    },
+    "tags": {
+      "title": "Tags sugeridas",
+      "generate": "Gerar tags",
+      "regenerate": "Regenerar tags"
+    },
+    "flashcards": {
+      "title": "Gerar flashcards",
+      "description": "Crie materiais de estudo a partir desta nota.",
+      "generate": "Gerar",
+      "regenerate": "Regenerar",
+      "withCost": "{{label}} ({{count}} tokens)",
+      "markdownHeading": "Flashcards"
+    },
+    "knowledgeQA": {
+      "title": "Perguntas e respostas",
+      "description": "Faça perguntas e obtenha respostas com base em todas as suas notas.",
+      "ask": "Fazer uma pergunta ({{count}} tokens)"
+    }
+  },
+  "extractor": {
+    "button": "Carregar Documento",
+    "stages": {
+      "uploading": "Carregando…",
+      "parsing": "Analisando conteúdo…",
+      "creating": "Criando nota…"
+    },
+    "errors": {
+      "unsupportedType": "Apenas arquivos PDF, TXT e MD são suportados.",
+      "tooLarge": "O arquivo deve ser menor que 10 MB."
+    },
+    "success": "\"{{title}}\" criado a partir de {{filename}}"
+  }
+}

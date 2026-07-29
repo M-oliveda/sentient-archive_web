@@ -13,6 +13,7 @@ export default {
         "^lucide-react$": "<rootDir>/tests/__mocks__/lucide-react.ts",
         "^framer-motion$": "<rootDir>/tests/__mocks__/framer-motion.tsx",
         "^firebase/functions$": "<rootDir>/tests/__mocks__/firebase-functions.ts",
+        "^react-i18next$": "<rootDir>/tests/__mocks__/react-i18next.ts",
     },
     setupFilesAfterEnv: ["<rootDir>/tests/setup.ts"],
     collectCoverageFrom: [

@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Calendar, ChevronRight, Home, Sparkles } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { countWords } from "@/lib/notes-utils";
 import { MarkdownEditor } from "@/components/notes/markdown-editor";
 import { Button } from "@/components/ui/button";
@@ -12,8 +13,9 @@ interface IReadNoteViewProps {
 }
 
 export function ReadNoteView({ note, folderName, onEdit }: IReadNoteViewProps) {
+    const { t, i18n } = useTranslation("notes");
     const wordCount = countWords(note.content);
-    const formattedDate = note.createdAt.toLocaleDateString("en-US", {
+    const formattedDate = note.createdAt.toLocaleDateString(i18n.language, {
         month: "long",
         day: "numeric",
         year: "numeric",
@@ -21,30 +23,33 @@ export function ReadNoteView({ note, folderName, onEdit }: IReadNoteViewProps) {
 
     return (
         <div className="mx-auto flex max-w-3xl flex-col gap-6">
-            <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-sm">
+            <nav
+                aria-label={t("detail.breadcrumb")}
+                className="flex items-center gap-1.5 text-sm"
+            >
                 <Link
                     to="/notes"
                     className="text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
                 >
                     <Home className="size-3.5" />
-                    Home
+                    {t("detail.home")}
                 </Link>
                 <ChevronRight className="text-muted-foreground size-3.5 shrink-0" />
                 <span className="text-muted-foreground">
-                    {folderName ?? "All Notes"}
+                    {folderName ?? t("detail.allNotes")}
                 </span>
                 <ChevronRight className="text-muted-foreground size-3.5 shrink-0" />
                 <span className="text-foreground max-w-48 truncate font-medium">
-                    {note.title || "Untitled"}
+                    {note.title || t("detail.untitled")}
                 </span>
             </nav>
 
             <div className="flex items-start justify-between gap-4">
                 <h1 className="text-foreground text-3xl leading-tight font-bold">
-                    {note.title || "Untitled"}
+                    {note.title || t("detail.untitled")}
                 </h1>
                 <Button variant="secondary" size="sm" onClick={onEdit}>
-                    Edit
+                    {t("detail.edit")}
                 </Button>
             </div>
 
@@ -66,7 +71,7 @@ export function ReadNoteView({ note, folderName, onEdit }: IReadNoteViewProps) {
                     <Calendar className="size-4" />
                     {formattedDate}
                 </span>
-                <span>{wordCount.toLocaleString()} words</span>
+                <span>{t("detail.words", { count: wordCount })}</span>
             </div>
 
             {note.summary && <AiInsightBox summary={note.summary} />}
@@ -77,11 +82,15 @@ export function ReadNoteView({ note, folderName, onEdit }: IReadNoteViewProps) {
 }
 
 function AiInsightBox({ summary }: { summary: string }) {
+    const { t } = useTranslation("notes");
+
     return (
         <div className="bg-secondary rounded-xl p-4">
             <div className="mb-3 flex items-center gap-2">
                 <Sparkles className="text-primary size-4" />
-                <span className="text-foreground text-sm font-medium">AI Insight</span>
+                <span className="text-foreground text-sm font-medium">
+                    {t("detail.aiInsight")}
+                </span>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed">{summary}</p>
         </div>

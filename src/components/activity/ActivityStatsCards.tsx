@@ -1,4 +1,5 @@
 import { ArrowUp } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import type { IActivityStats } from "@/types/activity";
 
@@ -9,13 +10,9 @@ interface IActivityStatsCardsProps {
 
 interface IStatCardProps {
     label: string;
-    value: number;
+    value: string;
     deltaPct?: number;
     className?: string;
-}
-
-function formatCount(value: number): string {
-    return value.toLocaleString();
 }
 
 function StatCard({ label, value, deltaPct, className }: IStatCardProps) {
@@ -32,7 +29,7 @@ function StatCard({ label, value, deltaPct, className }: IStatCardProps) {
             <p className="text-foreground text-sm font-medium">{label}</p>
             <div className="flex items-end gap-0">
                 <p className="text-foreground text-3xl font-bold tabular-nums">
-                    {formatCount(value)}
+                    {value}
                 </p>
                 {showDelta ? (
                     <div className="flex items-center gap-0 px-2 py-1">
@@ -67,8 +64,14 @@ export function ActivityStatsCards({
     stats,
     isLoading = false,
 }: IActivityStatsCardsProps) {
+    const { t, i18n } = useTranslation("activity");
+
     if (isLoading || !stats) {
         return <StatsSkeleton />;
+    }
+
+    function formatCount(value: number): string {
+        return value.toLocaleString(i18n.language);
     }
 
     return (
@@ -78,21 +81,21 @@ export function ActivityStatsCards({
         >
             <div className="flex gap-2 md:contents">
                 <StatCard
-                    label="Actions today"
-                    value={stats.actionsToday}
+                    label={t("stats.actionsToday")}
+                    value={formatCount(stats.actionsToday)}
                     deltaPct={stats.actionsTodayDeltaPct}
                     className="flex-1"
                 />
                 <StatCard
-                    label="AI Ops This Week"
-                    value={stats.aiOpsThisWeek}
+                    label={t("stats.aiOpsThisWeek")}
+                    value={formatCount(stats.aiOpsThisWeek)}
                     deltaPct={stats.aiOpsThisWeekDeltaPct}
                     className="flex-1"
                 />
             </div>
             <StatCard
-                label="Total Actions"
-                value={stats.totalActions}
+                label={t("stats.totalActions")}
+                value={formatCount(stats.totalActions)}
                 className="w-full md:flex-1"
             />
         </div>

@@ -1,4 +1,5 @@
 import { Bot, Coins, FileText, Users } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { ActivityItem } from "@/components/dashboard/ActivityItem";
@@ -12,45 +13,53 @@ function statusVariant(status: ServiceStatus): "success" | "destructive" | "outl
 }
 
 export function AdminDashboardHome() {
+    const { t } = useTranslation("dashboard");
     const { data, isLoading } = useAdminStats();
     const stats = data;
+
+    const translateStatus = (status: ServiceStatus): string => {
+        if (status === "Operational") return t("admin.health.operational");
+        if (status === "In Danger") return t("admin.health.inDanger");
+        if (status === "Down") return t("admin.health.down");
+        return status;
+    };
 
     return (
         <div className="space-y-8">
             {/* Heading */}
             <section>
-                <h1 className="text-foreground text-4xl font-bold">Admin Dashboard</h1>
-                <p className="text-muted-foreground mt-2">
-                    System Overview &amp; Health Monitoring
-                </p>
+                <h1 className="text-foreground text-4xl font-bold">
+                    {t("admin.title")}
+                </h1>
+                <p className="text-muted-foreground mt-2">{t("admin.subtitle")}</p>
             </section>
 
             {/* Stats grid */}
             <section
                 className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4"
-                aria-label="System stats"
+                aria-label={t("admin.stats.ariaLabel")}
             >
                 <StatsCard
                     icon={Users}
-                    label="Total Users"
+                    label={t("admin.stats.totalUsers")}
                     value={isLoading ? "—" : (stats?.totalUsers ?? 0)}
                     variant="accent"
                 />
                 <StatsCard
                     icon={FileText}
-                    label="Total Notes"
+                    label={t("admin.stats.totalNotes")}
                     value={isLoading ? "—" : (stats?.totalNotes ?? 0)}
                     variant="accent"
                 />
                 <StatsCard
                     icon={Coins}
-                    label="Total Tokens"
+                    label={t("admin.stats.totalTokens")}
                     value={isLoading ? "—" : (stats?.totalTokens ?? 0)}
                     variant="accent"
                 />
                 <StatsCard
                     icon={Bot}
-                    label="Total AI Operations"
+                    label={t("admin.stats.totalAiOps")}
                     value={isLoading ? "—" : (stats?.totalAIOperations ?? 0)}
                     variant="accent"
                 />
@@ -61,10 +70,10 @@ export function AdminDashboardHome() {
                 {/* System Health */}
                 <section
                     className="bg-card border-border rounded-2xl border p-6"
-                    aria-label="System health"
+                    aria-label={t("admin.health.ariaLabel")}
                 >
                     <h2 className="text-foreground mb-4 text-lg font-bold">
-                        System Health
+                        {t("admin.health.title")}
                     </h2>
                     <ul className="space-y-3">
                         {(stats?.systemHealth ?? []).map(
@@ -83,7 +92,7 @@ export function AdminDashboardHome() {
                                         {service}
                                     </span>
                                     <Badge variant={statusVariant(status)}>
-                                        {status}
+                                        {translateStatus(status)}
                                     </Badge>
                                 </li>
                             ),
@@ -94,10 +103,10 @@ export function AdminDashboardHome() {
                 {/* Recent Activity */}
                 <section
                     className="bg-card border-border rounded-2xl border p-6"
-                    aria-label="Recent activity"
+                    aria-label={t("admin.activity.ariaLabel")}
                 >
                     <h2 className="text-foreground mb-4 text-lg font-bold">
-                        Recent Activity
+                        {t("admin.activity.title")}
                     </h2>
                     <ul className="flex flex-col space-y-4 overflow-x-auto pb-2">
                         {(stats?.recentActivity ?? []).map(

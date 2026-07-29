@@ -99,7 +99,7 @@ describe("AdminTokenRequestsPage", () => {
 
         render(<AdminTokenRequestsPage />, { wrapper: createWrapper() });
 
-        expect(screen.getByText("Token Requests")).toBeInTheDocument();
+        expect(screen.getByText("tokenRequests.title")).toBeInTheDocument();
         expect(screen.queryByText(/Review and approve/)).not.toBeInTheDocument();
     });
 
@@ -108,10 +108,10 @@ describe("AdminTokenRequestsPage", () => {
 
         render(<AdminTokenRequestsPage />, { wrapper: createWrapper() });
 
-        expect(screen.getByText("Pending")).toBeInTheDocument();
-        expect(screen.getByText("Approved")).toBeInTheDocument();
-        expect(screen.getByText("Denied")).toBeInTheDocument();
-        expect(screen.getByText("All History")).toBeInTheDocument();
+        expect(screen.getByText("tokenRequests.tabs.pending")).toBeInTheDocument();
+        expect(screen.getByText("tokenRequests.tabs.approved")).toBeInTheDocument();
+        expect(screen.getByText("tokenRequests.tabs.denied")).toBeInTheDocument();
+        expect(screen.getByText("tokenRequests.tabs.allHistory")).toBeInTheDocument();
     });
 
     it("defaults to the pending tab and shows pending/urgent stats", () => {
@@ -119,9 +119,11 @@ describe("AdminTokenRequestsPage", () => {
 
         render(<AdminTokenRequestsPage />, { wrapper: createWrapper() });
 
-        const pendingTab = screen.getByRole("button", { name: /Pending/ });
+        const pendingTab = screen.getByRole("button", {
+            name: /tokenRequests\.tabs\.pending/,
+        });
         expect(pendingTab).toHaveClass("bg-primary");
-        expect(screen.getByText("1 Urgent (Low Balance)")).toBeInTheDocument();
+        expect(screen.getByText("tokenRequests.urgentCount")).toBeInTheDocument();
     });
 
     it("switches tabs and refetches with the new status filter", async () => {
@@ -154,9 +156,9 @@ describe("AdminTokenRequestsPage", () => {
 
         render(<AdminTokenRequestsPage />, { wrapper: createWrapper() });
 
-        expect(screen.getByText("1 Urgent (Low Balance)")).toBeInTheDocument();
+        expect(screen.getByText("tokenRequests.urgentCount")).toBeInTheDocument();
 
-        await userEvent.click(screen.getByText("Approved"));
+        await userEvent.click(screen.getByText("tokenRequests.tabs.approved"));
 
         await waitFor(() => {
             expect(mockUseTokenRequests).toHaveBeenLastCalledWith(
@@ -165,7 +167,7 @@ describe("AdminTokenRequestsPage", () => {
         });
 
         // Urgent count is derived from the current response; approved has none
-        expect(screen.queryByText(/Urgent \(Low Balance\)/)).not.toBeInTheDocument();
+        expect(screen.queryByText("tokenRequests.urgentCount")).not.toBeInTheDocument();
     });
 
     it("renders token request cards", () => {
@@ -175,7 +177,7 @@ describe("AdminTokenRequestsPage", () => {
 
         expect(screen.getByText("Alice Chen")).toBeInTheDocument();
         expect(screen.getByText("alice.c@sentient.ai")).toBeInTheDocument();
-        expect(screen.getByText("50k TKN")).toBeInTheDocument();
+        expect(screen.getByText("tokens.unitCompact")).toBeInTheDocument();
     });
 
     it("displays approve/reject buttons for pending requests", () => {
@@ -183,8 +185,8 @@ describe("AdminTokenRequestsPage", () => {
 
         render(<AdminTokenRequestsPage />, { wrapper: createWrapper() });
 
-        const approveButtons = screen.getAllByText("Approve");
-        const rejectButtons = screen.getAllByText("Reject");
+        const approveButtons = screen.getAllByText("tokenRequests.card.approve");
+        const rejectButtons = screen.getAllByText("tokenRequests.card.reject");
         expect(approveButtons.length).toBeGreaterThan(0);
         expect(rejectButtons.length).toBeGreaterThan(0);
     });
@@ -195,10 +197,12 @@ describe("AdminTokenRequestsPage", () => {
 
         render(<AdminTokenRequestsPage />, { wrapper: createWrapper() });
 
-        await userEvent.click(screen.getAllByText("Approve")[0]!);
+        await userEvent.click(screen.getAllByText("tokenRequests.card.approve")[0]!);
 
         await waitFor(() => {
-            expect(screen.getByText("Approve Token Request")).toBeInTheDocument();
+            expect(
+                screen.getByText("tokenRequests.approveModal.title"),
+            ).toBeInTheDocument();
         });
 
         const dialog = screen.getByRole("dialog");
@@ -206,17 +210,23 @@ describe("AdminTokenRequestsPage", () => {
         await userEvent.clear(amountInput);
         await userEvent.type(amountInput, "750");
 
-        const notesInput = within(dialog).getByPlaceholderText("Approval notes...");
+        const notesInput = within(dialog).getByPlaceholderText(
+            "tokenRequests.approveModal.notesPlaceholder",
+        );
         await userEvent.type(notesInput, "Looks good");
 
-        await userEvent.click(within(dialog).getByRole("button", { name: "Approve" }));
+        await userEvent.click(
+            within(dialog).getByRole("button", {
+                name: "tokenRequests.approveModal.approve",
+            }),
+        );
 
         await waitFor(() => {
             expect(mockUseApproveTokenRequest().mutateAsync).toHaveBeenCalledWith({
                 requestId: "req1",
                 payload: { amount: 750, notes: "Looks good" },
             });
-            expect(toast.success).toHaveBeenCalledWith("Token request approved");
+            expect(toast.success).toHaveBeenCalledWith("tokenRequests.approveSuccess");
         });
     });
 
@@ -225,15 +235,21 @@ describe("AdminTokenRequestsPage", () => {
 
         render(<AdminTokenRequestsPage />, { wrapper: createWrapper() });
 
-        await userEvent.click(screen.getAllByText("Approve")[0]!);
+        await userEvent.click(screen.getAllByText("tokenRequests.card.approve")[0]!);
 
         await waitFor(() => {
-            expect(screen.getByText("Approve Token Request")).toBeInTheDocument();
+            expect(
+                screen.getByText("tokenRequests.approveModal.title"),
+            ).toBeInTheDocument();
         });
 
         const dialog = screen.getByRole("dialog");
         await userEvent.clear(within(dialog).getByRole("spinbutton"));
-        await userEvent.click(within(dialog).getByRole("button", { name: "Approve" }));
+        await userEvent.click(
+            within(dialog).getByRole("button", {
+                name: "tokenRequests.approveModal.approve",
+            }),
+        );
 
         await waitFor(() => {
             expect(mockUseApproveTokenRequest().mutateAsync).toHaveBeenCalledWith({
@@ -266,10 +282,12 @@ describe("AdminTokenRequestsPage", () => {
             </QueryClientProvider>,
         );
 
-        await userEvent.click(screen.getAllByText("Approve")[0]!);
+        await userEvent.click(screen.getAllByText("tokenRequests.card.approve")[0]!);
 
         await waitFor(() => {
-            expect(screen.getByText("Approve Token Request")).toBeInTheDocument();
+            expect(
+                screen.getByText("tokenRequests.approveModal.title"),
+            ).toBeInTheDocument();
         });
 
         pendingState.isPending = true;
@@ -279,7 +297,9 @@ describe("AdminTokenRequestsPage", () => {
             </QueryClientProvider>,
         );
 
-        expect(screen.getByText("Approving...")).toBeInTheDocument();
+        expect(
+            screen.getByText("tokenRequests.approveModal.approving"),
+        ).toBeInTheDocument();
     });
 
     it("shows Rejecting... while reject mutation is pending", async () => {
@@ -305,10 +325,12 @@ describe("AdminTokenRequestsPage", () => {
             </QueryClientProvider>,
         );
 
-        await userEvent.click(screen.getAllByText("Reject")[0]!);
+        await userEvent.click(screen.getAllByText("tokenRequests.card.reject")[0]!);
 
         await waitFor(() => {
-            expect(screen.getByText("Reject Token Request")).toBeInTheDocument();
+            expect(
+                screen.getByText("tokenRequests.rejectModal.title"),
+            ).toBeInTheDocument();
         });
 
         pendingState.isPending = true;
@@ -318,7 +340,9 @@ describe("AdminTokenRequestsPage", () => {
             </QueryClientProvider>,
         );
 
-        expect(screen.getByText("Rejecting...")).toBeInTheDocument();
+        expect(
+            screen.getByText("tokenRequests.rejectModal.rejecting"),
+        ).toBeInTheDocument();
     });
 
     it("shows generic error toast when approve fails with non-Error", async () => {
@@ -332,16 +356,20 @@ describe("AdminTokenRequestsPage", () => {
 
         render(<AdminTokenRequestsPage />, { wrapper: createWrapper() });
 
-        await userEvent.click(screen.getAllByText("Approve")[0]!);
+        await userEvent.click(screen.getAllByText("tokenRequests.card.approve")[0]!);
         await waitFor(() => {
-            expect(screen.getByText("Approve Token Request")).toBeInTheDocument();
+            expect(
+                screen.getByText("tokenRequests.approveModal.title"),
+            ).toBeInTheDocument();
         });
         await userEvent.click(
-            within(screen.getByRole("dialog")).getByRole("button", { name: "Approve" }),
+            within(screen.getByRole("dialog")).getByRole("button", {
+                name: "tokenRequests.approveModal.approve",
+            }),
         );
 
         await waitFor(() => {
-            expect(toast.error).toHaveBeenCalledWith("Failed to approve request");
+            expect(toast.error).toHaveBeenCalledWith("tokenRequests.approveError");
         });
     });
 
@@ -356,16 +384,20 @@ describe("AdminTokenRequestsPage", () => {
 
         render(<AdminTokenRequestsPage />, { wrapper: createWrapper() });
 
-        await userEvent.click(screen.getAllByText("Reject")[0]!);
+        await userEvent.click(screen.getAllByText("tokenRequests.card.reject")[0]!);
         await waitFor(() => {
-            expect(screen.getByText("Reject Token Request")).toBeInTheDocument();
+            expect(
+                screen.getByText("tokenRequests.rejectModal.title"),
+            ).toBeInTheDocument();
         });
         await userEvent.click(
-            within(screen.getByRole("dialog")).getByRole("button", { name: "Reject" }),
+            within(screen.getByRole("dialog")).getByRole("button", {
+                name: "tokenRequests.rejectModal.reject",
+            }),
         );
 
         await waitFor(() => {
-            expect(toast.error).toHaveBeenCalledWith("Failed to reject request");
+            expect(toast.error).toHaveBeenCalledWith("tokenRequests.rejectError");
         });
     });
 
@@ -374,7 +406,7 @@ describe("AdminTokenRequestsPage", () => {
 
         render(<AdminTokenRequestsPage />, { wrapper: createWrapper() });
 
-        expect(screen.getByText(/No token requests found/)).toBeInTheDocument();
+        expect(screen.getByText("tokenRequests.empty")).toBeInTheDocument();
     });
 
     it("renders error state when the query fails", () => {
@@ -382,8 +414,8 @@ describe("AdminTokenRequestsPage", () => {
 
         render(<AdminTokenRequestsPage />, { wrapper: createWrapper() });
 
-        expect(screen.getByText(/Failed to load token requests/)).toBeInTheDocument();
-        expect(screen.queryByText(/No token requests found/)).not.toBeInTheDocument();
+        expect(screen.getByText("tokenRequests.loadError")).toBeInTheDocument();
+        expect(screen.queryByText("tokenRequests.empty")).not.toBeInTheDocument();
     });
 
     it("updates reject reason input before submitting", async () => {
@@ -391,18 +423,26 @@ describe("AdminTokenRequestsPage", () => {
 
         render(<AdminTokenRequestsPage />, { wrapper: createWrapper() });
 
-        await userEvent.click(screen.getAllByText("Reject")[0]!);
+        await userEvent.click(screen.getAllByText("tokenRequests.card.reject")[0]!);
 
         await waitFor(() => {
-            expect(screen.getByText("Reject Token Request")).toBeInTheDocument();
+            expect(
+                screen.getByText("tokenRequests.rejectModal.title"),
+            ).toBeInTheDocument();
         });
 
         const dialog = screen.getByRole("dialog");
         await userEvent.type(
-            within(dialog).getByPlaceholderText("Rejection reason..."),
+            within(dialog).getByPlaceholderText(
+                "tokenRequests.rejectModal.reasonPlaceholder",
+            ),
             "Not justified",
         );
-        await userEvent.click(within(dialog).getByRole("button", { name: "Reject" }));
+        await userEvent.click(
+            within(dialog).getByRole("button", {
+                name: "tokenRequests.rejectModal.reject",
+            }),
+        );
 
         await waitFor(() => {
             expect(mockUseRejectTokenRequest().mutateAsync).toHaveBeenCalledWith({
@@ -423,12 +463,18 @@ describe("AdminTokenRequestsPage", () => {
 
         render(<AdminTokenRequestsPage />, { wrapper: createWrapper() });
 
-        await userEvent.click(screen.getAllByText("Approve")[0]!);
+        await userEvent.click(screen.getAllByText("tokenRequests.card.approve")[0]!);
         await waitFor(() => {
-            expect(screen.getByText("Approve Token Request")).toBeInTheDocument();
+            expect(
+                screen.getByText("tokenRequests.approveModal.title"),
+            ).toBeInTheDocument();
         });
         const dialog = screen.getByRole("dialog");
-        await userEvent.click(within(dialog).getByRole("button", { name: "Approve" }));
+        await userEvent.click(
+            within(dialog).getByRole("button", {
+                name: "tokenRequests.approveModal.approve",
+            }),
+        );
 
         await waitFor(() => {
             expect(toast.error).toHaveBeenCalledWith("Network error");
@@ -441,18 +487,24 @@ describe("AdminTokenRequestsPage", () => {
 
         render(<AdminTokenRequestsPage />, { wrapper: createWrapper() });
 
-        await userEvent.click(screen.getAllByText("Reject")[0]!);
+        await userEvent.click(screen.getAllByText("tokenRequests.card.reject")[0]!);
 
         await waitFor(() => {
-            expect(screen.getByText("Reject Token Request")).toBeInTheDocument();
+            expect(
+                screen.getByText("tokenRequests.rejectModal.title"),
+            ).toBeInTheDocument();
         });
 
         const dialog = screen.getByRole("dialog");
-        await userEvent.click(within(dialog).getByRole("button", { name: "Reject" }));
+        await userEvent.click(
+            within(dialog).getByRole("button", {
+                name: "tokenRequests.rejectModal.reject",
+            }),
+        );
 
         await waitFor(() => {
             expect(mockUseRejectTokenRequest().mutateAsync).toHaveBeenCalled();
-            expect(toast.success).toHaveBeenCalledWith("Token request rejected");
+            expect(toast.success).toHaveBeenCalledWith("tokenRequests.rejectSuccess");
         });
     });
 
@@ -467,12 +519,18 @@ describe("AdminTokenRequestsPage", () => {
 
         render(<AdminTokenRequestsPage />, { wrapper: createWrapper() });
 
-        await userEvent.click(screen.getAllByText("Reject")[0]!);
+        await userEvent.click(screen.getAllByText("tokenRequests.card.reject")[0]!);
         await waitFor(() => {
-            expect(screen.getByText("Reject Token Request")).toBeInTheDocument();
+            expect(
+                screen.getByText("tokenRequests.rejectModal.title"),
+            ).toBeInTheDocument();
         });
         const dialog = screen.getByRole("dialog");
-        await userEvent.click(within(dialog).getByRole("button", { name: "Reject" }));
+        await userEvent.click(
+            within(dialog).getByRole("button", {
+                name: "tokenRequests.rejectModal.reject",
+            }),
+        );
 
         await waitFor(() => {
             expect(toast.error).toHaveBeenCalledWith("Network error");
@@ -484,22 +542,30 @@ describe("AdminTokenRequestsPage", () => {
 
         render(<AdminTokenRequestsPage />, { wrapper: createWrapper() });
 
-        await userEvent.click(screen.getAllByText("Approve")[0]!);
+        await userEvent.click(screen.getAllByText("tokenRequests.card.approve")[0]!);
         await waitFor(() => {
-            expect(screen.getByText("Approve Token Request")).toBeInTheDocument();
+            expect(
+                screen.getByText("tokenRequests.approveModal.title"),
+            ).toBeInTheDocument();
         });
-        await userEvent.click(screen.getByText("Cancel"));
+        await userEvent.click(screen.getByText("tokenRequests.approveModal.cancel"));
         await waitFor(() => {
-            expect(screen.queryByText("Approve Token Request")).not.toBeInTheDocument();
+            expect(
+                screen.queryByText("tokenRequests.approveModal.title"),
+            ).not.toBeInTheDocument();
         });
 
-        await userEvent.click(screen.getAllByText("Reject")[0]!);
+        await userEvent.click(screen.getAllByText("tokenRequests.card.reject")[0]!);
         await waitFor(() => {
-            expect(screen.getByText("Reject Token Request")).toBeInTheDocument();
+            expect(
+                screen.getByText("tokenRequests.rejectModal.title"),
+            ).toBeInTheDocument();
         });
-        await userEvent.click(screen.getByText("Cancel"));
+        await userEvent.click(screen.getByText("tokenRequests.rejectModal.cancel"));
         await waitFor(() => {
-            expect(screen.queryByText("Reject Token Request")).not.toBeInTheDocument();
+            expect(
+                screen.queryByText("tokenRequests.rejectModal.title"),
+            ).not.toBeInTheDocument();
         });
     });
 
@@ -510,7 +576,7 @@ describe("AdminTokenRequestsPage", () => {
 
         render(<AdminTokenRequestsPage />, { wrapper: createWrapper() });
 
-        const loadMoreButton = screen.getByText("Load More");
+        const loadMoreButton = screen.getByText("tokenRequests.loadMore");
         expect(loadMoreButton).toBeInTheDocument();
 
         await userEvent.click(loadMoreButton);
@@ -527,7 +593,7 @@ describe("AdminTokenRequestsPage", () => {
 
         render(<AdminTokenRequestsPage />, { wrapper: createWrapper() });
 
-        expect(screen.queryByText("Load More")).not.toBeInTheDocument();
+        expect(screen.queryByText("tokenRequests.loadMore")).not.toBeInTheDocument();
     });
 
     it("shows loading state", () => {
@@ -535,7 +601,7 @@ describe("AdminTokenRequestsPage", () => {
 
         render(<AdminTokenRequestsPage />, { wrapper: createWrapper() });
 
-        expect(screen.getByText("Loading token requests...")).toBeInTheDocument();
+        expect(screen.getByText("tokenRequests.loading")).toBeInTheDocument();
     });
 
     it("shows empty state when no requests", () => {
@@ -543,6 +609,6 @@ describe("AdminTokenRequestsPage", () => {
 
         render(<AdminTokenRequestsPage />, { wrapper: createWrapper() });
 
-        expect(screen.getByText(/No token requests found/)).toBeInTheDocument();
+        expect(screen.getByText("tokenRequests.empty")).toBeInTheDocument();
     });
 });

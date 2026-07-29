@@ -10,71 +10,57 @@ import {
     Search,
     Tag,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
 
 interface IFeatureCard {
+    id: string;
     icon: React.ComponentType<{ className?: string }>;
-    title: string;
-    description: string;
     tokenCost?: number;
 }
 
 const FEATURES: IFeatureCard[] = [
     {
+        id: "realTimeSearch",
         icon: Search,
-        title: "Real-Time Search",
-        description:
-            "Find exactly what you are looking for in milliseconds with semantic search capabilities.",
     },
     {
+        id: "activityTracking",
         icon: Activity,
-        title: "Activity Tracking",
-        description:
-            "Visualize your learning habits and track your productivity with growth over time.",
     },
     {
+        id: "smartNoteTaking",
         icon: PenLine,
-        title: "Smart Note-Taking",
-        description:
-            "Capture ideas instantly with our distraction-free editor designed for speed and clarity.",
     },
     {
+        id: "hierarchicalFolders",
         icon: FolderTree,
-        title: "Hierarchical Folders",
-        description:
-            "Organize your thoughts with infinite nested folders and smart categories.",
     },
     {
+        id: "aiSummarization",
         icon: FileText,
-        title: "AI Summarization",
-        description:
-            "Condense long articles and papers into concise summaries automatically.",
         tokenCost: 2,
     },
     {
+        id: "flashcardGeneration",
         icon: BookOpen,
-        title: "Flashcard Generation",
-        description:
-            "Automatically generate study flashcards from your notes to reinforce learning and retention.",
         tokenCost: 2,
     },
     {
+        id: "autoTagging",
         icon: Tag,
-        title: "Auto-Tagging",
-        description:
-            "Let AI organize your library by automatically assigning relevant tags and categories.",
         tokenCost: 3,
     },
     {
+        id: "knowledgeQa",
         icon: MessageCircle,
-        title: "Knowledge Q&A",
-        description:
-            "Ask questions to your knowledge base and get answers based on your notes.",
         tokenCost: 4,
     },
 ];
 
 export function FeaturesSection() {
+    const { t } = useTranslation("landing");
+
     return (
         <section id="features" className="px-4 py-20">
             <div className="mx-auto max-w-5xl">
@@ -86,11 +72,10 @@ export function FeaturesSection() {
                     className="mb-12 text-center"
                 >
                     <h2 className="text-foreground text-4xl font-bold">
-                        Everything You Need to Build Your Knowledge Empire
+                        {t("features.title")}
                     </h2>
                     <p className="text-muted-foreground mt-4">
-                        Powerful AI features to help you capture, organize, and learn
-                        from your notes without the friction.
+                        {t("features.subtitle")}
                     </p>
                 </motion.div>
 
@@ -101,9 +86,9 @@ export function FeaturesSection() {
                     viewport={{ once: true }}
                     className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
                 >
-                    {FEATURES.map(({ icon: Icon, title, description, tokenCost }) => (
+                    {FEATURES.map(({ id, icon: Icon, tokenCost }) => (
                         <motion.div
-                            key={title}
+                            key={id}
                             variants={fadeInUp}
                             whileHover="hovered"
                             initial="rest"
@@ -142,15 +127,15 @@ export function FeaturesSection() {
                             </motion.div>
 
                             <h3 className="text-foreground group-hover:text-brand-300 mb-1.5 font-bold transition-colors duration-200">
-                                {title}
+                                {t(`features.items.${id}.title`)}
                             </h3>
                             <p className="text-muted-foreground flex-1 text-xs">
-                                {description}
+                                {t(`features.items.${id}.description`)}
                             </p>
                             {tokenCost !== undefined && (
                                 <span className="text-foreground bg-brand-300/40 group-hover:bg-brand-300/70 mt-3 inline-flex w-fit items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors duration-200">
                                     <Bot className="size-3" />
-                                    {tokenCost} tokens
+                                    {t("features.tokenCost", { count: tokenCost })}
                                 </span>
                             )}
                         </motion.div>

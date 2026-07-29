@@ -16,6 +16,6 @@ describe("forgot-password route", () => {
     it("should render forgot password page component", () => {
         renderRouteComponent(Route.options.component);
 
-        expect(screen.getByText("Reset Your Password")).toBeInTheDocument();
+        expect(screen.getByText("forgotPassword.requestTitle")).toBeInTheDocument();
     });
 });

@@ -2,33 +2,29 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { motion, useInView } from "framer-motion";
 import { PenLine, Sparkles, UserPlus } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
 
 const STEPS = [
     {
+        id: "createAccount",
         icon: UserPlus,
-        title: "Create Your Account",
-        description:
-            "Sign up and receive 20 free tokens to explore all AI features. No credit card required.",
     },
     {
+        id: "captureKnowledge",
         icon: PenLine,
-        title: "Capture Your Knowledge",
-        description:
-            "Write notes in Markdown, upload documents, or import existing content into organized folders.",
     },
     {
+        id: "unlockInsights",
         icon: Sparkles,
-        title: "Unlock AI Insights",
-        description:
-            "Let AI summarize, tag, generate flashcards, and chat with your notes.",
     },
 ];
 
 const STEP_DURATION = 1500;
 
 export function HowItWorksSection() {
+    const { t } = useTranslation("landing");
     const gridRef = useRef<HTMLDivElement>(null);
     const isInView = useInView(gridRef, { once: true, margin: "-100px" });
     const [activeStep, setActiveStep] = useState<number | null>(null);
@@ -63,9 +59,11 @@ export function HowItWorksSection() {
                     viewport={{ once: true }}
                     className="mb-12 text-center"
                 >
-                    <h2 className="text-foreground text-4xl font-bold">How It Works</h2>
+                    <h2 className="text-foreground text-4xl font-bold">
+                        {t("howItWorks.title")}
+                    </h2>
                     <p className="text-muted-foreground mt-4">
-                        Start building your second brain in three simple steps
+                        {t("howItWorks.subtitle")}
                     </p>
                 </motion.div>
 
@@ -77,11 +75,11 @@ export function HowItWorksSection() {
                     viewport={{ once: true }}
                     className="grid grid-cols-1 gap-6 sm:grid-cols-3"
                 >
-                    {STEPS.map(({ icon: Icon, title, description }, index) => {
+                    {STEPS.map(({ id, icon: Icon }, index) => {
                         const isActive = activeStep === null || activeStep === index;
                         return (
                             // Outer div: drives the stagger entry via variants
-                            <motion.div key={title} variants={fadeInUp}>
+                            <motion.div key={id} variants={fadeInUp}>
                                 {/* Inner div: drives the ongoing highlight animation */}
                                 <motion.div
                                     animate={{
@@ -93,7 +91,7 @@ export function HowItWorksSection() {
                                                 : "grayscale(0)",
                                     }}
                                     transition={{ duration: 0.5, ease: "easeInOut" }}
-                                    className="flex h-[300px] flex-col items-center"
+                                    className="flex h-75 flex-col items-center"
                                 >
                                     {/* Icon floating above card with dashed connectors */}
                                     <div className="relative mb-4 flex w-full items-center justify-center">
@@ -110,7 +108,7 @@ export function HowItWorksSection() {
                                         </div>
                                         {/* Horizontal connector right (desktop only, non-last) */}
                                         {index < STEPS.length - 1 && (
-                                            <div className="absolute top-1/2 -right-3 left-1/2 hidden -translate-y-1/2 border-t-2 border-dashed border-[hsl(var(--muted-foreground))]/30 sm:block" />
+                                            <div className="border-muted-foreground/30 absolute top-1/2 -right-3 left-1/2 hidden -translate-y-1/2 border-t-2 border-dashed sm:block" />
                                         )}
                                     </div>
 
@@ -120,13 +118,15 @@ export function HowItWorksSection() {
                                             0{index + 1}
                                         </p>
                                         <p className="text-muted-foreground mb-2 block text-xs font-semibold tracking-widest uppercase">
-                                            Step {index + 1}
+                                            {t("howItWorks.stepLabel", {
+                                                number: index + 1,
+                                            })}
                                         </p>
                                         <h3 className="text-foreground mb-2 font-bold">
-                                            {title}
+                                            {t(`howItWorks.steps.${id}.title`)}
                                         </h3>
                                         <p className="text-muted-foreground text-sm">
-                                            {description}
+                                            {t(`howItWorks.steps.${id}.description`)}
                                         </p>
                                     </div>
                                 </motion.div>
@@ -143,7 +143,7 @@ export function HowItWorksSection() {
                     className="mt-12 flex justify-center"
                 >
                     <Link to="/signup">
-                        <Button size="lg">Start For Free</Button>
+                        <Button size="lg">{t("howItWorks.cta")}</Button>
                     </Link>
                 </motion.div>
             </div>

@@ -23,11 +23,13 @@ describe("LoginPage", () => {
     it("should render login form", () => {
         render(<LoginPage />);
 
-        expect(screen.getByText("Welcome Back")).toBeInTheDocument();
-        expect(screen.getByLabelText("Email address")).toBeInTheDocument();
-        expect(screen.getByLabelText("Password")).toBeInTheDocument();
-        expect(screen.getByText("Continue with Google")).toBeInTheDocument();
-        expect(screen.getByRole("button", { name: /sign in/i })).toBeInTheDocument();
+        expect(screen.getByText("login.title")).toBeInTheDocument();
+        expect(screen.getByLabelText("login.emailLabel")).toBeInTheDocument();
+        expect(screen.getByLabelText("login.passwordLabel")).toBeInTheDocument();
+        expect(screen.getByText("shared.continueWithGoogle")).toBeInTheDocument();
+        expect(
+            screen.getByRole("button", { name: /login\.submitButton/i }),
+        ).toBeInTheDocument();
     });
 
     it("should handle email/password sign in", async () => {
@@ -35,9 +37,11 @@ describe("LoginPage", () => {
 
         render(<LoginPage />);
 
-        const emailInput = screen.getByLabelText("Email address");
-        const passwordInput = screen.getByLabelText("Password");
-        const signInButton = screen.getByRole("button", { name: /sign in/i });
+        const emailInput = screen.getByLabelText("login.emailLabel");
+        const passwordInput = screen.getByLabelText("login.passwordLabel");
+        const signInButton = screen.getByRole("button", {
+            name: /login\.submitButton/i,
+        });
 
         fireEvent.change(emailInput, { target: { value: "test@example.com" } });
         fireEvent.change(passwordInput, { target: { value: "password123" } });
@@ -59,16 +63,18 @@ describe("LoginPage", () => {
 
         render(<LoginPage />);
 
-        const emailInput = screen.getByLabelText("Email address");
-        const passwordInput = screen.getByLabelText("Password");
-        const signInButton = screen.getByRole("button", { name: /sign in/i });
+        const emailInput = screen.getByLabelText("login.emailLabel");
+        const passwordInput = screen.getByLabelText("login.passwordLabel");
+        const signInButton = screen.getByRole("button", {
+            name: /login\.submitButton/i,
+        });
 
         fireEvent.change(emailInput, { target: { value: "test@example.com" } });
         fireEvent.change(passwordInput, { target: { value: "wrongpassword" } });
         fireEvent.click(signInButton);
 
         await waitFor(() => {
-            expect(screen.getByText("Incorrect password")).toBeInTheDocument();
+            expect(screen.getByText("errors.wrongPassword")).toBeInTheDocument();
         });
     });
 
@@ -77,7 +83,7 @@ describe("LoginPage", () => {
 
         render(<LoginPage />);
 
-        fireEvent.click(screen.getByText("Continue with Google"));
+        fireEvent.click(screen.getByText("shared.continueWithGoogle"));
 
         await waitFor(() => {
             expect(authService.signInWithGoogle).toHaveBeenCalled();
@@ -92,41 +98,43 @@ describe("LoginPage", () => {
 
         render(<LoginPage />);
 
-        fireEvent.click(screen.getByText("Continue with Google"));
+        fireEvent.click(screen.getByText("shared.continueWithGoogle"));
 
         await waitFor(() => {
-            expect(
-                screen.getByText("Network error. Please check your connection"),
-            ).toBeInTheDocument();
+            expect(screen.getByText("errors.networkError")).toBeInTheDocument();
         });
     });
 
     it("should validate required fields on submit", () => {
         render(<LoginPage />);
 
-        const form = screen.getByRole("button", { name: /sign in/i }).closest("form");
+        const form = screen
+            .getByRole("button", { name: /login\.submitButton/i })
+            .closest("form");
         fireEvent.submit(form!);
 
-        expect(screen.getByText("Please enter your email address")).toBeInTheDocument();
-        expect(screen.getByText("Please enter your password")).toBeInTheDocument();
+        expect(screen.getByText("login.validation.emailRequired")).toBeInTheDocument();
+        expect(
+            screen.getByText("login.validation.passwordRequired"),
+        ).toBeInTheDocument();
     });
 
     it("should validate email format on submit", () => {
         render(<LoginPage />);
 
-        fireEvent.change(screen.getByLabelText("Email address"), {
+        fireEvent.change(screen.getByLabelText("login.emailLabel"), {
             target: { value: "invalid-email" },
         });
-        fireEvent.change(screen.getByLabelText("Password"), {
+        fireEvent.change(screen.getByLabelText("login.passwordLabel"), {
             target: { value: "password123" },
         });
 
-        const form = screen.getByRole("button", { name: /sign in/i }).closest("form");
+        const form = screen
+            .getByRole("button", { name: /login\.submitButton/i })
+            .closest("form");
         fireEvent.submit(form!);
 
-        expect(
-            screen.getByText("Please enter a valid email address"),
-        ).toBeInTheDocument();
+        expect(screen.getByText("login.validation.emailInvalid")).toBeInTheDocument();
     });
 
     it("should display fallback error message when sign in fails without code", async () => {
@@ -136,18 +144,16 @@ describe("LoginPage", () => {
 
         render(<LoginPage />);
 
-        fireEvent.change(screen.getByLabelText("Email address"), {
+        fireEvent.change(screen.getByLabelText("login.emailLabel"), {
             target: { value: "test@example.com" },
         });
-        fireEvent.change(screen.getByLabelText("Password"), {
+        fireEvent.change(screen.getByLabelText("login.passwordLabel"), {
             target: { value: "password123" },
         });
-        fireEvent.click(screen.getByRole("button", { name: /sign in/i }));
+        fireEvent.click(screen.getByRole("button", { name: /login\.submitButton/i }));
 
         await waitFor(() => {
-            expect(
-                screen.getByText("An error occurred. Please try again"),
-            ).toBeInTheDocument();
+            expect(screen.getByText("errors.generic")).toBeInTheDocument();
         });
     });
 
@@ -158,12 +164,10 @@ describe("LoginPage", () => {
 
         render(<LoginPage />);
 
-        fireEvent.click(screen.getByText("Continue with Google"));
+        fireEvent.click(screen.getByText("shared.continueWithGoogle"));
 
         await waitFor(() => {
-            expect(
-                screen.getByText("An error occurred. Please try again"),
-            ).toBeInTheDocument();
+            expect(screen.getByText("errors.generic")).toBeInTheDocument();
         });
     });
 
@@ -174,26 +178,26 @@ describe("LoginPage", () => {
 
         render(<LoginPage />);
 
-        fireEvent.change(screen.getByLabelText("Email address"), {
+        fireEvent.change(screen.getByLabelText("login.emailLabel"), {
             target: { value: "test@example.com" },
         });
-        fireEvent.change(screen.getByLabelText("Password"), {
+        fireEvent.change(screen.getByLabelText("login.passwordLabel"), {
             target: { value: "wrongpassword" },
         });
-        fireEvent.click(screen.getByRole("button", { name: /sign in/i }));
+        fireEvent.click(screen.getByRole("button", { name: /login\.submitButton/i }));
 
         await waitFor(() => {
-            expect(screen.getByText("Incorrect password")).toBeInTheDocument();
+            expect(screen.getByText("errors.wrongPassword")).toBeInTheDocument();
         });
 
-        fireEvent.change(screen.getByLabelText("Email address"), {
+        fireEvent.change(screen.getByLabelText("login.emailLabel"), {
             target: { value: "updated@example.com" },
         });
-        fireEvent.change(screen.getByLabelText("Password"), {
+        fireEvent.change(screen.getByLabelText("login.passwordLabel"), {
             target: { value: "newpassword" },
         });
 
-        expect(screen.queryByText("Incorrect password")).not.toBeInTheDocument();
+        expect(screen.queryByText("errors.wrongPassword")).not.toBeInTheDocument();
     });
 
     it("should navigate to dashboard when already authenticated", async () => {
@@ -209,7 +213,7 @@ describe("LoginPage", () => {
     it("should render Forgot Password link", () => {
         render(<LoginPage />);
 
-        const forgotPasswordLink = screen.getByText("Forgot Password?");
+        const forgotPasswordLink = screen.getByText("login.forgotPasswordLink");
         expect(forgotPasswordLink).toBeInTheDocument();
         expect(forgotPasswordLink.closest("a")).toHaveAttribute(
             "href",
@@ -220,7 +224,7 @@ describe("LoginPage", () => {
     it("should navigate to forgot password page when link is clicked", () => {
         render(<LoginPage />);
 
-        const forgotPasswordLink = screen.getByText("Forgot Password?");
+        const forgotPasswordLink = screen.getByText("login.forgotPasswordLink");
         expect(forgotPasswordLink.closest("a")).toHaveAttribute(
             "href",
             "/forgot-password",

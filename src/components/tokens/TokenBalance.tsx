@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
 
@@ -16,6 +17,7 @@ export function TokenBalance({
     warningThreshold = 100,
     className,
 }: ITokenBalanceProps) {
+    const { t } = useTranslation("tokens");
     const isLow = balance < lowThreshold;
     const isWarning = !isLow && balance < warningThreshold;
 
@@ -34,19 +36,18 @@ export function TokenBalance({
                     {balance.toLocaleString()}
                 </span>
                 <span className="text-muted-foreground text-xl">
-                    / {maxBalance.toLocaleString()} tokens
+                    {t("balanceCard.ofMax", { max: maxBalance.toLocaleString() })}
                 </span>
             </div>
             <Progress value={balance} max={maxBalance} />
             {isLow && (
                 <p className="text-sm font-medium text-[hsl(var(--error))]">
-                    Balance critically low — request more tokens to continue using AI
-                    features.
+                    {t("balanceCard.criticallyLow")}
                 </p>
             )}
             {isWarning && (
                 <p className="text-sm font-medium text-[hsl(var(--warning))]">
-                    Balance running low.
+                    {t("balanceCard.runningLow")}
                 </p>
             )}
         </div>

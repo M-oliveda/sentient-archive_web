@@ -26,7 +26,7 @@ describe("PendingRequests", () => {
         });
         render(<PendingRequests />);
         expect(screen.getByTestId("pending-requests-loading")).toBeInTheDocument();
-        expect(screen.getByText("Token Requests")).toBeInTheDocument();
+        expect(screen.getByText("requests.title")).toBeInTheDocument();
     });
 
     it("renders nothing when there are no requests", () => {
@@ -63,10 +63,10 @@ describe("PendingRequests", () => {
             isLoading: false,
         });
         render(<PendingRequests />);
-        expect(screen.getByText("Date")).toBeInTheDocument();
-        expect(screen.getByText("Amount")).toBeInTheDocument();
-        expect(screen.getByText("Reason")).toBeInTheDocument();
-        expect(screen.getByText("Status")).toBeInTheDocument();
+        expect(screen.getByText("requests.date")).toBeInTheDocument();
+        expect(screen.getByText("requests.amount")).toBeInTheDocument();
+        expect(screen.getByText("requests.reason")).toBeInTheDocument();
+        expect(screen.getByText("requests.status")).toBeInTheDocument();
     });
 
     it("displays the justification in the Reason column", () => {
@@ -88,7 +88,7 @@ describe("PendingRequests", () => {
             isLoading: false,
         });
         render(<PendingRequests />);
-        expect(screen.getByText("—")).toBeInTheDocument();
+        expect(screen.getByText("requests.dash")).toBeInTheDocument();
     });
 
     it("displays the rejection reason for rejected requests", () => {
@@ -133,31 +133,31 @@ describe("PendingRequests", () => {
         expect(screen.getByText(/Jun 1, 2024/)).toBeInTheDocument();
     });
 
-    it("shows 'Pending' badge for pending status", () => {
+    it("shows Pending badge for pending status", () => {
         (useMyTokenRequests as jest.Mock).mockReturnValue({
             data: [mockRequest({ status: "pending" })],
             isLoading: false,
         });
         render(<PendingRequests />);
-        expect(screen.getByText("Pending")).toBeInTheDocument();
+        expect(screen.getByText("requests.statuses.pending")).toBeInTheDocument();
     });
 
-    it("shows 'Approved' badge for approved status", () => {
+    it("shows Approved badge for approved status", () => {
         (useMyTokenRequests as jest.Mock).mockReturnValue({
             data: [mockRequest({ status: "approved" })],
             isLoading: false,
         });
         render(<PendingRequests />);
-        expect(screen.getByText("Approved")).toBeInTheDocument();
+        expect(screen.getByText("requests.statuses.approved")).toBeInTheDocument();
     });
 
-    it("shows 'Rejected' badge for rejected status", () => {
+    it("shows Rejected badge for rejected status", () => {
         (useMyTokenRequests as jest.Mock).mockReturnValue({
             data: [mockRequest({ status: "rejected" })],
             isLoading: false,
         });
         render(<PendingRequests />);
-        expect(screen.getByText("Rejected")).toBeInTheDocument();
+        expect(screen.getByText("requests.statuses.rejected")).toBeInTheDocument();
     });
 
     it("renders the section heading when requests are present", () => {
@@ -166,6 +166,6 @@ describe("PendingRequests", () => {
             isLoading: false,
         });
         render(<PendingRequests />);
-        expect(screen.getByText("Token Requests")).toBeInTheDocument();
+        expect(screen.getByText("requests.title")).toBeInTheDocument();
     });
 });

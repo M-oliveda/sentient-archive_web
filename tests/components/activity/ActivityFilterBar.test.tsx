@@ -20,12 +20,26 @@ describe("ActivityFilterBar", () => {
         );
 
         expect(screen.getByTestId("activity-filter-bar")).toBeInTheDocument();
-        expect(screen.getByTestId("activity-filter-ai")).toBeInTheDocument();
-        expect(screen.getByTestId("activity-filter-tokens")).toBeInTheDocument();
-        expect(screen.getByTestId("activity-filter-notes")).toBeInTheDocument();
-        expect(screen.getByTestId("activity-filter-all")).toBeInTheDocument();
-        expect(screen.getByTestId("activity-filter-folders")).toBeInTheDocument();
-        expect(screen.getByTestId("activity-search-input")).toBeInTheDocument();
+        expect(screen.getByTestId("activity-filter-ai")).toHaveTextContent(
+            "filters.ai",
+        );
+        expect(screen.getByTestId("activity-filter-tokens")).toHaveTextContent(
+            "filters.tokens",
+        );
+        expect(screen.getByTestId("activity-filter-notes")).toHaveTextContent(
+            "filters.notes",
+        );
+        expect(screen.getByTestId("activity-filter-all")).toHaveTextContent(
+            "filters.all",
+        );
+        expect(screen.getByTestId("activity-filter-folders")).toHaveTextContent(
+            "filters.folders",
+        );
+        expect(screen.getByTestId("activity-search-input")).toHaveAttribute(
+            "placeholder",
+            "filters.searchPlaceholder",
+        );
+        expect(screen.getByLabelText("filters.searchAriaLabel")).toBeInTheDocument();
     });
 
     it("marks the active category as pressed", () => {

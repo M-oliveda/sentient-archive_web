@@ -144,15 +144,13 @@ describe("AdminSystemConfigPage", () => {
 
     it("renders page title and subtitle", () => {
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
-        expect(screen.getByText("System Configuration")).toBeInTheDocument();
-        expect(
-            screen.getByText(/Manage global settings, AI models, and feature flags/),
-        ).toBeInTheDocument();
+        expect(screen.getByText("systemConfig.title")).toBeInTheDocument();
+        expect(screen.getByText("systemConfig.subtitle")).toBeInTheDocument();
     });
 
     it("shows save button in header", () => {
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
-        expect(screen.getByText("Save Changes")).toBeInTheDocument();
+        expect(screen.getByText("systemConfig.save")).toBeInTheDocument();
     });
 
     it("shows loading state", () => {
@@ -168,26 +166,26 @@ describe("AdminSystemConfigPage", () => {
 
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
-        expect(screen.getByText("Loading system configuration...")).toBeInTheDocument();
+        expect(screen.getByText("systemConfig.loading")).toBeInTheDocument();
     });
 
     it("displays last modified metadata", () => {
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
         expect(screen.getByText("admin@example.com")).toBeInTheDocument();
-        expect(screen.getByText(/Version 1/)).toBeInTheDocument();
+        expect(screen.getByText(/systemConfig\.meta\.version/)).toBeInTheDocument();
     });
 
     it("updates token costs and saves", async () => {
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
         const summarizeInput = screen.getByRole("spinbutton", {
-            name: "Summarization",
+            name: "systemConfig.tokens.summarization",
         });
         await userEvent.clear(summarizeInput);
         await userEvent.type(summarizeInput, "25");
 
-        await userEvent.click(screen.getByText("Save Changes"));
+        await userEvent.click(screen.getByText("systemConfig.save"));
 
         await waitFor(() => {
             expect(mutateAsync).toHaveBeenCalledWith(
@@ -204,11 +202,11 @@ describe("AdminSystemConfigPage", () => {
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
         const summarizeInput = screen.getByRole("spinbutton", {
-            name: "Summarization",
+            name: "systemConfig.tokens.summarization",
         });
         await userEvent.clear(summarizeInput);
 
-        await userEvent.click(screen.getByText("Save Changes"));
+        await userEvent.click(screen.getByText("systemConfig.save"));
 
         await waitFor(() => {
             expect(mutateAsync).toHaveBeenCalledWith(
@@ -232,7 +230,7 @@ describe("AdminSystemConfigPage", () => {
             expect(switches[0]).toHaveAttribute("data-checked", "false");
         });
 
-        await userEvent.click(screen.getByText("Save Changes"));
+        await userEvent.click(screen.getByText("systemConfig.save"));
 
         await waitFor(() => {
             expect(mutateAsync).toHaveBeenCalledWith(
@@ -249,27 +247,27 @@ describe("AdminSystemConfigPage", () => {
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
         await userEvent.selectOptions(
-            screen.getByLabelText("Default Gemini Model"),
+            screen.getByLabelText("systemConfig.ai.model"),
             "gemini-1.5-pro",
         );
 
-        const maxTokens = screen.getByLabelText("Max tokens / Op");
+        const maxTokens = screen.getByLabelText("systemConfig.ai.maxTokens");
         await userEvent.clear(maxTokens);
         await userEvent.type(maxTokens, "4096");
 
-        const temperature = screen.getByLabelText("Temperature");
+        const temperature = screen.getByLabelText("systemConfig.ai.temperature");
         await userEvent.clear(temperature);
         await userEvent.type(temperature, "0.5");
 
         await userEvent.selectOptions(
-            screen.getByLabelText("Thinking Level (Gemini 3+)"),
+            screen.getByLabelText("systemConfig.ai.thinkingLevel"),
             "high",
         );
 
-        const thinkingBudget = screen.getByLabelText("Thinking Budget (Gemini 2.5)");
+        const thinkingBudget = screen.getByLabelText("systemConfig.ai.thinkingBudget");
         fireEvent.change(thinkingBudget, { target: { value: "512" } });
 
-        await userEvent.click(screen.getByText("Save Changes"));
+        await userEvent.click(screen.getByText("systemConfig.save"));
 
         await waitFor(() => {
             expect(mutateAsync).toHaveBeenCalledWith(
@@ -289,7 +287,7 @@ describe("AdminSystemConfigPage", () => {
     it("falls back thinking budget to -1 when input is empty", () => {
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
-        const thinkingBudget = screen.getByLabelText("Thinking Budget (Gemini 2.5)");
+        const thinkingBudget = screen.getByLabelText("systemConfig.ai.thinkingBudget");
         fireEvent.change(thinkingBudget, { target: { value: "100" } });
         fireEvent.change(thinkingBudget, { target: { value: "" } });
 
@@ -299,27 +297,27 @@ describe("AdminSystemConfigPage", () => {
     it("updates rate limits and initial grants", async () => {
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
-        const hourly = screen.getByLabelText("Max Ops / User / Hour");
+        const hourly = screen.getByLabelText("systemConfig.ai.maxOpsHour");
         await userEvent.clear(hourly);
         await userEvent.type(hourly, "80");
 
-        const extractions = screen.getByLabelText("File Extractions / Day");
+        const extractions = screen.getByLabelText("systemConfig.ai.fileExtractionsDay");
         await userEvent.clear(extractions);
         await userEvent.type(extractions, "40");
 
-        const productionGrant = screen.getByLabelText("Production");
+        const productionGrant = screen.getByLabelText("systemConfig.tokens.production");
         await userEvent.clear(productionGrant);
         await userEvent.type(productionGrant, "250");
 
-        const stagingGrant = screen.getByLabelText("Staging");
+        const stagingGrant = screen.getByLabelText("systemConfig.tokens.staging");
         await userEvent.clear(stagingGrant);
         await userEvent.type(stagingGrant, "150");
 
-        const localGrant = screen.getByLabelText("Local");
+        const localGrant = screen.getByLabelText("systemConfig.tokens.local");
         await userEvent.clear(localGrant);
         await userEvent.type(localGrant, "75");
 
-        await userEvent.click(screen.getByText("Save Changes"));
+        await userEvent.click(screen.getByText("systemConfig.save"));
 
         await waitFor(() => {
             expect(mutateAsync).toHaveBeenCalledWith(
@@ -343,16 +341,16 @@ describe("AdminSystemConfigPage", () => {
     it("treats empty operational limit inputs as 0", async () => {
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
-        const maxTokens = screen.getByLabelText("Max tokens / Op");
+        const maxTokens = screen.getByLabelText("systemConfig.ai.maxTokens");
         await userEvent.clear(maxTokens);
 
-        const temperature = screen.getByLabelText("Temperature");
+        const temperature = screen.getByLabelText("systemConfig.ai.temperature");
         await userEvent.clear(temperature);
 
-        const hourly = screen.getByLabelText("Max Ops / User / Hour");
+        const hourly = screen.getByLabelText("systemConfig.ai.maxOpsHour");
         await userEvent.clear(hourly);
 
-        await userEvent.click(screen.getByText("Save Changes"));
+        await userEvent.click(screen.getByText("systemConfig.save"));
 
         await waitFor(() => {
             expect(mutateAsync).toHaveBeenCalledWith(
@@ -386,7 +384,7 @@ describe("AdminSystemConfigPage", () => {
 
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
-        expect(screen.getByText(/Last updated/)).toBeInTheDocument();
+        expect(screen.getByText(/systemConfig\.meta\.lastUpdated/)).toBeInTheDocument();
         expect(screen.queryByText("admin@example.com")).not.toBeInTheDocument();
     });
 
@@ -406,7 +404,7 @@ describe("AdminSystemConfigPage", () => {
 
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
-        const hourly = screen.getByLabelText("Max Ops / User / Hour");
+        const hourly = screen.getByLabelText("systemConfig.ai.maxOpsHour");
 
         expect(hourly).toHaveValue(20);
 
@@ -431,7 +429,7 @@ describe("AdminSystemConfigPage", () => {
 
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
-        const productionGrant = screen.getByLabelText("Production");
+        const productionGrant = screen.getByLabelText("systemConfig.tokens.production");
 
         expect(productionGrant).toHaveValue(25);
 
@@ -456,14 +454,14 @@ describe("AdminSystemConfigPage", () => {
 
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
-        const modelSelect = screen.getByLabelText("Default Gemini Model");
+        const modelSelect = screen.getByLabelText("systemConfig.ai.model");
         expect(modelSelect).toHaveValue("gemini-3.5-flash");
 
-        const maxTokens = screen.getByLabelText("Max tokens / Op");
+        const maxTokens = screen.getByLabelText("systemConfig.ai.maxTokens");
         await userEvent.clear(maxTokens);
         await userEvent.type(maxTokens, "1024");
 
-        await userEvent.click(screen.getByText("Save Changes"));
+        await userEvent.click(screen.getByText("systemConfig.save"));
 
         await waitFor(() => {
             expect(mutateAsync).toHaveBeenCalledWith(
@@ -519,9 +517,7 @@ describe("AdminSystemConfigPage", () => {
             capturedMutationOptions.onSuccess?.(mockConfig);
         });
 
-        expect(toast.success).toHaveBeenCalledWith(
-            "Configuration updated successfully",
-        );
+        expect(toast.success).toHaveBeenCalledWith("systemConfig.saveSuccess");
     });
 
     it("shows Error message on mutation onError", () => {
@@ -535,7 +531,7 @@ describe("AdminSystemConfigPage", () => {
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
         capturedMutationOptions.onError?.("boom");
-        expect(toast.error).toHaveBeenCalledWith("Failed to update configuration");
+        expect(toast.error).toHaveBeenCalledWith("systemConfig.saveError");
     });
 
     it("falls back to 0 when initialGrant values are missing", () => {
@@ -557,9 +553,9 @@ describe("AdminSystemConfigPage", () => {
 
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
-        expect(screen.getByLabelText("Production")).toHaveValue(0);
-        expect(screen.getByLabelText("Staging")).toHaveValue(0);
-        expect(screen.getByLabelText("Local")).toHaveValue(0);
+        expect(screen.getByLabelText("systemConfig.tokens.production")).toHaveValue(0);
+        expect(screen.getByLabelText("systemConfig.tokens.staging")).toHaveValue(0);
+        expect(screen.getByLabelText("systemConfig.tokens.local")).toHaveValue(0);
     });
 
     it("does not save when form data is unavailable", async () => {
@@ -575,7 +571,7 @@ describe("AdminSystemConfigPage", () => {
 
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
-        expect(screen.getByText("Loading system configuration...")).toBeInTheDocument();
+        expect(screen.getByText("systemConfig.loading")).toBeInTheDocument();
         expect(mutateAsync).not.toHaveBeenCalled();
     });
 
@@ -589,7 +585,7 @@ describe("AdminSystemConfigPage", () => {
 
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
-        expect(screen.getByText("Saving...")).toBeInTheDocument();
+        expect(screen.getByText("systemConfig.saving")).toBeInTheDocument();
     });
 
     it("falls back to 0 for missing token costs", () => {
@@ -611,10 +607,14 @@ describe("AdminSystemConfigPage", () => {
 
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
-        expect(screen.getByRole("spinbutton", { name: "Summarization" })).toHaveValue(
-            0,
-        );
-        expect(screen.getByRole("spinbutton", { name: "Auto-tagging" })).toHaveValue(0);
+        expect(
+            screen.getByRole("spinbutton", {
+                name: "systemConfig.tokens.summarization",
+            }),
+        ).toHaveValue(0);
+        expect(
+            screen.getByRole("spinbutton", { name: "systemConfig.tokens.autoTagging" }),
+        ).toHaveValue(0);
     });
 
     it("renders without metadata when timestamps are absent", () => {
@@ -635,7 +635,9 @@ describe("AdminSystemConfigPage", () => {
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
         expect(screen.queryByText("admin@example.com")).not.toBeInTheDocument();
-        expect(screen.queryByText(/Last modified/)).not.toBeInTheDocument();
+        expect(
+            screen.queryByText("systemConfig.meta.lastModifiedBy"),
+        ).not.toBeInTheDocument();
     });
 
     it("includes custom model option when current model is unknown", () => {
@@ -679,7 +681,7 @@ describe("AdminSystemConfigPage", () => {
             expect(switches[0]).toHaveAttribute("data-checked", "false");
         });
 
-        await userEvent.click(screen.getByText("Save Changes"));
+        await userEvent.click(screen.getByText("systemConfig.save"));
 
         await waitFor(() => {
             expect(mutateAsync).toHaveBeenCalledWith(
@@ -706,7 +708,7 @@ describe("AdminSystemConfigPage", () => {
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
         const summarizeInput = screen.getByRole("spinbutton", {
-            name: "Summarization",
+            name: "systemConfig.tokens.summarization",
         });
 
         expect(summarizeInput).toHaveValue(5);
@@ -722,7 +724,7 @@ describe("AdminSystemConfigPage", () => {
     it("disables Save button when no changes are made", () => {
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
-        const saveButton = screen.getByText("Save Changes");
+        const saveButton = screen.getByText("systemConfig.save");
 
         // Button should be disabled initially (no changes)
         expect(saveButton).toBeDisabled();
@@ -731,13 +733,13 @@ describe("AdminSystemConfigPage", () => {
     it("enables Save button when changes are made", async () => {
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
-        const saveButton = screen.getByText("Save Changes");
+        const saveButton = screen.getByText("systemConfig.save");
 
         // Button should be disabled initially
         expect(saveButton).toBeDisabled();
 
         // Make a change to the temperature
-        const temperatureInput = screen.getByLabelText("Temperature");
+        const temperatureInput = screen.getByLabelText("systemConfig.ai.temperature");
         await userEvent.clear(temperatureInput);
         await userEvent.type(temperatureInput, "0.5");
 
@@ -750,11 +752,13 @@ describe("AdminSystemConfigPage", () => {
     it("updates development initial grant", async () => {
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
-        const developmentGrant = screen.getByLabelText("Development");
+        const developmentGrant = screen.getByLabelText(
+            "systemConfig.tokens.development",
+        );
         await userEvent.clear(developmentGrant);
         await userEvent.type(developmentGrant, "125");
 
-        await userEvent.click(screen.getByText("Save Changes"));
+        await userEvent.click(screen.getByText("systemConfig.save"));
 
         await waitFor(() => {
             expect(mutateAsync).toHaveBeenCalledWith(
@@ -785,7 +789,9 @@ describe("AdminSystemConfigPage", () => {
 
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
-        const thinkingLevelSelect = screen.getByLabelText("Thinking Level (Gemini 3+)");
+        const thinkingLevelSelect = screen.getByLabelText(
+            "systemConfig.ai.thinkingLevel",
+        );
         expect(thinkingLevelSelect).toHaveValue("medium");
     });
 
@@ -805,7 +811,9 @@ describe("AdminSystemConfigPage", () => {
 
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
-        const thinkingLevelSelect = screen.getByLabelText("Thinking Level (Gemini 3+)");
+        const thinkingLevelSelect = screen.getByLabelText(
+            "systemConfig.ai.thinkingLevel",
+        );
         expect(thinkingLevelSelect).toHaveValue("medium");
     });
 
@@ -826,11 +834,11 @@ describe("AdminSystemConfigPage", () => {
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
         await userEvent.selectOptions(
-            screen.getByLabelText("Thinking Level (Gemini 3+)"),
+            screen.getByLabelText("systemConfig.ai.thinkingLevel"),
             "minimal",
         );
 
-        await userEvent.click(screen.getByText("Save Changes"));
+        await userEvent.click(screen.getByText("systemConfig.save"));
 
         await waitFor(() => {
             expect(mutateAsync).toHaveBeenCalledWith(
@@ -859,7 +867,7 @@ describe("AdminSystemConfigPage", () => {
 
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
-        const thinkingBudget = screen.getByLabelText("Thinking Budget (Gemini 2.5)");
+        const thinkingBudget = screen.getByLabelText("systemConfig.ai.thinkingBudget");
         expect(thinkingBudget).toHaveValue(-1);
     });
 
@@ -879,17 +887,19 @@ describe("AdminSystemConfigPage", () => {
 
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
-        const thinkingBudget = screen.getByLabelText("Thinking Budget (Gemini 2.5)");
+        const thinkingBudget = screen.getByLabelText("systemConfig.ai.thinkingBudget");
         expect(thinkingBudget).toHaveValue(-1);
     });
 
     it("handles empty initial grant inputs as 0", async () => {
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
-        const developmentGrant = screen.getByLabelText("Development");
+        const developmentGrant = screen.getByLabelText(
+            "systemConfig.tokens.development",
+        );
         await userEvent.clear(developmentGrant);
 
-        await userEvent.click(screen.getByText("Save Changes"));
+        await userEvent.click(screen.getByText("systemConfig.save"));
 
         await waitFor(() => {
             expect(mutateAsync).toHaveBeenCalledWith(
@@ -907,10 +917,12 @@ describe("AdminSystemConfigPage", () => {
     it("handles empty file extraction limit as 0", async () => {
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
-        const extractionLimit = screen.getByLabelText("File Extractions / Day");
+        const extractionLimit = screen.getByLabelText(
+            "systemConfig.ai.fileExtractionsDay",
+        );
         await userEvent.clear(extractionLimit);
 
-        await userEvent.click(screen.getByText("Save Changes"));
+        await userEvent.click(screen.getByText("systemConfig.save"));
 
         await waitFor(() => {
             expect(mutateAsync).toHaveBeenCalledWith(
@@ -927,12 +939,12 @@ describe("AdminSystemConfigPage", () => {
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
         const autoTagInput = screen.getByRole("spinbutton", {
-            name: "Auto-tagging",
+            name: "systemConfig.tokens.autoTagging",
         });
         await userEvent.clear(autoTagInput);
         await userEvent.type(autoTagInput, "15");
 
-        await userEvent.click(screen.getByText("Save Changes"));
+        await userEvent.click(screen.getByText("systemConfig.save"));
 
         await waitFor(() => {
             expect(mutateAsync).toHaveBeenCalledWith(
@@ -949,12 +961,12 @@ describe("AdminSystemConfigPage", () => {
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
         const flashcardsInput = screen.getByRole("spinbutton", {
-            name: "Flashcards",
+            name: "systemConfig.tokens.flashcards",
         });
         await userEvent.clear(flashcardsInput);
         await userEvent.type(flashcardsInput, "20");
 
-        await userEvent.click(screen.getByText("Save Changes"));
+        await userEvent.click(screen.getByText("systemConfig.save"));
 
         await waitFor(() => {
             expect(mutateAsync).toHaveBeenCalledWith(
@@ -971,12 +983,12 @@ describe("AdminSystemConfigPage", () => {
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
         const ragQueryInput = screen.getByRole("spinbutton", {
-            name: "Q&A Query",
+            name: "systemConfig.tokens.ragQuery",
         });
         await userEvent.clear(ragQueryInput);
         await userEvent.type(ragQueryInput, "12");
 
-        await userEvent.click(screen.getByText("Save Changes"));
+        await userEvent.click(screen.getByText("systemConfig.save"));
 
         await waitFor(() => {
             expect(mutateAsync).toHaveBeenCalledWith(
@@ -995,7 +1007,7 @@ describe("AdminSystemConfigPage", () => {
         const switches = screen.getAllByTestId("feature-switch");
         await userEvent.click(switches[1]!);
 
-        await userEvent.click(screen.getByText("Save Changes"));
+        await userEvent.click(screen.getByText("systemConfig.save"));
 
         await waitFor(() => {
             expect(mutateAsync).toHaveBeenCalledWith(
@@ -1014,7 +1026,7 @@ describe("AdminSystemConfigPage", () => {
         const switches = screen.getAllByTestId("feature-switch");
         await userEvent.click(switches[2]!);
 
-        await userEvent.click(screen.getByText("Save Changes"));
+        await userEvent.click(screen.getByText("systemConfig.save"));
 
         await waitFor(() => {
             expect(mutateAsync).toHaveBeenCalledWith(
@@ -1033,7 +1045,7 @@ describe("AdminSystemConfigPage", () => {
         const switches = screen.getAllByTestId("feature-switch");
         await userEvent.click(switches[3]!);
 
-        await userEvent.click(screen.getByText("Save Changes"));
+        await userEvent.click(screen.getByText("systemConfig.save"));
 
         await waitFor(() => {
             expect(mutateAsync).toHaveBeenCalledWith(
@@ -1052,7 +1064,7 @@ describe("AdminSystemConfigPage", () => {
         const switches = screen.getAllByTestId("feature-switch");
         await userEvent.click(switches[4]!);
 
-        await userEvent.click(screen.getByText("Save Changes"));
+        await userEvent.click(screen.getByText("systemConfig.save"));
 
         await waitFor(() => {
             expect(mutateAsync).toHaveBeenCalledWith(
@@ -1082,7 +1094,7 @@ describe("AdminSystemConfigPage", () => {
             wrapper: createWrapper(),
         });
 
-        expect(screen.getByText("Loading system configuration...")).toBeInTheDocument();
+        expect(screen.getByText("systemConfig.loading")).toBeInTheDocument();
 
         // Transition to loaded data
         mockUseQuery.mockReturnValue({
@@ -1094,13 +1106,15 @@ describe("AdminSystemConfigPage", () => {
 
         rerender(<AdminSystemConfigPage />);
 
-        expect(screen.getByText("System Configuration")).toBeInTheDocument();
+        expect(screen.getByText("systemConfig.title")).toBeInTheDocument();
     });
 
     it("updates all thinking level options", async () => {
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
-        const thinkingLevelSelect = screen.getByLabelText("Thinking Level (Gemini 3+)");
+        const thinkingLevelSelect = screen.getByLabelText(
+            "systemConfig.ai.thinkingLevel",
+        );
 
         // Test all thinking level options
         for (const level of ["minimal", "low", "medium", "high"]) {
@@ -1112,7 +1126,7 @@ describe("AdminSystemConfigPage", () => {
     it("renders all AI model options correctly", () => {
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
-        const modelSelect = screen.getByLabelText("Default Gemini Model");
+        const modelSelect = screen.getByLabelText("systemConfig.ai.model");
         const options = modelSelect.querySelectorAll("option");
 
         // Should have all AI_MODELS options
@@ -1123,43 +1137,62 @@ describe("AdminSystemConfigPage", () => {
     it("displays all feature flags", () => {
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
-        // Use getAllByText for labels that appear multiple times (feature flags + token costs)
-        const summarizationElements = screen.getAllByText("Summarization");
-        expect(summarizationElements.length).toBeGreaterThan(0);
+        expect(
+            screen.getByText("systemConfig.tokens.summarization"),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByText("systemConfig.features.summarization"),
+        ).toBeInTheDocument();
 
-        expect(screen.getByText("Auto-Tagging")).toBeInTheDocument();
+        expect(
+            screen.getByText("systemConfig.features.autoTagging"),
+        ).toBeInTheDocument();
 
-        const flashcardsElements = screen.getAllByText("Flashcards");
-        expect(flashcardsElements.length).toBeGreaterThan(0);
+        expect(screen.getByText("systemConfig.tokens.flashcards")).toBeInTheDocument();
+        expect(
+            screen.getByText("systemConfig.features.flashcards"),
+        ).toBeInTheDocument();
 
-        expect(screen.getByText("Q&A / RAG Query")).toBeInTheDocument();
-        expect(screen.getByText("File Extraction")).toBeInTheDocument();
+        expect(screen.getByText("systemConfig.features.ragQuery")).toBeInTheDocument();
+        expect(
+            screen.getByText("systemConfig.features.fileExtraction"),
+        ).toBeInTheDocument();
     });
 
     it("displays all token cost fields", () => {
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
         expect(
-            screen.getByRole("spinbutton", { name: "Auto-tagging" }),
+            screen.getByRole("spinbutton", { name: "systemConfig.tokens.autoTagging" }),
         ).toBeInTheDocument();
         expect(
-            screen.getByRole("spinbutton", { name: "Summarization" }),
+            screen.getByRole("spinbutton", {
+                name: "systemConfig.tokens.summarization",
+            }),
         ).toBeInTheDocument();
         expect(
-            screen.getByRole("spinbutton", { name: "Flashcards" }),
+            screen.getByRole("spinbutton", {
+                name: "systemConfig.tokens.flashcards",
+            }),
         ).toBeInTheDocument();
         expect(
-            screen.getByRole("spinbutton", { name: "Q&A Query" }),
+            screen.getByRole("spinbutton", { name: "systemConfig.tokens.ragQuery" }),
         ).toBeInTheDocument();
     });
 
     it("displays all initial grant fields", () => {
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
-        expect(screen.getByLabelText("Production")).toBeInTheDocument();
-        expect(screen.getByLabelText("Staging")).toBeInTheDocument();
-        expect(screen.getByLabelText("Development")).toBeInTheDocument();
-        expect(screen.getByLabelText("Local")).toBeInTheDocument();
+        expect(
+            screen.getByLabelText("systemConfig.tokens.production"),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByLabelText("systemConfig.tokens.staging"),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByLabelText("systemConfig.tokens.development"),
+        ).toBeInTheDocument();
+        expect(screen.getByLabelText("systemConfig.tokens.local")).toBeInTheDocument();
     });
 
     it("disables inputs while mutation is pending", () => {
@@ -1172,9 +1205,9 @@ describe("AdminSystemConfigPage", () => {
 
         render(<AdminSystemConfigPage />, { wrapper: createWrapper() });
 
-        const modelSelect = screen.getByLabelText("Default Gemini Model");
-        const maxTokens = screen.getByLabelText("Max tokens / Op");
-        const temperature = screen.getByLabelText("Temperature");
+        const modelSelect = screen.getByLabelText("systemConfig.ai.model");
+        const maxTokens = screen.getByLabelText("systemConfig.ai.maxTokens");
+        const temperature = screen.getByLabelText("systemConfig.ai.temperature");
 
         expect(modelSelect).toBeDisabled();
         expect(maxTokens).toBeDisabled();

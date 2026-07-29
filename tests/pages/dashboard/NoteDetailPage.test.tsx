@@ -205,30 +205,30 @@ describe("NoteDetailPage", () => {
             isError: false,
         });
         render(<NoteDetailPage noteId="n1" />);
-        expect(screen.getAllByText("Untitled").length).toBeGreaterThan(0);
+        expect(screen.getAllByText("detail.untitled").length).toBeGreaterThan(0);
     });
 
     it("uses an empty folders array when useFolders returns undefined data", () => {
         mockUseFolders.mockReturnValue({});
         render(<NoteDetailPage noteId="n1" />);
-        expect(screen.getByText("All Notes")).toBeInTheDocument();
+        expect(screen.getByText("detail.allNotes")).toBeInTheDocument();
     });
 
     it("renders the breadcrumb navigation", () => {
         render(<NoteDetailPage noteId="n1" />);
         expect(
-            screen.getByRole("navigation", { name: "Breadcrumb" }),
+            screen.getByRole("navigation", { name: "detail.breadcrumb" }),
         ).toBeInTheDocument();
     });
 
     it("renders 'Home' link in the breadcrumb", () => {
         render(<NoteDetailPage noteId="n1" />);
-        expect(screen.getByText("Home")).toBeInTheDocument();
+        expect(screen.getByText("detail.home")).toBeInTheDocument();
     });
 
     it("shows 'All Notes' in breadcrumb when note has no folder", () => {
         render(<NoteDetailPage noteId="n1" />);
-        expect(screen.getByText("All Notes")).toBeInTheDocument();
+        expect(screen.getByText("detail.allNotes")).toBeInTheDocument();
     });
 
     it("shows folder name in breadcrumb when note has a matching folder", () => {
@@ -262,7 +262,7 @@ describe("NoteDetailPage", () => {
 
     it("renders the word count from countWords", () => {
         render(<NoteDetailPage noteId="n1" />);
-        expect(screen.getByText("150 words")).toBeInTheDocument();
+        expect(screen.getByText("detail.words")).toBeInTheDocument();
     });
 
     it("renders the MarkdownEditor with the note content", () => {
@@ -274,7 +274,7 @@ describe("NoteDetailPage", () => {
 
     it("does NOT render the AI insight box when summary is null", () => {
         render(<NoteDetailPage noteId="n1" />);
-        expect(screen.queryByText("AI Insight")).not.toBeInTheDocument();
+        expect(screen.queryByText("detail.aiInsight")).not.toBeInTheDocument();
     });
 
     it("renders the AI insight box and summary text when summary is present", () => {
@@ -284,37 +284,37 @@ describe("NoteDetailPage", () => {
             isError: false,
         });
         render(<NoteDetailPage noteId="n1" />);
-        expect(screen.getByText("AI Insight")).toBeInTheDocument();
+        expect(screen.getByText("detail.aiInsight")).toBeInTheDocument();
         expect(screen.getByText("This note is about React.")).toBeInTheDocument();
     });
 
     it("renders an Edit button in read view", () => {
         render(<NoteDetailPage noteId="n1" />);
-        expect(screen.getByRole("button", { name: "Edit" })).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: "detail.edit" })).toBeInTheDocument();
     });
 
     it("switches to edit view when the Edit button is clicked", () => {
         render(<NoteDetailPage noteId="n1" />);
-        fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+        fireEvent.click(screen.getByRole("button", { name: "detail.edit" }));
         expect(screen.getByTestId("note-editor")).toBeInTheDocument();
     });
 
     it("passes the correct noteId to NoteEditor in edit mode", () => {
         render(<NoteDetailPage noteId="n1" />);
-        fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+        fireEvent.click(screen.getByRole("button", { name: "detail.edit" }));
         expect(screen.getByTestId("editor-note-id")).toHaveTextContent("n1");
     });
 
     it("hides read view and shows NoteEditor when editing", () => {
         render(<NoteDetailPage noteId="n1" />);
-        fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+        fireEvent.click(screen.getByRole("button", { name: "detail.edit" }));
         expect(screen.queryByRole("heading", { level: 1 })).not.toBeInTheDocument();
         expect(screen.getByTestId("note-editor")).toBeInTheDocument();
     });
 
     it("returns to read view when NoteEditor onBack is called", () => {
         render(<NoteDetailPage noteId="n1" />);
-        fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+        fireEvent.click(screen.getByRole("button", { name: "detail.edit" }));
         fireEvent.click(screen.getByRole("button", { name: "Back" }));
         expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
         expect(screen.queryByTestId("note-editor")).not.toBeInTheDocument();
@@ -322,21 +322,21 @@ describe("NoteDetailPage", () => {
 
     it("navigates to /notes when NoteEditor onDeleted is called", () => {
         render(<NoteDetailPage noteId="n1" />);
-        fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+        fireEvent.click(screen.getByRole("button", { name: "detail.edit" }));
         fireEvent.click(screen.getByRole("button", { name: "Delete" }));
         expect(mockNavigate).toHaveBeenCalledWith({ to: "/notes" });
     });
 
     it("shows the AI assistant modal when Toggle AI is clicked in edit mode", () => {
         render(<NoteDetailPage noteId="n1" />);
-        fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+        fireEvent.click(screen.getByRole("button", { name: "detail.edit" }));
         fireEvent.click(screen.getByRole("button", { name: "Toggle AI" }));
         expect(screen.getByTestId("ai-assistant-modal")).toBeInTheDocument();
     });
 
     it("hides the AI assistant modal when Toggle AI is clicked again", () => {
         render(<NoteDetailPage noteId="n1" />);
-        fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+        fireEvent.click(screen.getByRole("button", { name: "detail.edit" }));
         fireEvent.click(screen.getByRole("button", { name: "Toggle AI" }));
         fireEvent.click(screen.getByRole("button", { name: "Toggle AI" }));
         expect(screen.queryByTestId("ai-assistant-modal")).not.toBeInTheDocument();
@@ -344,7 +344,7 @@ describe("NoteDetailPage", () => {
 
     it("hides the AI assistant modal when its close button is clicked", () => {
         render(<NoteDetailPage noteId="n1" />);
-        fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+        fireEvent.click(screen.getByRole("button", { name: "detail.edit" }));
         fireEvent.click(screen.getByRole("button", { name: "Toggle AI" }));
         fireEvent.click(screen.getByRole("button", { name: "Close AI" }));
         expect(screen.queryByTestId("ai-assistant-modal")).not.toBeInTheDocument();
@@ -362,7 +362,7 @@ describe("NoteDetailPage", () => {
     it("calls prependContent on the editor handle when onInsertAtStart is triggered", () => {
         mockEditorShouldSetRef = true;
         render(<NoteDetailPage noteId="n1" />);
-        fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+        fireEvent.click(screen.getByRole("button", { name: "detail.edit" }));
         fireEvent.click(screen.getByRole("button", { name: "Toggle AI" }));
         fireEvent.click(screen.getByRole("button", { name: "Trigger Insert" }));
         expect(mockPrependContent).toHaveBeenCalledWith("summary-text");
@@ -371,7 +371,7 @@ describe("NoteDetailPage", () => {
     it("skips prependContent when editorHandleRef.current is null", () => {
         mockEditorShouldSetRef = false;
         render(<NoteDetailPage noteId="n1" />);
-        fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+        fireEvent.click(screen.getByRole("button", { name: "detail.edit" }));
         fireEvent.click(screen.getByRole("button", { name: "Toggle AI" }));
         fireEvent.click(screen.getByRole("button", { name: "Trigger Insert" }));
         expect(mockPrependContent).not.toHaveBeenCalled();
@@ -380,7 +380,7 @@ describe("NoteDetailPage", () => {
     it("calls appendContent on the editor handle when onAppendContent is triggered", () => {
         mockEditorShouldSetRef = true;
         render(<NoteDetailPage noteId="n1" />);
-        fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+        fireEvent.click(screen.getByRole("button", { name: "detail.edit" }));
         fireEvent.click(screen.getByRole("button", { name: "Toggle AI" }));
         fireEvent.click(screen.getByRole("button", { name: "Trigger Append" }));
         expect(mockAppendContent).toHaveBeenCalledWith("flashcard-text");
@@ -389,7 +389,7 @@ describe("NoteDetailPage", () => {
     it("skips appendContent when editorHandleRef.current is null", () => {
         mockEditorShouldSetRef = false;
         render(<NoteDetailPage noteId="n1" />);
-        fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+        fireEvent.click(screen.getByRole("button", { name: "detail.edit" }));
         fireEvent.click(screen.getByRole("button", { name: "Toggle AI" }));
         fireEvent.click(screen.getByRole("button", { name: "Trigger Append" }));
         expect(mockAppendContent).not.toHaveBeenCalled();

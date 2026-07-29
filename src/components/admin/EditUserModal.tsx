@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
     Dialog,
     DialogContent,
@@ -35,6 +36,7 @@ export function EditUserModal({
     onOpenChange,
     onSubmit,
 }: EditUserModalProps) {
+    const { t } = useTranslation("admin");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [role, setRole] = useState<"client" | "admin">(user?.role || "client");
     const [isActive, setIsActive] = useState(user?.isActive ?? true);
@@ -55,11 +57,11 @@ export function EditUserModal({
                 isActive,
                 tokenBalance,
             });
-            toast.success("User updated successfully");
+            toast.success(t("users.updated"));
             onOpenChange(false);
         } catch (error) {
             toast.error(
-                error instanceof Error ? error.message : "Failed to update user",
+                error instanceof Error ? error.message : t("users.updateError"),
             );
         } finally {
             setIsSubmitting(false);
@@ -70,16 +72,18 @@ export function EditUserModal({
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-106.5">
                 <DialogHeader>
-                    <DialogTitle>Edit User</DialogTitle>
+                    <DialogTitle>{t("users.edit.title")}</DialogTitle>
                     <DialogDescription>
-                        Update user details: {user?.email}
+                        {t("users.edit.description", { email: user?.email })}
                     </DialogDescription>
                 </DialogHeader>
 
                 {user && (
                     <div className="space-y-6">
                         <div className="space-y-2">
-                            <Label className="text-sm font-medium">Role</Label>
+                            <Label className="text-sm font-medium">
+                                {t("users.edit.role")}
+                            </Label>
                             <div className="flex gap-2">
                                 {(["client", "admin"] as const).map((r) => (
                                     <Badge
@@ -88,32 +92,40 @@ export function EditUserModal({
                                         className="cursor-pointer px-3 py-2 text-sm font-medium capitalize"
                                         onClick={() => setRole(r)}
                                     >
-                                        {r}
+                                        {t(`users.edit.${r}`)}
                                     </Badge>
                                 ))}
                             </div>
                         </div>
 
                         <div className="space-y-2">
-                            <Label className="text-sm font-medium">Status</Label>
+                            <Label className="text-sm font-medium">
+                                {t("users.edit.status")}
+                            </Label>
                             <div className="flex gap-2">
-                                {(["Active", "Inactive"] as const).map((status) => {
-                                    const isActiveValue = status === "Active";
-                                    return (
-                                        <Badge
-                                            key={status}
-                                            variant={
-                                                isActive === isActiveValue
-                                                    ? "default"
-                                                    : "outline"
-                                            }
-                                            className="cursor-pointer px-3 py-2 text-sm font-medium"
-                                            onClick={() => setIsActive(isActiveValue)}
-                                        >
-                                            {status}
-                                        </Badge>
-                                    );
-                                })}
+                                {(
+                                    [
+                                        {
+                                            value: true,
+                                            label: t("users.edit.active"),
+                                        },
+                                        {
+                                            value: false,
+                                            label: t("users.edit.inactive"),
+                                        },
+                                    ] as const
+                                ).map(({ value, label }) => (
+                                    <Badge
+                                        key={label}
+                                        variant={
+                                            isActive === value ? "default" : "outline"
+                                        }
+                                        className="cursor-pointer px-3 py-2 text-sm font-medium"
+                                        onClick={() => setIsActive(value)}
+                                    >
+                                        {label}
+                                    </Badge>
+                                ))}
                             </div>
                         </div>
 
@@ -122,7 +134,7 @@ export function EditUserModal({
                                 htmlFor="tokenBalance"
                                 className="text-sm font-medium"
                             >
-                                Token Balance
+                                {t("users.edit.tokenBalance")}
                             </Label>
                             <Input
                                 id="tokenBalance"
@@ -144,14 +156,16 @@ export function EditUserModal({
                                 onClick={() => onOpenChange(false)}
                                 disabled={isSubmitting || isLoading}
                             >
-                                Cancel
+                                {t("users.edit.cancel")}
                             </Button>
                             <Button
                                 type="button"
                                 onClick={() => handleSubmit(user)}
                                 disabled={isSubmitting || isLoading}
                             >
-                                {isSubmitting ? "Saving..." : "Save Changes"}
+                                {isSubmitting
+                                    ? t("users.edit.saving")
+                                    : t("users.edit.save")}
                             </Button>
                         </div>
                     </div>

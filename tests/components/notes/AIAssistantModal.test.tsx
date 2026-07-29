@@ -157,25 +157,25 @@ beforeEach(() => {
 describe("AIAssistantModal header", () => {
     it("renders 'AI Assistant' title", () => {
         renderModal(makeNote());
-        expect(screen.getByText("AI Assistant")).toBeInTheDocument();
+        expect(screen.getByText("assistant.title")).toBeInTheDocument();
     });
 
     it("falls back to 0 token balance when user is null", () => {
         (useAuthStore as unknown as jest.Mock).mockReturnValue({ user: null });
         renderModal(makeNote());
-        expect(screen.getByText("AI Assistant")).toBeInTheDocument();
+        expect(screen.getByText("assistant.title")).toBeInTheDocument();
     });
 });
 
 describe("TokenBadge", () => {
     it("uses singular 'token' for a count of 1", () => {
         render(<TokenBadge count={1} />);
-        expect(screen.getByText("1 token")).toBeInTheDocument();
+        expect(screen.getByText("assistant.token")).toBeInTheDocument();
     });
 
     it("uses plural 'tokens' for counts other than 1", () => {
         render(<TokenBadge count={5} />);
-        expect(screen.getByText("5 tokens")).toBeInTheDocument();
+        expect(screen.getByText("assistant.tokens")).toBeInTheDocument();
     });
 });
 
@@ -185,13 +185,15 @@ describe("SummaryCard – no summary", () => {
     it("shows 'Generate Summary' when user can afford it", () => {
         renderModal(makeNote({ summary: null }));
         expect(
-            screen.getByRole("button", { name: /generate summary/i }),
+            screen.getByRole("button", { name: /assistant\.summary\.generate/i }),
         ).toBeInTheDocument();
     });
 
     it("calls summarize.mutate when the generate button is clicked", () => {
         renderModal(makeNote({ summary: null }));
-        fireEvent.click(screen.getByRole("button", { name: /generate summary/i }));
+        fireEvent.click(
+            screen.getByRole("button", { name: /assistant\.summary\.generate/i }),
+        );
         expect(mockSummarizeMutate).toHaveBeenCalledTimes(1);
     });
 
@@ -199,7 +201,7 @@ describe("SummaryCard – no summary", () => {
         setupMocks({ tokenBalance: 1 });
         renderModal(makeNote({ summary: null }));
         const disabledBtns = screen
-            .getAllByRole("button", { name: /not enough tokens/i })
+            .getAllByRole("button", { name: /assistant\.notEnoughTokens/i })
             .filter((b) => b.hasAttribute("disabled"));
         expect(disabledBtns.length).toBeGreaterThan(0);
         expect(disabledBtns[0]).toBeDisabled();
@@ -209,7 +211,9 @@ describe("SummaryCard – no summary", () => {
         setupMocks({ summarizePending: true });
         renderModal(makeNote({ summary: null }));
         expect(screen.getByLabelText("Loading")).toBeInTheDocument();
-        expect(screen.getByText(/generating/i).closest("button")).toBeDisabled();
+        expect(
+            screen.getByText("assistant.generating").closest("button"),
+        ).toBeDisabled();
     });
 
     it("shows a friendly rate-limit message when the AI service is unavailable", () => {
@@ -218,19 +222,13 @@ describe("SummaryCard – no summary", () => {
                 "Summarization failed: [GoogleGenerativeAI Error]: [429 Too Many Requests] credits depleted",
         });
         renderModal(makeNote({ summary: null }));
-        expect(
-            screen.getByText(
-                "AI service is temporarily unavailable. Please try again later.",
-            ),
-        ).toBeInTheDocument();
+        expect(screen.getByText("assistant.errors.unavailable")).toBeInTheDocument();
     });
 
     it("shows a generic error message on other failures", () => {
         setupMocks({ summarizeError: "Summarization failed" });
         renderModal(makeNote({ summary: null }));
-        expect(
-            screen.getByText("Something went wrong. Please try again."),
-        ).toBeInTheDocument();
+        expect(screen.getByText("assistant.errors.generic")).toBeInTheDocument();
     });
 });
 
@@ -243,7 +241,7 @@ describe("SummaryCard – with summary", () => {
     it("shows the 'Insert at top' button when summary exists", () => {
         renderModal(makeNote({ summary: "A great summary." }));
         expect(
-            screen.getByRole("button", { name: /insert at top/i }),
+            screen.getByRole("button", { name: /assistant\.summary\.insert/i }),
         ).toBeInTheDocument();
     });
 
@@ -254,9 +252,11 @@ describe("SummaryCard – with summary", () => {
             onInsertAtStart,
             onOpenChange,
         });
-        fireEvent.click(screen.getByRole("button", { name: /insert at top/i }));
+        fireEvent.click(
+            screen.getByRole("button", { name: /assistant\.summary\.insert/i }),
+        );
         expect(onInsertAtStart).toHaveBeenCalledWith(
-            "## Summary\n\nA great summary.\n\n---\n\n",
+            "## assistant.summary.markdownHeading\n\nA great summary.\n\n---\n\n",
         );
         expect(onOpenChange).toHaveBeenCalledWith(false);
     });
@@ -270,7 +270,9 @@ describe("SummaryCard – with summary", () => {
             />,
         );
         expect(() =>
-            fireEvent.click(screen.getByRole("button", { name: /insert at top/i })),
+            fireEvent.click(
+                screen.getByRole("button", { name: /assistant\.summary\.insert/i }),
+            ),
         ).not.toThrow();
     });
 });
@@ -281,13 +283,15 @@ describe("SuggestedTagsCard – no AI tags", () => {
     it("shows 'Generate Tags' when user can afford it", () => {
         renderModal(makeNote({ aiTags: [] }));
         expect(
-            screen.getByRole("button", { name: /generate tags/i }),
+            screen.getByRole("button", { name: /assistant\.tags\.generate/i }),
         ).toBeInTheDocument();
     });
 
     it("calls autoTag.mutate with an onSuccess handler when Generate Tags is clicked", () => {
         renderModal(makeNote({ aiTags: [] }));
-        fireEvent.click(screen.getByRole("button", { name: /generate tags/i }));
+        fireEvent.click(
+            screen.getByRole("button", { name: /assistant\.tags\.generate/i }),
+        );
         expect(mockAutoTagMutate).toHaveBeenCalledWith(
             undefined,
             expect.objectContaining({ onSuccess: expect.any(Function) }),
@@ -297,7 +301,9 @@ describe("SuggestedTagsCard – no AI tags", () => {
     it("shows 'Not enough tokens' and disables when balance is too low", () => {
         setupMocks({ tokenBalance: 0 });
         renderModal(makeNote({ aiTags: [] }));
-        const btns = screen.getAllByRole("button", { name: /not enough tokens/i });
+        const btns = screen.getAllByRole("button", {
+            name: /assistant\.notEnoughTokens/i,
+        });
         expect(btns[0]).toBeDisabled();
     });
 
@@ -311,23 +317,23 @@ describe("SuggestedTagsCard – no AI tags", () => {
         setupMocks({ updateNotePending: true });
         renderModal(makeNote({ aiTags: [] }));
         // When isTagsPending is true the button shows "Generating…" not "Generate Tags"
-        const btn = screen.getByText(/generating…/i).closest("button");
+        const btn = screen.getByText("assistant.generating").closest("button");
         expect(btn).toBeDisabled();
     });
 
     it("shows a friendly error message on failure", () => {
         setupMocks({ autoTagError: "Tagging failed" });
         renderModal(makeNote({ aiTags: [] }));
-        expect(
-            screen.getByText("Something went wrong. Please try again."),
-        ).toBeInTheDocument();
+        expect(screen.getByText("assistant.errors.generic")).toBeInTheDocument();
     });
 });
 
 describe("SuggestedTagsCard – auto-apply on success", () => {
     it("calls updateNote.mutate with merged tags when onSuccess fires", () => {
         renderModal(makeNote({ aiTags: [], tags: ["existing"] }));
-        fireEvent.click(screen.getByRole("button", { name: /generate tags/i }));
+        fireEvent.click(
+            screen.getByRole("button", { name: /assistant\.tags\.generate/i }),
+        );
 
         const { onSuccess } = (mockAutoTagMutate as jest.Mock).mock.calls[0][1] as {
             onSuccess: (data: unknown) => void;
@@ -345,7 +351,9 @@ describe("SuggestedTagsCard – auto-apply on success", () => {
 
     it("deduplicates tags when merging", () => {
         renderModal(makeNote({ aiTags: [], tags: ["existing", "react"] }));
-        fireEvent.click(screen.getByRole("button", { name: /generate tags/i }));
+        fireEvent.click(
+            screen.getByRole("button", { name: /assistant\.tags\.generate/i }),
+        );
 
         const { onSuccess } = (mockAutoTagMutate as jest.Mock).mock.calls[0][1] as {
             onSuccess: (data: unknown) => void;
@@ -361,7 +369,9 @@ describe("SuggestedTagsCard – auto-apply on success", () => {
     it("closes the modal after updateNote succeeds", () => {
         const onOpenChange = jest.fn();
         renderModal(makeNote({ aiTags: [], tags: ["existing"] }), { onOpenChange });
-        fireEvent.click(screen.getByRole("button", { name: /generate tags/i }));
+        fireEvent.click(
+            screen.getByRole("button", { name: /assistant\.tags\.generate/i }),
+        );
 
         const { onSuccess: autoTagSuccess } = (mockAutoTagMutate as jest.Mock).mock
             .calls[0][1] as { onSuccess: (data: unknown) => void };
@@ -385,14 +395,14 @@ describe("SuggestedTagsCard – with AI tags", () => {
     it("shows 'Regenerate Tags' when AI tags already exist", () => {
         renderModal(makeNote({ aiTags: ["react"] }));
         expect(
-            screen.getByRole("button", { name: /regenerate tags/i }),
+            screen.getByRole("button", { name: /assistant\.tags\.regenerate/i }),
         ).toBeInTheDocument();
     });
 
     it("shows 'Regenerating…' spinner while pending with existing tags", () => {
         setupMocks({ autoTagPending: true });
         renderModal(makeNote({ aiTags: ["react"] }));
-        expect(screen.getByText(/regenerating/i)).toBeInTheDocument();
+        expect(screen.getByText("assistant.regenerating")).toBeInTheDocument();
     });
 });
 
@@ -402,20 +412,22 @@ describe("GenerateFlashcardsCard", () => {
     it("shows 'Generate (8 tokens)' when no flashcards exist", () => {
         renderModal(makeNote({ flashcards: null }));
         expect(
-            screen.getByRole("button", { name: /generate \(8 tokens\)/i }),
+            screen.getByRole("button", { name: /assistant\.flashcards\.withCost/i }),
         ).toBeInTheDocument();
     });
 
     it("shows 'Regenerate (8 tokens)' when flashcards already exist", () => {
         renderModal(makeNote({ flashcards: [{ front: "Q", back: "A" }] }));
         expect(
-            screen.getByRole("button", { name: /regenerate \(8 tokens\)/i }),
+            screen.getByRole("button", { name: /assistant\.flashcards\.withCost/i }),
         ).toBeInTheDocument();
     });
 
     it("calls flashcards.mutate with onSuccess handler when generate is clicked", () => {
         renderModal(makeNote());
-        fireEvent.click(screen.getByRole("button", { name: /generate \(8 tokens\)/i }));
+        fireEvent.click(
+            screen.getByRole("button", { name: /assistant\.flashcards\.withCost/i }),
+        );
         expect(mockFlashcardsMutate).toHaveBeenCalledWith(
             undefined,
             expect.objectContaining({ onSuccess: expect.any(Function) }),
@@ -425,7 +437,9 @@ describe("GenerateFlashcardsCard", () => {
     it("calls onAppendContent with formatted flashcards markdown on success", () => {
         const onAppendContent = jest.fn();
         renderModal(makeNote(), { onAppendContent });
-        fireEvent.click(screen.getByRole("button", { name: /generate \(8 tokens\)/i }));
+        fireEvent.click(
+            screen.getByRole("button", { name: /assistant\.flashcards\.withCost/i }),
+        );
 
         const { onSuccess } = (mockFlashcardsMutate as jest.Mock).mock.calls[0][1] as {
             onSuccess: (data: unknown) => void;
@@ -437,7 +451,7 @@ describe("GenerateFlashcardsCard", () => {
 
         expect(onAppendContent).toHaveBeenCalledTimes(1);
         const calledWith = (onAppendContent as jest.Mock).mock.calls[0][0] as string;
-        expect(calledWith).toContain("Flashcards");
+        expect(calledWith).toContain("assistant.flashcards.markdownHeading");
         expect(calledWith).toContain("What is React?");
         expect(calledWith).toContain("A UI library.");
     });
@@ -446,7 +460,9 @@ describe("GenerateFlashcardsCard", () => {
         render(
             <AIAssistantModal note={makeNote()} open={true} onOpenChange={jest.fn()} />,
         );
-        fireEvent.click(screen.getByRole("button", { name: /generate \(8 tokens\)/i }));
+        fireEvent.click(
+            screen.getByRole("button", { name: /assistant\.flashcards\.withCost/i }),
+        );
         const { onSuccess } = (mockFlashcardsMutate as jest.Mock).mock.calls[0][1] as {
             onSuccess: (data: unknown) => void;
         };
@@ -461,7 +477,9 @@ describe("GenerateFlashcardsCard", () => {
     it("closes the modal after flashcards are appended", () => {
         const onOpenChange = jest.fn();
         renderModal(makeNote(), { onOpenChange });
-        fireEvent.click(screen.getByRole("button", { name: /generate \(8 tokens\)/i }));
+        fireEvent.click(
+            screen.getByRole("button", { name: /assistant\.flashcards\.withCost/i }),
+        );
 
         const { onSuccess } = (mockFlashcardsMutate as jest.Mock).mock.calls[0][1] as {
             onSuccess: (data: unknown) => void;
@@ -479,7 +497,7 @@ describe("GenerateFlashcardsCard", () => {
         renderModal(makeNote());
         const flashcardsCard = screen.getByTestId("flashcards-card");
         const btn = within(flashcardsCard).getByRole("button", {
-            name: /not enough tokens/i,
+            name: /assistant\.notEnoughTokens/i,
         });
         expect(btn).toBeDisabled();
     });
@@ -493,9 +511,7 @@ describe("GenerateFlashcardsCard", () => {
     it("shows a friendly error message on failure", () => {
         setupMocks({ flashcardsError: "Flashcard generation failed" });
         renderModal(makeNote());
-        expect(
-            screen.getByText("Something went wrong. Please try again."),
-        ).toBeInTheDocument();
+        expect(screen.getByText("assistant.errors.generic")).toBeInTheDocument();
     });
 });
 
@@ -505,7 +521,7 @@ describe("KnowledgeQACard", () => {
     it("renders the card with 'Ask a Question' button when balance is sufficient", () => {
         renderModal(makeNote());
         expect(
-            screen.getByRole("button", { name: /ask a question \(10 tokens\)/i }),
+            screen.getByRole("button", { name: /assistant\.knowledgeQA\.ask/i }),
         ).toBeInTheDocument();
     });
 
@@ -513,7 +529,9 @@ describe("KnowledgeQACard", () => {
         setupMocks({ tokenBalance: 3 });
         renderModal(makeNote());
         const qaCard = screen.getByTestId("knowledge-qa-card");
-        const btn = within(qaCard).getByRole("button", { name: /not enough tokens/i });
+        const btn = within(qaCard).getByRole("button", {
+            name: /assistant\.notEnoughTokens/i,
+        });
         expect(btn).toBeDisabled();
     });
 
@@ -523,7 +541,7 @@ describe("KnowledgeQACard", () => {
         expect(modal).toHaveAttribute("data-open", "false");
 
         fireEvent.click(
-            screen.getByRole("button", { name: /ask a question \(10 tokens\)/i }),
+            screen.getByRole("button", { name: /assistant\.knowledgeQA\.ask/i }),
         );
 
         expect(modal).toHaveAttribute("data-open", "true");
@@ -532,7 +550,7 @@ describe("KnowledgeQACard", () => {
     it("closes the RAGQueryModal via its onOpenChange callback", () => {
         renderModal(makeNote());
         fireEvent.click(
-            screen.getByRole("button", { name: /ask a question \(10 tokens\)/i }),
+            screen.getByRole("button", { name: /assistant\.knowledgeQA\.ask/i }),
         );
         expect(screen.getByTestId("rag-query-modal")).toHaveAttribute(
             "data-open",
@@ -559,7 +577,7 @@ describe("AIAssistantModal feature flags", () => {
         renderModal(makeNote());
 
         expect(screen.queryByTestId("flashcards-card")).not.toBeInTheDocument();
-        expect(screen.getByText("Summary")).toBeInTheDocument();
+        expect(screen.getByText("assistant.summary.title")).toBeInTheDocument();
         expect(screen.getByTestId("knowledge-qa-card")).toBeInTheDocument();
     });
 
@@ -576,7 +594,7 @@ describe("AIAssistantModal feature flags", () => {
         renderModal(makeNote());
 
         expect(screen.getByTestId("no-ai-features")).toBeInTheDocument();
-        expect(screen.queryByText("Summary")).not.toBeInTheDocument();
+        expect(screen.queryByText("assistant.summary.title")).not.toBeInTheDocument();
         expect(screen.queryByTestId("flashcards-card")).not.toBeInTheDocument();
         expect(screen.queryByTestId("knowledge-qa-card")).not.toBeInTheDocument();
     });

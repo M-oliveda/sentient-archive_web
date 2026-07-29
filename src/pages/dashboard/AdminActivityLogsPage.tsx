@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Clock, RefreshCw } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,14 +13,6 @@ import { Bot, Coins, FileText, Pencil, Folder, type LucideIcon } from "lucide-re
 const DEFAULT_LIMIT = 50;
 
 type CategoryFilter = "all" | "ai" | "tokens" | "notes" | "folders";
-
-const CATEGORY_TABS: Array<{ value: CategoryFilter; label: string }> = [
-    { value: "all", label: "All Activity" },
-    { value: "ai", label: "AI Operations" },
-    { value: "tokens", label: "Tokens" },
-    { value: "notes", label: "Notes" },
-    { value: "folders", label: "Folders" },
-];
 
 const ICON_MAP: Record<IAdminActivityEntry["iconHint"], LucideIcon> = {
     bot: Bot,
@@ -38,6 +31,7 @@ const CATEGORY_COLORS: Record<CategoryFilter, string> = {
 };
 
 export function AdminActivityLogsPage() {
+    const { t } = useTranslation("admin");
     const [category, setCategory] = useState<CategoryFilter>("all");
     const [search, setSearch] = useState("");
     const [limit, setLimit] = useState(DEFAULT_LIMIT);
@@ -56,6 +50,14 @@ export function AdminActivityLogsPage() {
     const entries = response?.entries || [];
     const total = response?.total || 0;
     const hasMore = entries.length < total;
+
+    const categoryTabs: Array<{ value: CategoryFilter; label: string }> = [
+        { value: "all", label: t("activityLogs.tabs.all") },
+        { value: "ai", label: t("activityLogs.tabs.ai") },
+        { value: "tokens", label: t("activityLogs.tabs.tokens") },
+        { value: "notes", label: t("activityLogs.tabs.notes") },
+        { value: "folders", label: t("activityLogs.tabs.folders") },
+    ];
 
     const handleLoadMore = () => {
         setLimit((prev) => prev + DEFAULT_LIMIT);
@@ -78,20 +80,20 @@ export function AdminActivityLogsPage() {
                 <div className="text-muted-foreground flex items-center gap-2">
                     <Clock className="size-5" aria-hidden />
                     <span className="text-sm font-medium tracking-wider uppercase">
-                        System Activity
+                        {t("activityLogs.eyebrow")}
                     </span>
                 </div>
                 <h1 className="text-foreground text-4xl font-bold tracking-tighter">
-                    Activity Logs
+                    {t("activityLogs.title")}
                 </h1>
                 <p className="text-foreground text-lg leading-7">
-                    Monitor all system activities across all users
+                    {t("activityLogs.subtitle")}
                 </p>
             </header>
 
             {/* Category Tabs */}
             <div className="flex flex-wrap gap-2">
-                {CATEGORY_TABS.map(({ value, label }) => {
+                {categoryTabs.map(({ value, label }) => {
                     const isActive = category === value;
                     return (
                         <Badge
@@ -110,7 +112,7 @@ export function AdminActivityLogsPage() {
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                 <div className="flex-1">
                     <Input
-                        placeholder="Search by user email, action, or description..."
+                        placeholder={t("activityLogs.searchPlaceholder")}
                         value={search}
                         onChange={(e) => handleSearchChange(e.target.value)}
                         className="w-full"
@@ -122,7 +124,7 @@ export function AdminActivityLogsPage() {
                         onClick={() => handleSearchChange("")}
                         className="gap-2"
                     >
-                        Clear
+                        {t("activityLogs.clear")}
                     </Button>
                 )}
             </div>
@@ -131,7 +133,7 @@ export function AdminActivityLogsPage() {
             {isLoading && entries.length === 0 && (
                 <div className="flex items-center justify-center py-12">
                     <div className="text-muted-foreground">
-                        Loading activity logs...
+                        {t("activityLogs.loading")}
                     </div>
                 </div>
             )}
@@ -139,18 +141,14 @@ export function AdminActivityLogsPage() {
             {/* Error State */}
             {isError && (
                 <Alert variant="destructive">
-                    <AlertDescription>
-                        Failed to load activity logs. Please try again.
-                    </AlertDescription>
+                    <AlertDescription>{t("activityLogs.loadError")}</AlertDescription>
                 </Alert>
             )}
 
             {/* Empty State */}
             {!isLoading && !isError && entries.length === 0 && (
                 <Alert>
-                    <AlertDescription>
-                        No activity logs found. Try adjusting your filters.
-                    </AlertDescription>
+                    <AlertDescription>{t("activityLogs.empty")}</AlertDescription>
                 </Alert>
             )}
 
@@ -158,7 +156,10 @@ export function AdminActivityLogsPage() {
             {entries.length > 0 && (
                 <div className="space-y-4">
                     <div className="text-muted-foreground text-sm">
-                        Showing {entries.length} of {total.toLocaleString()} activities
+                        {t("activityLogs.showing", {
+                            count: entries.length,
+                            total: total.toLocaleString(),
+                        })}
                     </div>
 
                     <div className="space-y-3">
@@ -176,7 +177,7 @@ export function AdminActivityLogsPage() {
                                 className="gap-2"
                                 variant="outline"
                             >
-                                Load More
+                                {t("activityLogs.loadMore")}
                                 <RefreshCw
                                     className={cn(
                                         "size-4",

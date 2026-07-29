@@ -37,29 +37,29 @@ jest.mock("@tanstack/react-router", () => ({
 }));
 
 async function goToPasswordStep(displayName = "Test User", email = "test@example.com") {
-    fireEvent.change(screen.getByLabelText("Display Name"), {
+    fireEvent.change(screen.getByLabelText("signup.displayNameLabel"), {
         target: { value: displayName },
     });
-    fireEvent.change(screen.getByLabelText("Email"), {
+    fireEvent.change(screen.getByLabelText("signup.emailLabel"), {
         target: { value: email },
     });
-    fireEvent.click(screen.getByRole("button", { name: /next/i }));
+    fireEvent.click(screen.getByRole("button", { name: /signup\.nextButton/i }));
 
     await waitFor(() => {
-        expect(screen.getByLabelText("Password")).toBeInTheDocument();
-        expect(screen.getByText("Step 2 of 2: Create a password")).toBeInTheDocument();
+        expect(screen.getByLabelText("signup.passwordLabel")).toBeInTheDocument();
+        expect(screen.getByText("signup.step2Description")).toBeInTheDocument();
     });
 }
 
 async function acceptTerms() {
-    fireEvent.click(screen.getByRole("checkbox", { name: /terms of service/i }));
+    fireEvent.click(screen.getByRole("checkbox", { name: /signup\.termsPrefix/i }));
 }
 
 function fillPasswordFields(password = "Password123!") {
-    fireEvent.change(screen.getByLabelText("Password"), {
+    fireEvent.change(screen.getByLabelText("signup.passwordLabel"), {
         target: { value: password },
     });
-    fireEvent.change(screen.getByLabelText("Confirm Password"), {
+    fireEvent.change(screen.getByLabelText("signup.confirmPasswordLabel"), {
         target: { value: password },
     });
 }
@@ -83,61 +83,73 @@ describe("SignupPage", () => {
     it("should render signup form", () => {
         render(<SignupPage />);
 
-        expect(screen.getByText("Create Account")).toBeInTheDocument();
-        expect(screen.getByText("Step 1 of 2: Enter your details")).toBeInTheDocument();
-        expect(screen.getByLabelText("Display Name")).toBeInTheDocument();
-        expect(screen.getByLabelText("Email")).toBeInTheDocument();
-        expect(screen.queryByLabelText("Password")).not.toBeInTheDocument();
-        expect(screen.queryByLabelText("Confirm Password")).not.toBeInTheDocument();
-        expect(screen.getByText("Continue with Google")).toBeInTheDocument();
-        expect(screen.getByRole("button", { name: /next/i })).toBeInTheDocument();
+        expect(screen.getByText("signup.title")).toBeInTheDocument();
+        expect(screen.getByText("signup.step1Description")).toBeInTheDocument();
+        expect(screen.getByLabelText("signup.displayNameLabel")).toBeInTheDocument();
+        expect(screen.getByLabelText("signup.emailLabel")).toBeInTheDocument();
+        expect(screen.queryByLabelText("signup.passwordLabel")).not.toBeInTheDocument();
+        expect(
+            screen.queryByLabelText("signup.confirmPasswordLabel"),
+        ).not.toBeInTheDocument();
+        expect(screen.getByText("shared.continueWithGoogle")).toBeInTheDocument();
+        expect(
+            screen.getByRole("button", { name: /signup\.nextButton/i }),
+        ).toBeInTheDocument();
     });
 
     it("should validate step 1 fields on submit", () => {
         render(<SignupPage />);
 
-        const form = screen.getByRole("button", { name: /next/i }).closest("form");
+        const form = screen
+            .getByRole("button", { name: /signup\.nextButton/i })
+            .closest("form");
         fireEvent.submit(form!);
 
-        expect(screen.getByText("Please enter your display name")).toBeInTheDocument();
-        expect(screen.getByText("Please enter your email address")).toBeInTheDocument();
+        expect(
+            screen.getByText("signup.validation.displayNameRequired"),
+        ).toBeInTheDocument();
+        expect(screen.getByText("signup.validation.emailRequired")).toBeInTheDocument();
     });
 
     it("should validate email format on step 1 submit", () => {
         render(<SignupPage />);
 
-        fireEvent.change(screen.getByLabelText("Display Name"), {
+        fireEvent.change(screen.getByLabelText("signup.displayNameLabel"), {
             target: { value: "Test User" },
         });
-        fireEvent.change(screen.getByLabelText("Email"), {
+        fireEvent.change(screen.getByLabelText("signup.emailLabel"), {
             target: { value: "invalid-email" },
         });
 
-        const form = screen.getByRole("button", { name: /next/i }).closest("form");
+        const form = screen
+            .getByRole("button", { name: /signup\.nextButton/i })
+            .closest("form");
         fireEvent.submit(form!);
 
-        expect(
-            screen.getByText("Please enter a valid email address"),
-        ).toBeInTheDocument();
+        expect(screen.getByText("signup.validation.emailInvalid")).toBeInTheDocument();
     });
 
     it("should clear step 1 field errors when values change", () => {
         render(<SignupPage />);
 
-        const form = screen.getByRole("button", { name: /next/i }).closest("form");
+        const form = screen
+            .getByRole("button", { name: /signup\.nextButton/i })
+            .closest("form");
         fireEvent.submit(form!);
 
-        expect(screen.getByText("Please enter your display name")).toBeInTheDocument();
+        expect(
+            screen.getByText("signup.validation.displayNameRequired"),
+        ).toBeInTheDocument();
 
-        fireEvent.change(screen.getByLabelText("Display Name"), {
+        fireEvent.change(screen.getByLabelText("signup.displayNameLabel"), {
             target: { value: "Test User" },
         });
-        fireEvent.change(screen.getByLabelText("Email"), {
+        fireEvent.change(screen.getByLabelText("signup.emailLabel"), {
             target: { value: "test@example.com" },
         });
 
         expect(
-            screen.queryByText("Please enter your display name"),
+            screen.queryByText("signup.validation.displayNameRequired"),
         ).not.toBeInTheDocument();
     });
 
@@ -145,13 +157,17 @@ describe("SignupPage", () => {
         render(<SignupPage />);
         await goToPasswordStep();
 
-        const passwordInput = screen.getByLabelText("Password");
+        const passwordInput = screen.getByLabelText("signup.passwordLabel");
 
         fireEvent.change(passwordInput, { target: { value: "weak" } });
 
         await waitFor(() => {
-            expect(screen.getByText("At least 8 characters")).toBeInTheDocument();
-            expect(screen.getByText("One uppercase letter")).toBeInTheDocument();
+            expect(
+                screen.getByText("signup.passwordRules.min-length"),
+            ).toBeInTheDocument();
+            expect(
+                screen.getByText("signup.passwordRules.uppercase"),
+            ).toBeInTheDocument();
         });
     });
 
@@ -159,8 +175,8 @@ describe("SignupPage", () => {
         render(<SignupPage />);
         await goToPasswordStep();
 
-        const passwordInput = screen.getByLabelText("Password");
-        const confirmInput = screen.getByLabelText("Confirm Password");
+        const passwordInput = screen.getByLabelText("signup.passwordLabel");
+        const confirmInput = screen.getByLabelText("signup.confirmPasswordLabel");
 
         fireEvent.change(passwordInput, {
             target: { value: "Password123!" },
@@ -170,7 +186,9 @@ describe("SignupPage", () => {
         });
 
         await waitFor(() => {
-            expect(screen.getByText("Passwords do not match")).toBeInTheDocument();
+            expect(
+                screen.getByText("signup.validation.passwordsMismatch"),
+            ).toBeInTheDocument();
         });
     });
 
@@ -178,12 +196,10 @@ describe("SignupPage", () => {
         render(<SignupPage />);
         await goToPasswordStep();
 
-        fireEvent.click(screen.getByRole("button", { name: /back/i }));
+        fireEvent.click(screen.getByRole("button", { name: /signup\.backButton/i }));
 
         await waitFor(() => {
-            expect(
-                screen.getByText("Step 1 of 2: Enter your details"),
-            ).toBeInTheDocument();
+            expect(screen.getByText("signup.step1Description")).toBeInTheDocument();
         });
     });
 
@@ -192,7 +208,7 @@ describe("SignupPage", () => {
 
         render(<SignupPage />);
 
-        fireEvent.click(screen.getByText("Continue with Google"));
+        fireEvent.click(screen.getByText("shared.continueWithGoogle"));
 
         await waitFor(() => {
             expect(authService.signInWithGoogle).toHaveBeenCalled();
@@ -207,12 +223,10 @@ describe("SignupPage", () => {
 
         render(<SignupPage />);
 
-        fireEvent.click(screen.getByText("Continue with Google"));
+        fireEvent.click(screen.getByText("shared.continueWithGoogle"));
 
         await waitFor(() => {
-            expect(
-                screen.getByText("Network error. Please check your connection"),
-            ).toBeInTheDocument();
+            expect(screen.getByText("errors.networkError")).toBeInTheDocument();
         });
     });
 
@@ -223,12 +237,10 @@ describe("SignupPage", () => {
 
         render(<SignupPage />);
 
-        fireEvent.click(screen.getByText("Continue with Google"));
+        fireEvent.click(screen.getByText("shared.continueWithGoogle"));
 
         await waitFor(() => {
-            expect(
-                screen.getByText("An error occurred. Please try again"),
-            ).toBeInTheDocument();
+            expect(screen.getByText("errors.generic")).toBeInTheDocument();
         });
     });
 
@@ -242,12 +254,10 @@ describe("SignupPage", () => {
 
         fillPasswordFields();
         await acceptTerms();
-        fireEvent.click(screen.getByRole("button", { name: /sign up/i }));
+        fireEvent.click(screen.getByRole("button", { name: /signup\.submitButton/i }));
 
         await waitFor(() => {
-            expect(
-                screen.getByText("An error occurred. Please try again"),
-            ).toBeInTheDocument();
+            expect(screen.getByText("errors.generic")).toBeInTheDocument();
         });
     });
 
@@ -255,19 +265,23 @@ describe("SignupPage", () => {
         render(<SignupPage />);
         await goToPasswordStep();
 
-        fireEvent.change(screen.getByLabelText("Password"), {
+        fireEvent.change(screen.getByLabelText("signup.passwordLabel"), {
             target: { value: "weak" },
         });
-        fireEvent.change(screen.getByLabelText("Confirm Password"), {
+        fireEvent.change(screen.getByLabelText("signup.confirmPasswordLabel"), {
             target: { value: "weak" },
         });
 
-        const form = screen.getByRole("button", { name: /sign up/i }).closest("form");
+        const form = screen
+            .getByRole("button", { name: /signup\.submitButton/i })
+            .closest("form");
         fireEvent.submit(form!);
 
         await waitFor(() => {
             expect(authService.signUpWithEmail).not.toHaveBeenCalled();
-            expect(screen.getByText("At least 8 characters")).toBeInTheDocument();
+            expect(
+                screen.getByText("signup.passwordRules.min-length"),
+            ).toBeInTheDocument();
         });
     });
 
@@ -275,20 +289,22 @@ describe("SignupPage", () => {
         render(<SignupPage />);
         await goToPasswordStep();
 
-        fireEvent.change(screen.getByLabelText("Password"), {
+        fireEvent.change(screen.getByLabelText("signup.passwordLabel"), {
             target: { value: "Password123!" },
         });
-        fireEvent.change(screen.getByLabelText("Confirm Password"), {
+        fireEvent.change(screen.getByLabelText("signup.confirmPasswordLabel"), {
             target: { value: "Different123!" },
         });
 
-        const form = screen.getByRole("button", { name: /sign up/i }).closest("form");
+        const form = screen
+            .getByRole("button", { name: /signup\.submitButton/i })
+            .closest("form");
         fireEvent.submit(form!);
 
         await waitFor(() => {
             expect(authService.signUpWithEmail).not.toHaveBeenCalled();
             expect(
-                screen.getAllByText("Passwords do not match").length,
+                screen.getAllByText("signup.validation.passwordsMismatch").length,
             ).toBeGreaterThan(0);
         });
     });
@@ -301,7 +317,7 @@ describe("SignupPage", () => {
 
         fillPasswordFields();
         await acceptTerms();
-        fireEvent.click(screen.getByRole("button", { name: /sign up/i }));
+        fireEvent.click(screen.getByRole("button", { name: /signup\.submitButton/i }));
 
         await waitFor(() => {
             expect(authService.signUpWithEmail).toHaveBeenCalledWith(
@@ -323,12 +339,10 @@ describe("SignupPage", () => {
 
         fillPasswordFields();
         await acceptTerms();
-        fireEvent.click(screen.getByRole("button", { name: /sign up/i }));
+        fireEvent.click(screen.getByRole("button", { name: /signup\.submitButton/i }));
 
         await waitFor(() => {
-            expect(
-                screen.getByText("An account already exists with this email"),
-            ).toBeInTheDocument();
+            expect(screen.getByText("errors.emailAlreadyInUse")).toBeInTheDocument();
         });
     });
 
@@ -342,21 +356,17 @@ describe("SignupPage", () => {
 
         fillPasswordFields();
         await acceptTerms();
-        fireEvent.click(screen.getByRole("button", { name: /sign up/i }));
+        fireEvent.click(screen.getByRole("button", { name: /signup\.submitButton/i }));
 
         await waitFor(() => {
-            expect(
-                screen.getByText("An account already exists with this email"),
-            ).toBeInTheDocument();
+            expect(screen.getByText("errors.emailAlreadyInUse")).toBeInTheDocument();
         });
 
-        fireEvent.change(screen.getByLabelText("Password"), {
+        fireEvent.change(screen.getByLabelText("signup.passwordLabel"), {
             target: { value: "Password123!@" },
         });
 
-        expect(
-            screen.queryByText("An account already exists with this email"),
-        ).not.toBeInTheDocument();
+        expect(screen.queryByText("errors.emailAlreadyInUse")).not.toBeInTheDocument();
     });
 
     it("should disable sign up until terms are accepted", async () => {
@@ -365,11 +375,15 @@ describe("SignupPage", () => {
 
         fillPasswordFields();
 
-        expect(screen.getByRole("button", { name: /sign up/i })).toBeDisabled();
+        expect(
+            screen.getByRole("button", { name: /signup\.submitButton/i }),
+        ).toBeDisabled();
 
         await acceptTerms();
 
-        expect(screen.getByRole("button", { name: /sign up/i })).not.toBeDisabled();
+        expect(
+            screen.getByRole("button", { name: /signup\.submitButton/i }),
+        ).not.toBeDisabled();
     });
 
     it("should show loading state during signup", async () => {
@@ -382,10 +396,10 @@ describe("SignupPage", () => {
 
         fillPasswordFields();
         await acceptTerms();
-        fireEvent.click(screen.getByRole("button", { name: /sign up/i }));
+        fireEvent.click(screen.getByRole("button", { name: /signup\.submitButton/i }));
 
         expect(
-            screen.getByRole("button", { name: /creating account/i }),
+            screen.getByRole("button", { name: /signup\.submittingButton/i }),
         ).toBeInTheDocument();
     });
 });

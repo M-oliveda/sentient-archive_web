@@ -30,11 +30,13 @@ describe("ActivityTimeline", () => {
     it("shows error state", () => {
         render(<ActivityTimeline entries={[]} isError />);
         expect(screen.getByTestId("activity-timeline-error")).toBeInTheDocument();
+        expect(screen.getByText("timeline.error")).toBeInTheDocument();
     });
 
     it("shows empty state", () => {
         render(<ActivityTimeline entries={[]} />);
         expect(screen.getByTestId("activity-timeline-empty")).toBeInTheDocument();
+        expect(screen.getByText("timeline.empty")).toBeInTheDocument();
     });
 
     it("groups entries by date", () => {
@@ -42,7 +44,7 @@ describe("ActivityTimeline", () => {
         expect(screen.getByTestId("activity-timeline")).toBeInTheDocument();
         expect(screen.getByText("AI Summary")).toBeInTheDocument();
         expect(screen.getByText("Note created")).toBeInTheDocument();
-        expect(screen.getByText(/Today/i)).toBeInTheDocument();
+        expect(screen.getByText("timeline.today")).toBeInTheDocument();
     });
 
     it("groups multiple entries on the same day", () => {

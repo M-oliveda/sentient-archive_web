@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -20,6 +21,7 @@ export function ForgotPasswordRequestCard({
     onSubmit,
     isLoading,
 }: IForgotPasswordRequestCardProps) {
+    const { t } = useTranslation("auth");
     const [email, setEmail] = useState("");
     const [emailError, setEmailError] = useState<string | null>(null);
 
@@ -32,12 +34,12 @@ export function ForgotPasswordRequestCard({
         e.preventDefault();
 
         if (!email.trim()) {
-            setEmailError("Please enter your email address");
+            setEmailError(t("forgotPassword.validation.emailRequired"));
             return;
         }
 
         if (!validateEmail(email)) {
-            setEmailError("Please enter a valid email address");
+            setEmailError(t("forgotPassword.validation.emailInvalid"));
             return;
         }
 
@@ -47,30 +49,29 @@ export function ForgotPasswordRequestCard({
             setEmailError(
                 error instanceof Error
                     ? error.message
-                    : "Failed to send reset link. Please try again.",
+                    : t("forgotPassword.validation.sendFailed"),
             );
         }
     };
 
     return (
-        <Card className="h-[480px] w-full max-w-sm justify-between gap-2">
+        <Card className="h-120 w-full max-w-sm justify-between gap-2">
             <CardHeader className="text-center">
                 <CardTitle className="text-2xl font-bold">
-                    Reset Your Password
+                    {t("forgotPassword.requestTitle")}
                 </CardTitle>
                 <CardDescription>
-                    Enter your email address and we&apos;ll send you a link to reset
-                    your password.
+                    {t("forgotPassword.requestDescription")}
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <SentientInput
                         id="reset-email"
-                        label="Email address"
+                        label={t("forgotPassword.emailLabel")}
                         type="text"
                         inputMode="email"
-                        placeholder="johndoe@example.com"
+                        placeholder={t("forgotPassword.emailPlaceholder")}
                         value={email}
                         onChange={(e) => {
                             setEmail(e.target.value);
@@ -86,18 +87,20 @@ export function ForgotPasswordRequestCard({
                         className="w-full"
                         disabled={isLoading || !email.trim()}
                     >
-                        {isLoading ? "Sending..." : "Send Reset Link"}
+                        {isLoading
+                            ? t("forgotPassword.submittingButton")
+                            : t("forgotPassword.submitButton")}
                     </Button>
                 </form>
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
                 <p className="text-muted-foreground text-center text-sm">
-                    Remember your password?{" "}
+                    {t("forgotPassword.rememberPassword")}{" "}
                     <Link
                         to="/login"
                         className="text-primary font-medium underline-offset-4 hover:underline"
                     >
-                        Sign in
+                        {t("forgotPassword.signInLink")}
                     </Link>
                 </p>
                 <div className="flex items-center justify-center gap-2">
@@ -109,7 +112,7 @@ export function ForgotPasswordRequestCard({
                         className="size-9"
                     />
                     <span className="text-foreground text-lg font-bold">
-                        SentientArchive
+                        {t("shared.appName")}
                     </span>
                 </div>
             </CardFooter>

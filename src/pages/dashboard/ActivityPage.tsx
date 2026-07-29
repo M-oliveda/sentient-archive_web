@@ -1,4 +1,5 @@
 import { useQueryState } from "nuqs";
+import { useTranslation } from "react-i18next";
 import { Clock } from "lucide-react";
 import {
     ActivityFilterBar,
@@ -23,6 +24,7 @@ function parseCategory(value: string): ActivityFilterCategory {
 }
 
 export function ActivityPage() {
+    const { t } = useTranslation("activity");
     const [category, setCategory] = useQueryState<ActivityFilterCategory>("category", {
         defaultValue: "all",
         parse: parseCategory,
@@ -45,14 +47,14 @@ export function ActivityPage() {
                 <div className="text-muted-foreground flex items-center gap-2">
                     <Clock className="size-5" aria-hidden />
                     <span className="text-sm font-medium tracking-wider uppercase">
-                        Activity
+                        {t("page.eyebrow")}
                     </span>
                 </div>
                 <h1 className="text-foreground text-4xl font-bold tracking-tighter">
-                    Activity Log
+                    {t("page.title")}
                 </h1>
                 <p className="text-foreground text-lg leading-7">
-                    Track all your actions, AI operations, and token usage history.
+                    {t("page.subtitle")}
                 </p>
             </header>
 

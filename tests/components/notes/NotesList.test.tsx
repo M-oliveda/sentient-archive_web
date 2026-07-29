@@ -65,12 +65,12 @@ describe("NotesList", () => {
 
     it("shows empty state when there are no notes and no search", () => {
         render(<NotesList {...BASE_PROPS} notes={[]} totalNotes={0} />);
-        expect(screen.getByText("No notes yet.")).toBeInTheDocument();
+        expect(screen.getByText("list.empty")).toBeInTheDocument();
     });
 
     it("shows search empty state when search is active but no results", () => {
         render(<NotesList {...BASE_PROPS} notes={[]} totalNotes={0} search="xyz" />);
-        expect(screen.getByText("No notes match your search.")).toBeInTheDocument();
+        expect(screen.getByText("list.emptySearch")).toBeInTheDocument();
     });
 
     it("shows a spinner when isLoading is true", () => {
@@ -80,7 +80,7 @@ describe("NotesList", () => {
 
     it("calls onSearchChange when the search input changes", () => {
         render(<NotesList {...BASE_PROPS} />);
-        fireEvent.change(screen.getByPlaceholderText("Search notes…"), {
+        fireEvent.change(screen.getByPlaceholderText("list.searchPlaceholder"), {
             target: { value: "hello" },
         });
         expect(BASE_PROPS.onSearchChange).toHaveBeenCalledWith("hello");
@@ -88,13 +88,13 @@ describe("NotesList", () => {
 
     it("calls onSortChange when a sort button is clicked", () => {
         render(<NotesList {...BASE_PROPS} />);
-        fireEvent.click(screen.getByText("Title"));
+        fireEvent.click(screen.getByText("list.sort.title"));
         expect(BASE_PROPS.onSortChange).toHaveBeenCalledWith("title");
     });
 
     it("highlights the active sort button", () => {
         render(<NotesList {...BASE_PROPS} sort="title" />);
-        expect(screen.getByText("Title").className).toContain("bg-primary");
+        expect(screen.getByText("list.sort.title").className).toContain("bg-primary");
     });
 
     it("reflects the search prop value in the input", () => {
@@ -124,39 +124,39 @@ describe("NotesList", () => {
 
     it("does not render pagination when totalNotes is 0", () => {
         render(<NotesList {...BASE_PROPS} notes={[]} totalNotes={0} />);
-        expect(screen.queryByText(/Showing/)).not.toBeInTheDocument();
+        expect(screen.queryByText("list.showing")).not.toBeInTheDocument();
     });
 
     it("does not render pagination when all notes fit on one page", () => {
         render(<NotesList {...BASE_PROPS} totalNotes={5} />);
-        expect(screen.queryByText(/Showing/)).not.toBeInTheDocument();
+        expect(screen.queryByText("list.showing")).not.toBeInTheDocument();
     });
 
     it("renders pagination when totalNotes exceeds one page", () => {
         render(<NotesList {...BASE_PROPS} totalNotes={25} page={1} />);
-        expect(screen.getByText(/Showing 1–6 of 25 notes/)).toBeInTheDocument();
+        expect(screen.getByText("list.showing")).toBeInTheDocument();
     });
 
     it("calls onPageChange when next page button is clicked", () => {
         render(<NotesList {...BASE_PROPS} totalNotes={25} page={1} />);
-        fireEvent.click(screen.getByLabelText("Next page"));
+        fireEvent.click(screen.getByLabelText("list.nextPage"));
         expect(BASE_PROPS.onPageChange).toHaveBeenCalledWith(2);
     });
 
     it("calls onPageChange when previous page button is clicked", () => {
         render(<NotesList {...BASE_PROPS} totalNotes={25} page={2} />);
-        fireEvent.click(screen.getByLabelText("Previous page"));
+        fireEvent.click(screen.getByLabelText("list.prevPage"));
         expect(BASE_PROPS.onPageChange).toHaveBeenCalledWith(1);
     });
 
     it("disables previous page button on first page", () => {
         render(<NotesList {...BASE_PROPS} totalNotes={25} page={1} />);
-        expect(screen.getByLabelText("Previous page")).toBeDisabled();
+        expect(screen.getByLabelText("list.prevPage")).toBeDisabled();
     });
 
     it("disables next page button on last page", () => {
         render(<NotesList {...BASE_PROPS} totalNotes={25} page={5} />);
-        expect(screen.getByLabelText("Next page")).toBeDisabled();
+        expect(screen.getByLabelText("list.nextPage")).toBeDisabled();
     });
 
     it("calls onPageChange when a page number is clicked", () => {

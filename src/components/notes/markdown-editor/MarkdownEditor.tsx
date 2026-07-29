@@ -12,6 +12,7 @@ import {
     TRANSFORMERS,
 } from "@lexical/markdown";
 import type { EditorState } from "lexical";
+import { useTranslation } from "react-i18next";
 import { editorTheme } from "./editorTheme";
 import { EDITOR_NODES } from "./editorNodes";
 import { MarkdownFormattingToolbar } from "./MarkdownFormattingToolbar";
@@ -28,12 +29,15 @@ interface IMarkdownEditorProps {
 
 export function MarkdownEditor({
     initialContent,
-    placeholder = "Start writing… (markdown shortcuts supported)",
+    placeholder,
     onChange,
     readOnly = false,
     showToolbar = false,
     editorRef,
 }: IMarkdownEditorProps) {
+    const { t } = useTranslation("notes");
+    const resolvedPlaceholder = placeholder ?? t("editor.placeholder");
+
     const handleChange = (editorState: EditorState) => {
         if (readOnly || !onChange) return;
         editorState.read(() => {
@@ -62,11 +66,13 @@ export function MarkdownEditor({
                         contentEditable={
                             <ContentEditable
                                 className="editor-content min-h-full"
-                                aria-label="Note content"
+                                aria-label={t("editor.contentAriaLabel")}
                             />
                         }
                         placeholder={
-                            <div className="editor-placeholder">{placeholder}</div>
+                            <div className="editor-placeholder">
+                                {resolvedPlaceholder}
+                            </div>
                         }
                         ErrorBoundary={LexicalErrorBoundary}
                     />

@@ -4,23 +4,25 @@ import { TokenSystemSection } from "@/components/landing/TokenSystemSection";
 describe("TokenSystemSection", () => {
     it("renders the section heading", () => {
         render(<TokenSystemSection />);
-        expect(screen.getByText("Simple Token-Based System")).toBeInTheDocument();
+        expect(screen.getByText("tokens.title")).toBeInTheDocument();
     });
 
     it("renders the free tokens explanation", () => {
         render(<TokenSystemSection />);
-        expect(screen.getByText(/20 free/)).toBeInTheDocument();
+        expect(screen.getByText("tokens.freeStartHighlight")).toBeInTheDocument();
     });
 
     it("renders all four token cost cards", () => {
         render(<TokenSystemSection />);
-        expect(screen.getByText("Auto-Tagging")).toBeInTheDocument();
-        expect(screen.getByText("1 token")).toBeInTheDocument();
-        expect(screen.getByText("Summarization")).toBeInTheDocument();
-        expect(screen.getByText("2 tokens")).toBeInTheDocument();
-        expect(screen.getByText("Flashcards")).toBeInTheDocument();
-        expect(screen.getByText("Q&A Chat")).toBeInTheDocument();
-        expect(screen.getByText("4 tokens per query")).toBeInTheDocument();
+        expect(screen.getByText("tokens.costs.autoTagging.label")).toBeInTheDocument();
+        expect(screen.getByText("tokens.costs.autoTagging.cost")).toBeInTheDocument();
+        expect(
+            screen.getByText("tokens.costs.summarization.label"),
+        ).toBeInTheDocument();
+        expect(screen.getByText("tokens.costs.summarization.cost")).toBeInTheDocument();
+        expect(screen.getByText("tokens.costs.flashcards.label")).toBeInTheDocument();
+        expect(screen.getByText("tokens.costs.qaChat.label")).toBeInTheDocument();
+        expect(screen.getByText("tokens.costs.qaChat.cost")).toBeInTheDocument();
     });
 
     it("has the token-system anchor id", () => {

@@ -38,10 +38,9 @@ describe("SettingsPage", () => {
         });
 
         render(<SettingsPage />);
-        expect(screen.getByText("Settings")).toBeInTheDocument();
-        expect(
-            screen.getByText("Manage your account settings, preferences, and billing."),
-        ).toBeInTheDocument();
+        expect(screen.getByText("page.title")).toBeInTheDocument();
+        expect(screen.getByText("page.eyebrow")).toBeInTheDocument();
+        expect(screen.getByText("page.subtitle")).toBeInTheDocument();
         expect(screen.getByTestId("profile-settings-card")).toBeInTheDocument();
     });
 });

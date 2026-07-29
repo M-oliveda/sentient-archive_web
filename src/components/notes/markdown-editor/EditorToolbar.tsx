@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ArrowLeft, Check, Loader2, Trash2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -33,6 +34,7 @@ export function EditorToolbar({
     onBack,
     onToggleAI,
 }: IEditorToolbarProps) {
+    const { t } = useTranslation("notes");
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const showStatus = saveStatus !== "idle";
 
@@ -43,7 +45,7 @@ export function EditorToolbar({
                     type="button"
                     onClick={onBack}
                     className="text-muted-foreground hover:text-foreground shrink-0 rounded p-1 transition-colors"
-                    aria-label="Back"
+                    aria-label={t("editor.back")}
                 >
                     <ArrowLeft className="size-4" />
                 </button>
@@ -52,9 +54,9 @@ export function EditorToolbar({
             <Input
                 value={title}
                 onChange={(e) => onTitleChange(e.target.value)}
-                placeholder="Untitled"
+                placeholder={t("editor.untitled")}
                 className="border-0 bg-transparent pr-0 pl-2 text-xl font-bold shadow-none focus-visible:ring-0"
-                aria-label="Note title"
+                aria-label={t("editor.titleAriaLabel")}
             />
 
             <div className="flex shrink-0 items-center gap-2">
@@ -64,9 +66,9 @@ export function EditorToolbar({
                         size="sm"
                         onClick={onToggleAI}
                         className="bg-primary text-primary-foreground hover:bg-primary/90 h-7 px-3 text-xs"
-                        aria-label="Toggle AI Tools"
+                        aria-label={t("editor.toggleAI")}
                     >
-                        Toggle AI Tools
+                        {t("editor.toggleAI")}
                     </Button>
                 )}
 
@@ -78,13 +80,13 @@ export function EditorToolbar({
                     {saveStatus === "saving" && (
                         <>
                             <Loader2 className="size-3 animate-spin" />
-                            Saving
+                            {t("editor.saving")}
                         </>
                     )}
                     {saveStatus === "saved" && (
                         <>
                             <Check className="size-3 text-[hsl(var(--success))]" />
-                            Saved
+                            {t("editor.saved")}
                         </>
                     )}
                 </span>
@@ -94,7 +96,7 @@ export function EditorToolbar({
                     size="sm"
                     onClick={() => setIsDeleteDialogOpen(true)}
                     className="text-destructive hover:text-destructive h-7 w-7 p-0"
-                    aria-label="Delete note"
+                    aria-label={t("editor.deleteNote")}
                 >
                     <Trash2 className="size-3.5" />
                 </Button>
@@ -106,16 +108,17 @@ export function EditorToolbar({
                         <AlertDialogMedia>
                             <Trash2 />
                         </AlertDialogMedia>
-                        <AlertDialogTitle>Delete note?</AlertDialogTitle>
+                        <AlertDialogTitle>
+                            {t("editor.deleteConfirmTitle")}
+                        </AlertDialogTitle>
                         <AlertDialogDescription>
-                            This action cannot be undone. The note will be permanently
-                            deleted.
+                            {t("editor.deleteConfirmDescription")}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>{t("editor.cancel")}</AlertDialogCancel>
                         <AlertDialogAction variant="destructive" onClick={onDelete}>
-                            Delete
+                            {t("editor.delete")}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

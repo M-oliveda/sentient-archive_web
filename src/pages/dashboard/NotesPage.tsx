@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { useQueryState } from "nuqs";
 import { useNavigate } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { Plus } from "lucide-react";
 import { useNotes } from "@/hooks/useNotes";
 import { useFolders } from "@/hooks/useFolders";
@@ -10,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import type { NoteSort } from "@/hooks/useNotes";
 
 export function NotesPage() {
+    const { t } = useTranslation("notes");
     const navigate = useNavigate();
 
     const [search, setSearch] = useQueryState("q", { defaultValue: "" });
@@ -84,9 +86,13 @@ export function NotesPage() {
         <div className="flex h-full flex-col gap-6">
             <div className="bg-secondary flex shrink-0 flex-wrap items-center justify-between gap-4 rounded-xl p-6">
                 <div>
-                    <h1 className="text-foreground text-2xl font-bold">My Notes</h1>
+                    <h1 className="text-foreground text-2xl font-bold">
+                        {t("list.title")}
+                    </h1>
                     <p className="text-muted-foreground mt-1 text-sm">
-                        {notes.length} {notes.length === 1 ? "note" : "notes"} total
+                        {t(notes.length === 1 ? "list.noteTotal" : "list.notesTotal", {
+                            count: notes.length,
+                        })}
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -95,7 +101,7 @@ export function NotesPage() {
                         disabled={createNote.isPending}
                     >
                         <Plus className="size-4" />
-                        New Note
+                        {t("list.newNote")}
                     </Button>
                 </div>
             </div>

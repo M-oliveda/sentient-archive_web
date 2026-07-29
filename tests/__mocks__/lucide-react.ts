@@ -52,6 +52,9 @@ export const MessageCircle = svg;
 export const UserPlus = svg;
 export const Sparkles = svg;
 
+// Language switcher icons
+export const Languages = svg;
+
 // PublicNavbar icons
 export const Menu = svg;
 export const ChevronRight = svg;

@@ -39,22 +39,24 @@ describe("EditUserModal", () => {
     it("renders user email in the description", () => {
         render(<EditUserModal {...defaultProps} />);
 
-        expect(screen.getByText("Edit User")).toBeInTheDocument();
-        expect(screen.getByText(/user@example.com/)).toBeInTheDocument();
+        expect(screen.getByText("users.edit.title")).toBeInTheDocument();
+        expect(screen.getByText(/users\.edit\.description/)).toBeInTheDocument();
     });
 
     it("does not render form fields when user is null", () => {
         render(<EditUserModal {...defaultProps} user={null} />);
 
-        expect(screen.queryByLabelText("Token Balance")).not.toBeInTheDocument();
+        expect(
+            screen.queryByLabelText("users.edit.tokenBalance"),
+        ).not.toBeInTheDocument();
     });
 
     it("changes role when role badge is clicked", async () => {
         render(<EditUserModal {...defaultProps} />);
 
-        await userEvent.click(screen.getByText("admin"));
+        await userEvent.click(screen.getByText("users.edit.admin"));
 
-        await userEvent.click(screen.getByRole("button", { name: "Save Changes" }));
+        await userEvent.click(screen.getByRole("button", { name: "users.edit.save" }));
 
         await waitFor(() => {
             expect(defaultProps.onSubmit).toHaveBeenCalledWith("user1", {
@@ -68,9 +70,9 @@ describe("EditUserModal", () => {
     it("changes status when status badge is clicked", async () => {
         render(<EditUserModal {...defaultProps} />);
 
-        await userEvent.click(screen.getByText("Inactive"));
+        await userEvent.click(screen.getByText("users.edit.inactive"));
 
-        await userEvent.click(screen.getByRole("button", { name: "Save Changes" }));
+        await userEvent.click(screen.getByRole("button", { name: "users.edit.save" }));
 
         await waitFor(() => {
             expect(defaultProps.onSubmit).toHaveBeenCalledWith("user1", {
@@ -84,11 +86,11 @@ describe("EditUserModal", () => {
     it("updates token balance from input", async () => {
         render(<EditUserModal {...defaultProps} />);
 
-        const input = screen.getByLabelText("Token Balance");
+        const input = screen.getByLabelText("users.edit.tokenBalance");
         await userEvent.clear(input);
         await userEvent.type(input, "250");
 
-        await userEvent.click(screen.getByRole("button", { name: "Save Changes" }));
+        await userEvent.click(screen.getByRole("button", { name: "users.edit.save" }));
 
         await waitFor(() => {
             expect(defaultProps.onSubmit).toHaveBeenCalledWith(
@@ -101,10 +103,10 @@ describe("EditUserModal", () => {
     it("treats empty token balance as 0", async () => {
         render(<EditUserModal {...defaultProps} />);
 
-        const input = screen.getByLabelText("Token Balance");
+        const input = screen.getByLabelText("users.edit.tokenBalance");
         await userEvent.clear(input);
 
-        await userEvent.click(screen.getByRole("button", { name: "Save Changes" }));
+        await userEvent.click(screen.getByRole("button", { name: "users.edit.save" }));
 
         await waitFor(() => {
             expect(defaultProps.onSubmit).toHaveBeenCalledWith(
@@ -119,10 +121,10 @@ describe("EditUserModal", () => {
 
         render(<EditUserModal {...defaultProps} />);
 
-        await userEvent.click(screen.getByRole("button", { name: "Save Changes" }));
+        await userEvent.click(screen.getByRole("button", { name: "users.edit.save" }));
 
         await waitFor(() => {
-            expect(toast.success).toHaveBeenCalledWith("User updated successfully");
+            expect(toast.success).toHaveBeenCalledWith("users.updated");
             expect(defaultProps.onOpenChange).toHaveBeenCalledWith(false);
         });
     });
@@ -133,7 +135,7 @@ describe("EditUserModal", () => {
 
         render(<EditUserModal {...defaultProps} onSubmit={onSubmit} />);
 
-        await userEvent.click(screen.getByRole("button", { name: "Save Changes" }));
+        await userEvent.click(screen.getByRole("button", { name: "users.edit.save" }));
 
         await waitFor(() => {
             expect(toast.error).toHaveBeenCalledWith("Update failed");
@@ -146,17 +148,19 @@ describe("EditUserModal", () => {
 
         render(<EditUserModal {...defaultProps} onSubmit={onSubmit} />);
 
-        await userEvent.click(screen.getByRole("button", { name: "Save Changes" }));
+        await userEvent.click(screen.getByRole("button", { name: "users.edit.save" }));
 
         await waitFor(() => {
-            expect(toast.error).toHaveBeenCalledWith("Failed to update user");
+            expect(toast.error).toHaveBeenCalledWith("users.updateError");
         });
     });
 
     it("closes when Cancel is clicked", async () => {
         render(<EditUserModal {...defaultProps} />);
 
-        await userEvent.click(screen.getByRole("button", { name: "Cancel" }));
+        await userEvent.click(
+            screen.getByRole("button", { name: "users.edit.cancel" }),
+        );
 
         expect(defaultProps.onOpenChange).toHaveBeenCalledWith(false);
     });
@@ -168,7 +172,7 @@ describe("EditUserModal", () => {
 
         // Dialog still open but no Save button when user is null
         expect(
-            screen.queryByRole("button", { name: "Save Changes" }),
+            screen.queryByRole("button", { name: "users.edit.save" }),
         ).not.toBeInTheDocument();
         expect(onSubmit).not.toHaveBeenCalled();
     });
@@ -184,15 +188,15 @@ describe("EditUserModal", () => {
 
         render(<EditUserModal {...defaultProps} onSubmit={onSubmit} />);
 
-        await userEvent.click(screen.getByRole("button", { name: "Save Changes" }));
+        await userEvent.click(screen.getByRole("button", { name: "users.edit.save" }));
 
-        expect(await screen.findByText("Saving...")).toBeInTheDocument();
+        expect(await screen.findByText("users.edit.saving")).toBeInTheDocument();
 
         resolveSubmit();
 
         await waitFor(() => {
             expect(
-                screen.getByRole("button", { name: "Save Changes" }),
+                screen.getByRole("button", { name: "users.edit.save" }),
             ).toBeInTheDocument();
         });
     });
@@ -217,7 +221,7 @@ describe("EditUserModal", () => {
             />,
         );
 
-        await userEvent.click(screen.getByRole("button", { name: "Save Changes" }));
+        await userEvent.click(screen.getByRole("button", { name: "users.edit.save" }));
 
         await waitFor(() => {
             expect(onSubmit).toHaveBeenCalledWith("user1", {

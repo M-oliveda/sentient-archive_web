@@ -1,0 +1,27 @@
+{
+  "page": {
+    "eyebrow": "Activity",
+    "title": "Activity Log",
+    "subtitle": "Track all your actions, AI operations, and token usage history."
+  },
+  "stats": {
+    "actionsToday": "Actions today",
+    "aiOpsThisWeek": "AI Ops This Week",
+    "totalActions": "Total Actions"
+  },
+  "filters": {
+    "searchPlaceholder": "Search logs...",
+    "searchAriaLabel": "Search logs",
+    "all": "All",
+    "ai": "AI Ops",
+    "tokens": "Tokens",
+    "notes": "Notes",
+    "folders": "Folders"
+  },
+  "timeline": {
+    "today": "Today, {{date}}",
+    "error": "Could not load activity. Please try again.",
+    "empty": "No activity yet. Notes, folders, and AI operations will appear here."
+  },
+  "recent": "Recent Activity"
+}

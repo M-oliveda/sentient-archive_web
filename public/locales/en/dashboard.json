@@ -1,0 +1,50 @@
+{
+  "client": {
+    "welcome": "Welcome back, {{firstName}}",
+    "welcomeFallback": "there",
+    "subtitle": "Your knowledge base is organized and ready for insights.",
+    "lowBalance": {
+      "message": "Your token balance is low.",
+      "link": "Request more tokens",
+      "suffix": "to keep using AI features."
+    },
+    "actions": {
+      "newNote": "New Note"
+    },
+    "stats": {
+      "ariaLabel": "Stats overview",
+      "notes": "Notes",
+      "tokens": "Tokens",
+      "lastEdited": "Last Edited",
+      "requestMore": "Request More"
+    },
+    "recentNotes": {
+      "title": "Recent Notes",
+      "showMore": "Show More",
+      "empty": "No notes yet. Create your first note!",
+      "folderFallback": "Notes"
+    }
+  },
+  "admin": {
+    "title": "Admin Dashboard",
+    "subtitle": "System Overview & Health Monitoring",
+    "stats": {
+      "ariaLabel": "System stats",
+      "totalUsers": "Total Users",
+      "totalNotes": "Total Notes",
+      "totalTokens": "Total Tokens",
+      "totalAiOps": "Total AI Operations"
+    },
+    "health": {
+      "title": "System Health",
+      "ariaLabel": "System health",
+      "operational": "Operational",
+      "inDanger": "In Danger",
+      "down": "Down"
+    },
+    "activity": {
+      "title": "Recent Activity",
+      "ariaLabel": "Recent activity"
+    }
+  }
+}

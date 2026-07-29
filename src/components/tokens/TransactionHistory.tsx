@@ -1,22 +1,19 @@
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { useTransactions } from "@/hooks/useTransactions";
 import type { ITransaction, TransactionReason } from "@/types/transaction";
 
-const REASON_LABELS: Record<TransactionReason, string> = {
-    ai_summarize: "AI Summary",
-    ai_autotag: "AI Auto-Tag",
-    ai_flashcards: "AI Flashcards",
-    ai_ragquery: "AI Q&A",
-    admin_grant: "Admin Grant",
-    initial_grant: "Welcome Bonus",
+const REASON_KEYS: Record<TransactionReason, string> = {
+    ai_summarize: "history.reasons.aiSummarize",
+    ai_autotag: "history.reasons.aiAutotag",
+    ai_flashcards: "history.reasons.aiFlashcards",
+    ai_ragquery: "history.reasons.aiRagquery",
+    admin_grant: "history.reasons.adminGrant",
+    initial_grant: "history.reasons.initialGrant",
 };
 
-function formatReason(reason: TransactionReason): string {
-    return REASON_LABELS[reason] ?? reason;
-}
-
-function formatDate(date: Date): string {
-    return date.toLocaleDateString("en-US", {
+function formatDate(date: Date, language: string): string {
+    return date.toLocaleDateString(language, {
         month: "short",
         day: "numeric",
         year: "numeric",
@@ -28,15 +25,17 @@ interface ITransactionRowProps {
 }
 
 function TransactionRow({ tx }: ITransactionRowProps) {
+    const { t, i18n } = useTranslation("tokens");
     const isCredit = tx.type === "credit";
+    const reasonKey = REASON_KEYS[tx.reason];
 
     return (
         <tr className="border-border border-b last:border-0">
             <td className="text-muted-foreground py-3 pr-4 text-sm">
-                {formatDate(tx.createdAt)}
+                {formatDate(tx.createdAt, i18n.language)}
             </td>
             <td className="text-foreground py-3 pr-4 text-sm font-medium">
-                {formatReason(tx.reason)}
+                {reasonKey ? t(reasonKey) : tx.reason}
             </td>
             <td
                 className={cn(
@@ -57,6 +56,7 @@ function TransactionRow({ tx }: ITransactionRowProps) {
 }
 
 export function TransactionHistory() {
+    const { t } = useTranslation("tokens");
     const { data: transactions, isLoading } = useTransactions();
 
     if (isLoading) {
@@ -75,7 +75,7 @@ export function TransactionHistory() {
                 className="text-muted-foreground py-8 text-center text-sm"
                 data-testid="transaction-history-empty"
             >
-                No transactions yet. AI features will appear here once you use them.
+                {t("history.empty")}
             </p>
         );
     }
@@ -86,16 +86,16 @@ export function TransactionHistory() {
                 <thead>
                     <tr className="border-border border-b">
                         <th className="text-muted-foreground pr-4 pb-3 text-left text-xs font-medium tracking-wider uppercase">
-                            Date
+                            {t("history.date")}
                         </th>
                         <th className="text-muted-foreground pr-4 pb-3 text-left text-xs font-medium tracking-wider uppercase">
-                            Action
+                            {t("history.action")}
                         </th>
                         <th className="text-muted-foreground pr-4 pb-3 text-right text-xs font-medium tracking-wider uppercase">
-                            Change
+                            {t("history.change")}
                         </th>
                         <th className="text-muted-foreground pb-3 text-right text-xs font-medium tracking-wider uppercase">
-                            Balance
+                            {t("history.balance")}
                         </th>
                     </tr>
                 </thead>

@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import { ActivityTimelineItem } from "./ActivityTimelineItem";
 import type { IActivityEntry } from "@/types/activity";
 
@@ -13,30 +15,34 @@ interface IDateGroup {
     entries: IActivityEntry[];
 }
 
-function formatDateHeader(date: Date): string {
+function formatDateHeader(date: Date, language: string, t: TFunction): string {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const target = new Date(date);
     target.setHours(0, 0, 0, 0);
 
     const isToday = target.getTime() === today.getTime();
-    const formatted = date.toLocaleDateString("en-US", {
+    const formatted = date.toLocaleDateString(language, {
         month: "short",
         day: "numeric",
     });
 
     if (isToday) {
-        return `Today, ${formatted}`;
+        return t("timeline.today", { date: formatted });
     }
 
-    return date.toLocaleDateString("en-US", {
+    return date.toLocaleDateString(language, {
         weekday: "short",
         month: "short",
         day: "numeric",
     });
 }
 
-function groupByDate(entries: IActivityEntry[]): IDateGroup[] {
+function groupByDate(
+    entries: IActivityEntry[],
+    language: string,
+    t: TFunction,
+): IDateGroup[] {
     const groups = new Map<string, IDateGroup>();
 
     for (const entry of entries) {
@@ -48,7 +54,7 @@ function groupByDate(entries: IActivityEntry[]): IDateGroup[] {
         } else {
             groups.set(key, {
                 key,
-                label: formatDateHeader(date),
+                label: formatDateHeader(date, language, t),
                 entries: [entry],
             });
         }
@@ -62,6 +68,8 @@ export function ActivityTimeline({
     isLoading = false,
     isError = false,
 }: IActivityTimelineProps) {
+    const { t, i18n } = useTranslation("activity");
+
     if (isLoading) {
         return (
             <div className="space-y-4" data-testid="activity-timeline-loading">
@@ -78,7 +86,7 @@ export function ActivityTimeline({
                 className="text-muted-foreground py-8 text-center text-sm"
                 data-testid="activity-timeline-error"
             >
-                Could not load activity. Please try again.
+                {t("timeline.error")}
             </p>
         );
     }
@@ -89,12 +97,12 @@ export function ActivityTimeline({
                 className="text-muted-foreground py-8 text-center text-sm"
                 data-testid="activity-timeline-empty"
             >
-                No activity yet. Notes, folders, and AI operations will appear here.
+                {t("timeline.empty")}
             </p>
         );
     }
 
-    const groups = groupByDate(entries);
+    const groups = groupByDate(entries, i18n.language, t);
 
     return (
         <div className="flex flex-col gap-6" data-testid="activity-timeline">

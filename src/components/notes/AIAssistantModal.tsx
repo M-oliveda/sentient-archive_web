@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Layers, Sparkles, Brain } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Spinner } from "@/components/ui/spinner";
 import {
     Dialog,
@@ -16,19 +17,19 @@ import type { INote, IFlashcard } from "@/types/note";
 import type { ITokenCosts } from "@/types/config";
 import { DEFAULT_TOKEN_COSTS } from "@/types/config";
 
-function friendlyAiError(raw: string | null): string | null {
+function friendlyAiErrorKey(raw: string | null): string | null {
     if (!raw) return null;
     if (/429|too many requests|rate.?limit|credits depleted|quota/i.test(raw)) {
-        return "AI service is temporarily unavailable. Please try again later.";
+        return "assistant.errors.unavailable";
     }
-    return "Something went wrong. Please try again.";
+    return "assistant.errors.generic";
 }
 
-function formatFlashcardsAsMarkdown(cards: IFlashcard[]): string {
+function formatFlashcardsAsMarkdown(cards: IFlashcard[], heading: string): string {
     const lines = cards
         .map((c) => `**Q:** ${c.front}\n\n**A:** ${c.back}`)
         .join("\n\n---\n\n");
-    return `## Flashcards\n\n${lines}`;
+    return `## ${heading}\n\n${lines}`;
 }
 
 interface IAIAssistantModalProps {
@@ -46,6 +47,7 @@ export function AIAssistantModal({
     onInsertAtStart,
     onAppendContent,
 }: IAIAssistantModalProps) {
+    const { t } = useTranslation("notes");
     const { user } = useAuthStore();
     const tokenBalance = user?.tokenBalance ?? 0;
     const { features, tokenCosts } = useClientConfig();
@@ -55,7 +57,8 @@ export function AIAssistantModal({
 
     const handleInsertSummary = () => {
         // note.summary is guaranteed non-null here; button only renders when summary exists
-        onInsertAtStart?.(`## Summary\n\n${note.summary!}\n\n---\n\n`);
+        const heading = t("assistant.summary.markdownHeading");
+        onInsertAtStart?.(`## ${heading}\n\n${note.summary!}\n\n---\n\n`);
         onOpenChange(false);
     };
 
@@ -75,7 +78,12 @@ export function AIAssistantModal({
     const handleGenerateFlashcards = () => {
         flashcards.mutate(undefined, {
             onSuccess: (data) => {
-                onAppendContent?.(formatFlashcardsAsMarkdown(data.data.flashcards));
+                onAppendContent?.(
+                    formatFlashcardsAsMarkdown(
+                        data.data.flashcards,
+                        t("assistant.flashcards.markdownHeading"),
+                    ),
+                );
                 onOpenChange(false);
             },
         });
@@ -95,7 +103,7 @@ export function AIAssistantModal({
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <Sparkles className="text-primary size-5" />
-                            AI Assistant
+                            {t("assistant.title")}
                         </DialogTitle>
                     </DialogHeader>
 
@@ -104,7 +112,7 @@ export function AIAssistantModal({
                             className="text-muted-foreground text-sm"
                             data-testid="no-ai-features"
                         >
-                            No AI features are currently available.
+                            {t("assistant.noFeatures")}
                         </p>
                     )}
 
@@ -114,7 +122,9 @@ export function AIAssistantModal({
                             tokenBalance={tokenBalance}
                             tokenCost={tokenCosts.summarize}
                             isPending={summarize.isPending}
-                            error={friendlyAiError(summarize.error?.message ?? null)}
+                            errorKey={friendlyAiErrorKey(
+                                summarize.error?.message ?? null,
+                            )}
                             onGenerate={() => summarize.mutate()}
                             onInsert={handleInsertSummary}
                         />
@@ -125,7 +135,9 @@ export function AIAssistantModal({
                             tokenBalance={tokenBalance}
                             tokenCost={tokenCosts.autoTag}
                             isPending={isTagsPending}
-                            error={friendlyAiError(autoTag.error?.message ?? null)}
+                            errorKey={friendlyAiErrorKey(
+                                autoTag.error?.message ?? null,
+                            )}
                             onGenerate={handleGenerateTags}
                         />
                     )}
@@ -135,7 +147,9 @@ export function AIAssistantModal({
                             tokenBalance={tokenBalance}
                             tokenCost={tokenCosts.flashcards}
                             isPending={flashcards.isPending}
-                            error={friendlyAiError(flashcards.error?.message ?? null)}
+                            errorKey={friendlyAiErrorKey(
+                                flashcards.error?.message ?? null,
+                            )}
                             onGenerate={handleGenerateFlashcards}
                         />
                     )}
@@ -161,9 +175,11 @@ export function AIAssistantModal({
 }
 
 export function TokenBadge({ count }: { count: number }) {
+    const { t } = useTranslation("notes");
+
     return (
         <span className="bg-foreground text-background rounded-full px-2.5 py-0.5 text-xs font-medium">
-            {count} {count === 1 ? "token" : "tokens"}
+            {t(count === 1 ? "assistant.token" : "assistant.tokens", { count })}
         </span>
     );
 }
@@ -197,7 +213,7 @@ interface ISummaryCardProps {
     tokenBalance: number;
     tokenCost: number;
     isPending: boolean;
-    error: string | null;
+    errorKey: string | null;
     onGenerate: () => void;
     onInsert?: () => void;
 }
@@ -207,16 +223,19 @@ function SummaryCard({
     tokenBalance,
     tokenCost,
     isPending,
-    error,
+    errorKey,
     onGenerate,
     onInsert,
 }: ISummaryCardProps) {
+    const { t } = useTranslation("notes");
     const canAfford = tokenBalance >= tokenCost;
 
     return (
         <div className="bg-muted flex flex-col gap-3 rounded-xl p-4">
             <div className="flex items-center justify-between">
-                <span className="text-foreground text-sm font-bold">Summary</span>
+                <span className="text-foreground text-sm font-bold">
+                    {t("assistant.summary.title")}
+                </span>
                 <TokenBadge count={tokenCost} />
             </div>
             {summary !== null ? (
@@ -224,23 +243,25 @@ function SummaryCard({
                     <p className="text-muted-foreground text-sm leading-relaxed">
                         {summary}
                     </p>
-                    <CardAction onClick={onInsert}>Insert at top</CardAction>
+                    <CardAction onClick={onInsert}>
+                        {t("assistant.summary.insert")}
+                    </CardAction>
                 </>
             ) : (
                 <CardAction onClick={onGenerate} disabled={!canAfford || isPending}>
                     {isPending ? (
                         <span className="flex items-center justify-center gap-1.5">
                             <Spinner className="size-4" />
-                            Generating…
+                            {t("assistant.generating")}
                         </span>
                     ) : canAfford ? (
-                        "Generate Summary"
+                        t("assistant.summary.generate")
                     ) : (
-                        "Not enough tokens"
+                        t("assistant.notEnoughTokens")
                     )}
                 </CardAction>
             )}
-            {error && <p className="text-error text-xs">{error}</p>}
+            {errorKey && <p className="text-error text-xs">{t(errorKey)}</p>}
         </div>
     );
 }
@@ -250,7 +271,7 @@ interface ISuggestedTagsCardProps {
     tokenBalance: number;
     tokenCost: number;
     isPending: boolean;
-    error: string | null;
+    errorKey: string | null;
     onGenerate: () => void;
 }
 
@@ -259,9 +280,10 @@ function SuggestedTagsCard({
     tokenBalance,
     tokenCost,
     isPending,
-    error,
+    errorKey,
     onGenerate,
 }: ISuggestedTagsCardProps) {
+    const { t } = useTranslation("notes");
     const canAfford = tokenBalance >= tokenCost;
     const hasTags = note.aiTags.length > 0;
 
@@ -269,7 +291,7 @@ function SuggestedTagsCard({
         <div className="bg-muted flex flex-col gap-3 rounded-xl p-4">
             <div className="flex items-center justify-between">
                 <span className="text-foreground text-sm font-bold">
-                    Suggested Tags
+                    {t("assistant.tags.title")}
                 </span>
                 <TokenBadge count={tokenCost} />
             </div>
@@ -289,19 +311,21 @@ function SuggestedTagsCard({
                 {isPending ? (
                     <span className="flex items-center justify-center gap-1.5">
                         <Spinner className="size-4" />
-                        {hasTags ? "Regenerating…" : "Generating…"}
+                        {hasTags
+                            ? t("assistant.regenerating")
+                            : t("assistant.generating")}
                     </span>
                 ) : canAfford ? (
                     hasTags ? (
-                        "Regenerate Tags"
+                        t("assistant.tags.regenerate")
                     ) : (
-                        "Generate Tags"
+                        t("assistant.tags.generate")
                     )
                 ) : (
-                    "Not enough tokens"
+                    t("assistant.notEnoughTokens")
                 )}
             </CardAction>
-            {error && <p className="text-error text-xs">{error}</p>}
+            {errorKey && <p className="text-error text-xs">{t(errorKey)}</p>}
         </div>
     );
 }
@@ -311,7 +335,7 @@ interface IGenerateFlashcardsCardProps {
     tokenBalance: number;
     tokenCost: number;
     isPending: boolean;
-    error: string | null;
+    errorKey: string | null;
     onGenerate: () => void;
 }
 
@@ -320,11 +344,14 @@ function GenerateFlashcardsCard({
     tokenBalance,
     tokenCost,
     isPending,
-    error,
+    errorKey,
     onGenerate,
 }: IGenerateFlashcardsCardProps) {
+    const { t } = useTranslation("notes");
     const canAfford = tokenBalance >= tokenCost;
-    const label = hasFlashcards ? "Regenerate" : "Generate";
+    const label = hasFlashcards
+        ? t("assistant.flashcards.regenerate")
+        : t("assistant.flashcards.generate");
 
     return (
         <div
@@ -335,24 +362,24 @@ function GenerateFlashcardsCard({
                 <Layers className="text-foreground size-6" />
             </div>
             <span className="text-foreground text-sm font-bold">
-                Generate Flashcards
+                {t("assistant.flashcards.title")}
             </span>
             <p className="text-muted-foreground text-center text-sm">
-                Create study aids from this note.
+                {t("assistant.flashcards.description")}
             </p>
             <CardAction onClick={onGenerate} disabled={!canAfford || isPending}>
                 {isPending ? (
                     <span className="flex items-center justify-center gap-1.5">
                         <Spinner className="size-4" />
-                        Generating…
+                        {t("assistant.generating")}
                     </span>
                 ) : canAfford ? (
-                    `${label} (${tokenCost} tokens)`
+                    t("assistant.flashcards.withCost", { label, count: tokenCost })
                 ) : (
-                    "Not enough tokens"
+                    t("assistant.notEnoughTokens")
                 )}
             </CardAction>
-            {error && <p className="text-error text-xs">{error}</p>}
+            {errorKey && <p className="text-error text-xs">{t(errorKey)}</p>}
         </div>
     );
 }
@@ -364,6 +391,7 @@ interface IKnowledgeQACardProps {
 }
 
 function KnowledgeQACard({ tokenBalance, tokenCost, onOpen }: IKnowledgeQACardProps) {
+    const { t } = useTranslation("notes");
     const canAfford = tokenBalance >= tokenCost;
 
     return (
@@ -374,14 +402,16 @@ function KnowledgeQACard({ tokenBalance, tokenCost, onOpen }: IKnowledgeQACardPr
             <div className="bg-secondary rounded-full p-3">
                 <Brain className="text-foreground size-6" />
             </div>
-            <span className="text-foreground text-sm font-bold">Knowledge Q&A</span>
+            <span className="text-foreground text-sm font-bold">
+                {t("assistant.knowledgeQA.title")}
+            </span>
             <p className="text-muted-foreground text-center text-sm">
-                Ask questions and get answers sourced from all your notes.
+                {t("assistant.knowledgeQA.description")}
             </p>
             <CardAction onClick={onOpen} disabled={!canAfford}>
                 {canAfford
-                    ? `Ask a Question (${tokenCost} tokens)`
-                    : "Not enough tokens"}
+                    ? t("assistant.knowledgeQA.ask", { count: tokenCost })
+                    : t("assistant.notEnoughTokens")}
             </CardAction>
         </div>
     );

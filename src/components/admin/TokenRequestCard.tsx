@@ -1,4 +1,5 @@
 import { History } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -27,11 +28,12 @@ export function TokenRequestCard({
     onReject,
     isProcessing = false,
 }: TokenRequestCardProps) {
+    const { t } = useTranslation("admin");
     const displayName =
         request.userName ||
         request.userDisplayName ||
         request.userEmail ||
-        "Unknown User";
+        t("tokenRequests.card.unknownUser");
     const isPending = request.status === "pending";
     const isUrgent = Boolean(request.isUrgent) && isPending;
     const currentBalance = request.currentBalance ?? 0;
@@ -65,7 +67,7 @@ export function TokenRequestCard({
                 <div className="flex flex-col items-end gap-1">
                     {isUrgent && (
                         <Badge className="bg-error border-transparent text-white">
-                            Urgent!
+                            {t("tokenRequests.card.urgent")}
                         </Badge>
                     )}
                     <span className="text-muted-foreground text-xs whitespace-nowrap">
@@ -79,7 +81,7 @@ export function TokenRequestCard({
                 <div className="flex gap-3">
                     <div className="bg-muted flex-1 rounded-3xl p-3">
                         <p className="text-muted-foreground text-xs tracking-wider uppercase">
-                            Current
+                            {t("tokenRequests.card.current")}
                         </p>
                         <p
                             className={cn(
@@ -92,7 +94,7 @@ export function TokenRequestCard({
                     </div>
                     <div className="bg-primary text-primary-foreground flex-1 rounded-3xl p-3">
                         <p className="text-xs tracking-wider uppercase opacity-80">
-                            Requested
+                            {t("tokenRequests.card.requested")}
                         </p>
                         <p
                             className={cn(
@@ -108,7 +110,7 @@ export function TokenRequestCard({
                 {request.justification && (
                     <div className="space-y-1">
                         <p className="text-muted-foreground text-xs font-bold">
-                            Justification:
+                            {t("tokenRequests.card.justification")}
                         </p>
                         <p className="text-foreground text-sm">
                             &ldquo;{request.justification}&rdquo;
@@ -120,7 +122,9 @@ export function TokenRequestCard({
                     <div className="border-border flex items-center gap-2 border-t pt-3">
                         <History className="text-muted-foreground size-4" />
                         <span className="text-muted-foreground text-xs">
-                            Last grant: {formatTimeAgo(new Date(request.lastGrantAt))}
+                            {t("tokenRequests.card.lastGrant", {
+                                time: formatTimeAgo(new Date(request.lastGrantAt)),
+                            })}
                         </span>
                     </div>
                 )}
@@ -135,14 +139,14 @@ export function TokenRequestCard({
                             onClick={() => onReject(request)}
                             disabled={isProcessing}
                         >
-                            Reject
+                            {t("tokenRequests.card.reject")}
                         </Button>
                         <Button
                             className="bg-success hover:bg-success/90 border-none text-white"
                             onClick={() => onApprove(request)}
                             disabled={isProcessing}
                         >
-                            Approve
+                            {t("tokenRequests.card.approve")}
                         </Button>
                     </>
                 ) : (
@@ -152,7 +156,9 @@ export function TokenRequestCard({
                         }
                         className="capitalize"
                     >
-                        {request.status === "rejected" ? "Denied" : request.status}
+                        {request.status === "rejected"
+                            ? t("tokenRequests.card.denied")
+                            : t("tokenRequests.card.approved")}
                     </Badge>
                 )}
             </div>

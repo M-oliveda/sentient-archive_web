@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { NOTES_PER_PAGE } from "./constants";
 
@@ -28,6 +29,7 @@ export function NotesPagination({
     totalNotes,
     onPageChange,
 }: INotesPaginationProps) {
+    const { t } = useTranslation("notes");
     const totalPages = Math.ceil(totalNotes / NOTES_PER_PAGE);
     const start = (page - 1) * NOTES_PER_PAGE + 1;
     const end = Math.min(page * NOTES_PER_PAGE, totalNotes);
@@ -39,7 +41,7 @@ export function NotesPagination({
     return (
         <div className="flex shrink-0 flex-col items-center gap-3 pt-2">
             <p className="text-muted-foreground text-sm">
-                Showing {start}–{end} of {totalNotes} notes
+                {t("list.showing", { start, end, total: totalNotes })}
             </p>
             <div className="flex items-center gap-1">
                 <button
@@ -47,7 +49,7 @@ export function NotesPagination({
                     onClick={() => onPageChange(page - 1)}
                     disabled={page === 1}
                     className="text-muted-foreground hover:text-foreground rounded px-2 py-1 text-sm transition-colors disabled:opacity-40"
-                    aria-label="Previous page"
+                    aria-label={t("list.prevPage")}
                 >
                     ←
                 </button>
@@ -81,7 +83,7 @@ export function NotesPagination({
                     onClick={() => onPageChange(page + 1)}
                     disabled={page === totalPages}
                     className="text-muted-foreground hover:text-foreground rounded px-2 py-1 text-sm transition-colors disabled:opacity-40"
-                    aria-label="Next page"
+                    aria-label={t("list.nextPage")}
                 >
                     →
                 </button>

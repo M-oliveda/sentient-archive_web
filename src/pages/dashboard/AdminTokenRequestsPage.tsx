@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,14 +27,8 @@ const DEFAULT_LIMIT = 25;
 
 type StatusFilter = "all" | "pending" | "approved" | "rejected";
 
-const STATUS_TABS: Array<{ value: StatusFilter; label: string }> = [
-    { value: "pending", label: "Pending" },
-    { value: "approved", label: "Approved" },
-    { value: "rejected", label: "Denied" },
-    { value: "all", label: "All History" },
-];
-
 export function AdminTokenRequestsPage() {
+    const { t } = useTranslation("admin");
     const [queryParams, setQueryParams] = useState<TokenRequestsQueryParams>({
         limit: DEFAULT_LIMIT,
         offset: 0,
@@ -54,6 +49,13 @@ export function AdminTokenRequestsPage() {
     } = useTokenRequests(queryParams);
     const approveMutation = useApproveTokenRequest();
     const rejectMutation = useRejectTokenRequest();
+
+    const statusTabs: Array<{ value: StatusFilter; label: string }> = [
+        { value: "pending", label: t("tokenRequests.tabs.pending") },
+        { value: "approved", label: t("tokenRequests.tabs.approved") },
+        { value: "rejected", label: t("tokenRequests.tabs.denied") },
+        { value: "all", label: t("tokenRequests.tabs.allHistory") },
+    ];
 
     const handleStatusFilter = (status: StatusFilter) => {
         setQueryParams({
@@ -92,12 +94,14 @@ export function AdminTokenRequestsPage() {
                     notes: approveNotes || undefined,
                 },
             });
-            toast.success("Token request approved");
+            toast.success(t("tokenRequests.approveSuccess"));
             setIsApproveModalOpen(false);
             setSelectedRequest(null);
         } catch (error) {
             toast.error(
-                error instanceof Error ? error.message : "Failed to approve request",
+                error instanceof Error
+                    ? error.message
+                    : t("tokenRequests.approveError"),
             );
         }
     };
@@ -110,12 +114,12 @@ export function AdminTokenRequestsPage() {
                     reason: rejectReason || undefined,
                 },
             });
-            toast.success("Token request rejected");
+            toast.success(t("tokenRequests.rejectSuccess"));
             setIsRejectModalOpen(false);
             setSelectedRequest(null);
         } catch (error) {
             toast.error(
-                error instanceof Error ? error.message : "Failed to reject request",
+                error instanceof Error ? error.message : t("tokenRequests.rejectError"),
             );
         }
     };
@@ -123,7 +127,9 @@ export function AdminTokenRequestsPage() {
     if (isLoading && !requestsResponse) {
         return (
             <div className="flex items-center justify-center py-12">
-                <div className="text-muted-foreground">Loading token requests...</div>
+                <div className="text-muted-foreground">
+                    {t("tokenRequests.loading")}
+                </div>
             </div>
         );
     }
@@ -135,18 +141,19 @@ export function AdminTokenRequestsPage() {
     ).length;
     const hasMore = requests.length > 0 && requests.length < total;
     const isProcessing = approveMutation.isPending || rejectMutation.isPending;
+    const fromName = selectedRequest?.userName || selectedRequest?.userEmail || "";
 
     return (
         <section className="space-y-8">
             <div className="space-y-4">
                 <h1 className="text-foreground text-4xl font-bold tracking-tight">
-                    Token Requests
+                    {t("tokenRequests.title")}
                 </h1>
             </div>
 
             {/* Status tabs */}
             <div className="flex flex-wrap items-center gap-4 sm:gap-6">
-                {STATUS_TABS.map(({ value, label }) => {
+                {statusTabs.map(({ value, label }) => {
                     const isActive = queryParams.status === value;
                     return (
                         <button
@@ -161,9 +168,11 @@ export function AdminTokenRequestsPage() {
                             )}
                         >
                             <span>{label}</span>
-                            {label === "Pending" && urgentCount > 0 && (
+                            {value === "pending" && urgentCount > 0 && (
                                 <span className="text-error">
-                                    {urgentCount} Urgent (Low Balance)
+                                    {t("tokenRequests.urgentCount", {
+                                        count: urgentCount,
+                                    })}
                                 </span>
                             )}
                         </button>
@@ -177,11 +186,11 @@ export function AdminTokenRequestsPage() {
                     className="border-error/40 bg-error/5 text-error rounded-3xl border px-4 py-6 text-sm"
                     role="alert"
                 >
-                    Failed to load token requests. Please try again.
+                    {t("tokenRequests.loadError")}
                 </div>
             ) : requests.length === 0 ? (
                 <Alert>
-                    <AlertDescription>No token requests found.</AlertDescription>
+                    <AlertDescription>{t("tokenRequests.empty")}</AlertDescription>
                 </Alert>
             ) : (
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -205,7 +214,7 @@ export function AdminTokenRequestsPage() {
                         onClick={handleLoadMore}
                         disabled={isLoading}
                     >
-                        Load More
+                        {t("tokenRequests.loadMore")}
                         <RefreshCw className="size-4" />
                     </Button>
                 </div>
@@ -213,7 +222,10 @@ export function AdminTokenRequestsPage() {
 
             {requests.length > 0 && (
                 <div className="text-muted-foreground text-center text-sm">
-                    Showing {requests.length} of {total}
+                    {t("tokenRequests.showing", {
+                        count: requests.length,
+                        total,
+                    })}
                 </div>
             )}
 
@@ -221,17 +233,20 @@ export function AdminTokenRequestsPage() {
             <Dialog open={isApproveModalOpen} onOpenChange={setIsApproveModalOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Approve Token Request</DialogTitle>
+                        <DialogTitle>
+                            {t("tokenRequests.approveModal.title")}
+                        </DialogTitle>
                         <DialogDescription>
-                            From{" "}
-                            {selectedRequest?.userName || selectedRequest?.userEmail}
+                            {t("tokenRequests.approveModal.from", { name: fromName })}
                         </DialogDescription>
                     </DialogHeader>
 
                     {selectedRequest && (
                         <div className="space-y-4">
                             <div className="space-y-2">
-                                <Label className="text-sm font-medium">Amount</Label>
+                                <Label className="text-sm font-medium">
+                                    {t("tokenRequests.approveModal.amount")}
+                                </Label>
                                 <Input
                                     type="number"
                                     value={approveAmount}
@@ -240,17 +255,21 @@ export function AdminTokenRequestsPage() {
                                     min="1"
                                 />
                                 <p className="text-muted-foreground text-xs">
-                                    Original request: {selectedRequest.amount} tokens
+                                    {t("tokenRequests.approveModal.originalRequest", {
+                                        amount: selectedRequest.amount,
+                                    })}
                                 </p>
                             </div>
 
                             <div className="space-y-2">
                                 <Label htmlFor="notes" className="text-sm font-medium">
-                                    Notes (Optional)
+                                    {t("tokenRequests.approveModal.notes")}
                                 </Label>
                                 <Input
                                     id="notes"
-                                    placeholder="Approval notes..."
+                                    placeholder={t(
+                                        "tokenRequests.approveModal.notesPlaceholder",
+                                    )}
                                     value={approveNotes}
                                     onChange={(e) => setApproveNotes(e.target.value)}
                                     disabled={approveMutation.isPending}
@@ -263,15 +282,15 @@ export function AdminTokenRequestsPage() {
                                     onClick={() => setIsApproveModalOpen(false)}
                                     disabled={approveMutation.isPending}
                                 >
-                                    Cancel
+                                    {t("tokenRequests.approveModal.cancel")}
                                 </Button>
                                 <Button
                                     onClick={() => handleSubmitApprove(selectedRequest)}
                                     disabled={approveMutation.isPending}
                                 >
                                     {approveMutation.isPending
-                                        ? "Approving..."
-                                        : "Approve"}
+                                        ? t("tokenRequests.approveModal.approving")
+                                        : t("tokenRequests.approveModal.approve")}
                                 </Button>
                             </div>
                         </div>
@@ -283,10 +302,11 @@ export function AdminTokenRequestsPage() {
             <Dialog open={isRejectModalOpen} onOpenChange={setIsRejectModalOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Reject Token Request</DialogTitle>
+                        <DialogTitle>
+                            {t("tokenRequests.rejectModal.title")}
+                        </DialogTitle>
                         <DialogDescription>
-                            From{" "}
-                            {selectedRequest?.userName || selectedRequest?.userEmail}
+                            {t("tokenRequests.rejectModal.from", { name: fromName })}
                         </DialogDescription>
                     </DialogHeader>
 
@@ -294,11 +314,13 @@ export function AdminTokenRequestsPage() {
                         <div className="space-y-4">
                             <div className="space-y-2">
                                 <Label htmlFor="reason" className="text-sm font-medium">
-                                    Reason (Optional)
+                                    {t("tokenRequests.rejectModal.reason")}
                                 </Label>
                                 <Input
                                     id="reason"
-                                    placeholder="Rejection reason..."
+                                    placeholder={t(
+                                        "tokenRequests.rejectModal.reasonPlaceholder",
+                                    )}
                                     value={rejectReason}
                                     onChange={(e) => setRejectReason(e.target.value)}
                                     disabled={rejectMutation.isPending}
@@ -311,7 +333,7 @@ export function AdminTokenRequestsPage() {
                                     onClick={() => setIsRejectModalOpen(false)}
                                     disabled={rejectMutation.isPending}
                                 >
-                                    Cancel
+                                    {t("tokenRequests.rejectModal.cancel")}
                                 </Button>
                                 <Button
                                     variant="destructive"
@@ -319,8 +341,8 @@ export function AdminTokenRequestsPage() {
                                     disabled={rejectMutation.isPending}
                                 >
                                     {rejectMutation.isPending
-                                        ? "Rejecting..."
-                                        : "Reject"}
+                                        ? t("tokenRequests.rejectModal.rejecting")
+                                        : t("tokenRequests.rejectModal.reject")}
                                 </Button>
                             </div>
                         </div>

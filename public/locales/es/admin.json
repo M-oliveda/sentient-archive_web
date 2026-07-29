@@ -1,0 +1,257 @@
+{
+  "users": {
+    "title": "Gestión de usuarios",
+    "totalUsers": "{{formatted}} usuarios en total",
+    "totalUsersLoading": "— usuarios en total",
+    "showing": "Mostrando {{start}}-{{end}} de {{total}} usuarios",
+    "loadError": "No se pudieron cargar los usuarios. Inténtalo de nuevo.",
+    "loading": "Cargando usuarios...",
+    "empty": "No se encontraron usuarios.",
+    "prevPage": "Página anterior",
+    "nextPage": "Página siguiente",
+    "page": "Página {{page}}",
+    "deactivated": "Usuario desactivado",
+    "activated": "Usuario activado",
+    "statusUpdateError": "No se pudo actualizar el estado del usuario",
+    "adminRevoked": "Rol de administrador revocado",
+    "adminGranted": "Rol de administrador otorgado",
+    "roleUpdateError": "No se pudo actualizar el rol del usuario",
+    "updated": "Usuario actualizado correctamente",
+    "updateError": "No se pudo actualizar el usuario",
+    "filters": {
+      "search": "Buscar",
+      "searchPlaceholder": "Buscar por correo o nombre...",
+      "filtersLabel": "Filtros:",
+      "allRoles": "Todos los roles",
+      "admins": "Administradores",
+      "clients": "Clientes",
+      "allStatuses": "Todos los estados",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "clear": "Limpiar"
+    },
+    "table": {
+      "user": "Usuario",
+      "role": "Rol",
+      "tokenBalance": "Saldo de tokens",
+      "lastActive": "Última actividad",
+      "status": "Estado",
+      "actions": "Acciones",
+      "admin": "Admin",
+      "client": "Cliente",
+      "edit": "Editar",
+      "revokeAdmin": "Revocar admin",
+      "grantAdmin": "Otorgar admin",
+      "low": "Bajo",
+      "actionsFor": "Acciones para {{name}}",
+      "toggleActive": "Cambiar estado activo de {{name}}"
+    },
+    "edit": {
+      "title": "Editar usuario",
+      "description": "Actualizar detalles del usuario: {{email}}",
+      "role": "Rol",
+      "status": "Estado",
+      "tokenBalance": "Saldo de tokens",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "client": "cliente",
+      "admin": "admin",
+      "cancel": "Cancelar",
+      "save": "Guardar cambios",
+      "saving": "Guardando..."
+    }
+  },
+  "tokenRequests": {
+    "title": "Solicitudes de tokens",
+    "loading": "Cargando solicitudes de tokens...",
+    "loadError": "No se pudieron cargar las solicitudes de tokens. Inténtalo de nuevo.",
+    "empty": "No se encontraron solicitudes de tokens.",
+    "loadMore": "Cargar más",
+    "showing": "Mostrando {{count}} de {{total}}",
+    "tabs": {
+      "pending": "Pendientes",
+      "approved": "Aprobadas",
+      "denied": "Denegadas",
+      "allHistory": "Todo el historial"
+    },
+    "urgentCount": "{{count}} urgentes (saldo bajo)",
+    "approveSuccess": "Solicitud de tokens aprobada",
+    "approveError": "No se pudo aprobar la solicitud",
+    "rejectSuccess": "Solicitud de tokens rechazada",
+    "rejectError": "No se pudo rechazar la solicitud",
+    "approveModal": {
+      "title": "Aprobar solicitud de tokens",
+      "from": "De {{name}}",
+      "amount": "Cantidad",
+      "originalRequest": "Solicitud original: {{amount}} tokens",
+      "notes": "Notas (opcional)",
+      "notesPlaceholder": "Notas de aprobación...",
+      "cancel": "Cancelar",
+      "approve": "Aprobar",
+      "approving": "Aprobando..."
+    },
+    "rejectModal": {
+      "title": "Rechazar solicitud de tokens",
+      "from": "De {{name}}",
+      "reason": "Motivo (opcional)",
+      "reasonPlaceholder": "Motivo del rechazo...",
+      "cancel": "Cancelar",
+      "reject": "Rechazar",
+      "rejecting": "Rechazando..."
+    },
+    "card": {
+      "urgent": "¡Urgente!",
+      "current": "Actual",
+      "requested": "Solicitado",
+      "justification": "Justificación:",
+      "lastGrant": "Última concesión: {{time}}",
+      "approve": "Aprobar",
+      "reject": "Rechazar",
+      "denied": "Denegada",
+      "approved": "aprobada",
+      "unknownUser": "Usuario desconocido"
+    }
+  },
+  "activityLogs": {
+    "eyebrow": "Actividad del sistema",
+    "title": "Registros de actividad",
+    "subtitle": "Supervisa todas las actividades del sistema de todos los usuarios",
+    "tabs": {
+      "all": "Toda la actividad",
+      "ai": "Operaciones de IA",
+      "tokens": "Tokens",
+      "notes": "Notas",
+      "folders": "Carpetas"
+    },
+    "searchPlaceholder": "Buscar por correo, acción o descripción...",
+    "clear": "Limpiar",
+    "loading": "Cargando registros de actividad...",
+    "loadError": "No se pudieron cargar los registros de actividad. Inténtalo de nuevo.",
+    "empty": "No se encontraron registros de actividad. Prueba a ajustar los filtros.",
+    "showing": "Mostrando {{count}} de {{total}} actividades",
+    "loadMore": "Cargar más"
+  },
+  "analytics": {
+    "title": "Analíticas",
+    "subtitle": "Estadísticas de uso e información del sistema",
+    "loading": "Cargando analíticas...",
+    "loadError": "No se pudieron cargar las analíticas. Inténtalo de nuevo.",
+    "period": "Periodo:",
+    "ranges": {
+      "7d": "7 días",
+      "30d": "30 días",
+      "90d": "90 días"
+    },
+    "lastDays": {
+      "7d": "Últimos 7 días",
+      "30d": "Últimos 30 días",
+      "90d": "Últimos 90 días"
+    },
+    "cards": {
+      "totalUsers": "Usuarios totales",
+      "activeCount": "{{count}} activos",
+      "totalNotes": "Notas totales",
+      "notesCreated": "Creadas por usuarios",
+      "tokensSpent": "Tokens gastados",
+      "netBalance": "{{count}} saldo neto",
+      "aiOperations": "Operaciones de IA"
+    },
+    "aiBreakdown": {
+      "title": "Desglose de operaciones de IA",
+      "description": "Uso por tipo de operación",
+      "summarization": "Resumen",
+      "autoTagging": "Etiquetado automático",
+      "flashcards": "Tarjetas",
+      "qa": "Preguntas y respuestas"
+    },
+    "aiTrend": {
+      "title": "Tendencia de operaciones de IA",
+      "description": "Operaciones a lo largo del tiempo ({{range}})"
+    },
+    "tokenTrend": {
+      "title": "Tendencia de uso de tokens",
+      "description": "Concedidos vs gastados ({{range}})",
+      "granted": "Concedidos",
+      "spent": "Gastados"
+    },
+    "userGrowth": {
+      "title": "Crecimiento de usuarios",
+      "description": "Usuarios totales y nuevos ({{range}})",
+      "totalUsers": "Usuarios totales"
+    },
+    "distribution": {
+      "title": "Distribución de usuarios",
+      "description": "Recuento de usuarios por rol y estado",
+      "clients": "Clientes",
+      "admins": "Administradores",
+      "active": "Activos",
+      "inactive": "Inactivos"
+    }
+  },
+  "systemConfig": {
+    "title": "Configuración del sistema",
+    "subtitle": "Gestiona la configuración global, los modelos de IA y las funciones.",
+    "loading": "Cargando configuración del sistema...",
+    "save": "Guardar cambios",
+    "saving": "Guardando...",
+    "saveSuccess": "Configuración actualizada correctamente",
+    "saveError": "No se pudo actualizar la configuración",
+    "ai": {
+      "title": "Configuración de IA",
+      "model": "Modelo Gemini predeterminado",
+      "modelHint": "El modelo seleccionado se usará para todas las consultas de propósito general.",
+      "operationalLimits": "Límites operativos",
+      "maxTokens": "Máx. tokens / op.",
+      "maxOpsHour": "Máx. ops. / usuario / hora",
+      "fileExtractionsDay": "Extracciones de archivo / día",
+      "temperature": "Temperatura",
+      "temperatureHint": "Recomendado: 1.0 para Gemini 3+, 0.7 para modelos anteriores",
+      "thinkingLevel": "Nivel de razonamiento (Gemini 3+)",
+      "thinkingLevelHint": "Controla la profundidad de razonamiento en modelos Gemini 3+",
+      "thinkingMinimal": "Mínimo (menor latencia)",
+      "thinkingLow": "Bajo (respuestas rápidas)",
+      "thinkingMedium": "Medio (equilibrado)",
+      "thinkingHigh": "Alto (razonamiento profundo)",
+      "thinkingBudget": "Presupuesto de razonamiento (Gemini 2.5)",
+      "thinkingBudgetHint": "-1 = Dinámico, 0 = Desactivado, >0 = Número específico de tokens (solo Gemini 2.5)"
+    },
+    "tokens": {
+      "title": "Economía de tokens",
+      "featureCosts": "Costes de funciones (tokens)",
+      "autoTagging": "Etiquetado automático",
+      "autoTaggingHint": "por elemento",
+      "summarization": "Resumen",
+      "summarizationHint": "por 1k palabras",
+      "flashcards": "Tarjetas",
+      "flashcardsHint": "por conjunto",
+      "ragQuery": "Consulta P&R",
+      "ragQueryHint": "por consulta",
+      "newUserGrants": "Concesiones a nuevos usuarios",
+      "production": "Producción",
+      "staging": "Staging",
+      "development": "Desarrollo",
+      "local": "Local"
+    },
+    "features": {
+      "title": "Funciones",
+      "on": "ON",
+      "off": "OFF",
+      "summarization": "Resumen",
+      "summarizationDesc": "Permitir a los usuarios generar resúmenes de notas",
+      "autoTagging": "Etiquetado automático",
+      "autoTaggingDesc": "Permitir sugerencias automáticas de etiquetas",
+      "flashcards": "Tarjetas",
+      "flashcardsDesc": "Permitir la generación de tarjetas a partir de notas",
+      "ragQuery": "P&R / consulta RAG",
+      "ragQueryDesc": "Permitir preguntas sobre la base de conocimiento",
+      "fileExtraction": "Extracción de archivos",
+      "fileExtractionDesc": "Permitir extracción de contenido PDF/TXT/MD"
+    },
+    "meta": {
+      "lastModifiedBy": "Última modificación por",
+      "on": "el",
+      "lastUpdated": "Última actualización",
+      "version": "Versión {{version}}"
+    }
+  }
+}

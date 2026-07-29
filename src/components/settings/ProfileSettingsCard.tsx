@@ -1,5 +1,7 @@
+import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -8,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useUpdateProfile } from "@/hooks/useUpdateProfile";
 import {
-    profileSchema,
+    createProfileSchema,
     type ProfileFormValues,
 } from "@/components/settings/profileSchema";
 
@@ -34,14 +36,16 @@ export function ProfileSettingsCard({
     email,
     photoURL,
 }: IProfileSettingsCardProps) {
+    const { t } = useTranslation("settings");
     const updateProfile = useUpdateProfile();
+    const schema = useMemo(() => createProfileSchema(), []);
 
     const {
         register,
         handleSubmit,
         formState: { errors, isDirty, isSubmitting },
     } = useForm<ProfileFormValues>({
-        resolver: zodResolver(profileSchema),
+        resolver: zodResolver(schema),
         defaultValues: {
             displayName: displayName ?? "",
         },
@@ -52,10 +56,10 @@ export function ProfileSettingsCard({
             await updateProfile.mutateAsync({
                 displayName: values.displayName,
             });
-            toast.success("Profile updated");
+            toast.success(t("card.updateSuccess"));
         } catch (error) {
             const message =
-                error instanceof Error ? error.message : "Failed to update profile";
+                error instanceof Error ? error.message : t("card.updateError");
             toast.error(message);
         }
     }
@@ -84,7 +88,7 @@ export function ProfileSettingsCard({
                     </Avatar>
 
                     <div className="flex w-full flex-col gap-2">
-                        <Label htmlFor="displayName">Full Name</Label>
+                        <Label htmlFor="displayName">{t("card.fullName")}</Label>
                         <Input
                             id="displayName"
                             type="text"
@@ -103,7 +107,7 @@ export function ProfileSettingsCard({
                     </div>
 
                     <div className="flex w-full flex-col gap-2">
-                        <Label htmlFor="username">Username</Label>
+                        <Label htmlFor="username">{t("card.username")}</Label>
                         <Input
                             id="username"
                             type="text"
@@ -119,7 +123,7 @@ export function ProfileSettingsCard({
                         disabled={!isDirty || isSaving}
                         data-testid="profile-save-button"
                     >
-                        {isSaving ? "Saving..." : "Save Changes"}
+                        {isSaving ? t("card.saving") : t("card.save")}
                     </Button>
                 </form>
             </CardContent>

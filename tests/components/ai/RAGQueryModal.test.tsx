@@ -77,12 +77,12 @@ beforeEach(() => {
 describe("RAGQueryModal rendering", () => {
     it("renders the modal title", () => {
         renderModal();
-        expect(screen.getByText("Knowledge Q&A")).toBeInTheDocument();
+        expect(screen.getByText("rag.title")).toBeInTheDocument();
     });
 
     it("renders the description text", () => {
         renderModal();
-        expect(screen.getByText(/search across all your notes/i)).toBeInTheDocument();
+        expect(screen.getByText("rag.description")).toBeInTheDocument();
     });
 
     it("renders the question textarea", () => {
@@ -92,16 +92,14 @@ describe("RAGQueryModal rendering", () => {
 
     it("renders the Ask button with token cost when balance is sufficient", () => {
         renderModal();
-        expect(
-            screen.getByRole("button", { name: /ask \(10 tokens\)/i }),
-        ).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: /rag\.ask/i })).toBeInTheDocument();
     });
 
-    it("renders 'Not enough tokens' when balance is below 4", () => {
+    it("renders Not enough tokens when balance is below cost", () => {
         setupMocks({ tokenBalance: 3 });
         renderModal();
         const btn = screen.getByTestId("ask-button");
-        expect(btn).toHaveTextContent(/not enough tokens/i);
+        expect(btn).toHaveTextContent("rag.notEnoughTokens");
         expect(btn).toBeDisabled();
     });
 
@@ -111,7 +109,7 @@ describe("RAGQueryModal rendering", () => {
         });
         renderModal();
         const btn = screen.getByTestId("ask-button");
-        expect(btn).toHaveTextContent(/not enough tokens/i);
+        expect(btn).toHaveTextContent("rag.notEnoughTokens");
         expect(btn).toBeDisabled();
     });
 
@@ -121,7 +119,7 @@ describe("RAGQueryModal rendering", () => {
         });
         renderModal();
         const btn = screen.getByTestId("ask-button");
-        expect(btn).toHaveTextContent(/not enough tokens/i);
+        expect(btn).toHaveTextContent("rag.notEnoughTokens");
         expect(btn).toBeDisabled();
     });
 });
@@ -221,6 +219,7 @@ describe("RAGQueryModal interaction", () => {
         expect(screen.getByTestId("answer-content")).toHaveTextContent(
             "React is a UI library.",
         );
+        expect(screen.getByText("rag.answer")).toBeInTheDocument();
     });
 
     it("clears the answer when the user types a new question", () => {
@@ -250,11 +249,11 @@ describe("RAGQueryModal interaction", () => {
 // ── Loading state ─────────────────────────────────────────────────────────────
 
 describe("RAGQueryModal loading state", () => {
-    it("shows 'Searching your notes…' and disables the button while pending", () => {
+    it("shows searching state and disables the button while pending", () => {
         setupMocks({ ragQueryPending: true });
         renderModal();
         const btn = screen.getByTestId("ask-button");
-        expect(btn).toHaveTextContent(/searching your notes/i);
+        expect(btn).toHaveTextContent("rag.searching");
         expect(btn).toBeDisabled();
     });
 
@@ -274,7 +273,7 @@ describe("RAGQueryModal error state", () => {
         });
         renderModal();
         expect(screen.getByTestId("error-message")).toHaveTextContent(
-            "AI service is temporarily unavailable. Please try again later.",
+            "rag.errors.unavailable",
         );
     });
 
@@ -282,7 +281,7 @@ describe("RAGQueryModal error state", () => {
         setupMocks({ ragQueryError: "Unknown server error" });
         renderModal();
         expect(screen.getByTestId("error-message")).toHaveTextContent(
-            "Something went wrong. Please try again.",
+            "rag.errors.generic",
         );
     });
 

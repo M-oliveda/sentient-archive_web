@@ -1,2 +1,6 @@
 export { ProfileSettingsCard } from "./ProfileSettingsCard";
-export { profileSchema, type ProfileFormValues } from "./profileSchema";
+export {
+    createProfileSchema,
+    profileSchema,
+    type ProfileFormValues,
+} from "./profileSchema";

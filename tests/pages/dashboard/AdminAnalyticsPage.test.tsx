@@ -146,30 +146,30 @@ describe("AdminAnalyticsPage", () => {
     it("renders page title", () => {
         render(<AdminAnalyticsPage />, { wrapper: createWrapper() });
 
-        expect(screen.getByText("Analytics")).toBeInTheDocument();
+        expect(screen.getByText("analytics.title")).toBeInTheDocument();
     });
 
     it("displays period selector", () => {
         render(<AdminAnalyticsPage />, { wrapper: createWrapper() });
 
-        expect(screen.getByText("Period:")).toBeInTheDocument();
-        expect(screen.getByText("7 days")).toBeInTheDocument();
-        expect(screen.getByText("30 days")).toBeInTheDocument();
-        expect(screen.getByText("90 days")).toBeInTheDocument();
+        expect(screen.getByText("analytics.period")).toBeInTheDocument();
+        expect(screen.getByText("analytics.ranges.7d")).toBeInTheDocument();
+        expect(screen.getByText("analytics.ranges.30d")).toBeInTheDocument();
+        expect(screen.getByText("analytics.ranges.90d")).toBeInTheDocument();
     });
 
     it("displays AI Operations Breakdown section", () => {
         render(<AdminAnalyticsPage />, { wrapper: createWrapper() });
 
-        expect(screen.getByText(/AI Operations Breakdown/)).toBeInTheDocument();
+        expect(screen.getByText("analytics.aiBreakdown.title")).toBeInTheDocument();
     });
 
     it("displays User Distribution section", () => {
         render(<AdminAnalyticsPage />, { wrapper: createWrapper() });
 
-        expect(screen.getByText(/User Distribution/)).toBeInTheDocument();
-        expect(screen.getByText("Clients")).toBeInTheDocument();
-        expect(screen.getByText("Admins")).toBeInTheDocument();
+        expect(screen.getByText("analytics.distribution.title")).toBeInTheDocument();
+        expect(screen.getByText("analytics.distribution.clients")).toBeInTheDocument();
+        expect(screen.getByText("analytics.distribution.admins")).toBeInTheDocument();
     });
 
     it("shows loading state", () => {
@@ -186,7 +186,7 @@ describe("AdminAnalyticsPage", () => {
 
         render(<AdminAnalyticsPage />, { wrapper: createWrapper() });
 
-        expect(screen.getByText("Loading analytics...")).toBeInTheDocument();
+        expect(screen.getByText("analytics.loading")).toBeInTheDocument();
     });
 
     it("shows error state when analytics fail to load", () => {
@@ -203,29 +203,27 @@ describe("AdminAnalyticsPage", () => {
 
         render(<AdminAnalyticsPage />, { wrapper: createWrapper() });
 
-        expect(
-            screen.getByText("Failed to load analytics. Please try again."),
-        ).toBeInTheDocument();
+        expect(screen.getByText("analytics.loadError")).toBeInTheDocument();
     });
 
     it("updates date range text when period badges are clicked", async () => {
         render(<AdminAnalyticsPage />, { wrapper: createWrapper() });
 
-        expect(screen.getByText("Last 30 days")).toBeInTheDocument();
+        expect(screen.getByText("analytics.lastDays.30d")).toBeInTheDocument();
 
-        await userEvent.click(screen.getByText("7 days"));
+        await userEvent.click(screen.getByText("analytics.ranges.7d"));
         await waitFor(() => {
-            expect(screen.getByText("Last 7 days")).toBeInTheDocument();
+            expect(screen.getByText("analytics.lastDays.7d")).toBeInTheDocument();
         });
 
-        await userEvent.click(screen.getByText("90 days"));
+        await userEvent.click(screen.getByText("analytics.ranges.90d"));
         await waitFor(() => {
-            expect(screen.getByText("Last 90 days")).toBeInTheDocument();
+            expect(screen.getByText("analytics.lastDays.90d")).toBeInTheDocument();
         });
 
-        await userEvent.click(screen.getByText("30 days"));
+        await userEvent.click(screen.getByText("analytics.ranges.30d"));
         await waitFor(() => {
-            expect(screen.getByText("Last 30 days")).toBeInTheDocument();
+            expect(screen.getByText("analytics.lastDays.30d")).toBeInTheDocument();
         });
     });
 
@@ -239,7 +237,7 @@ describe("AdminAnalyticsPage", () => {
 
         expect(mockUseAdminAnalytics).toHaveBeenCalledWith("30d");
 
-        await userEvent.click(screen.getByText("7 days"));
+        await userEvent.click(screen.getByText("analytics.ranges.7d"));
         await waitFor(() => {
             expect(mockUseAdminAnalytics).toHaveBeenCalledWith("7d");
         });
@@ -249,10 +247,10 @@ describe("AdminAnalyticsPage", () => {
         render(<AdminAnalyticsPage />, { wrapper: createWrapper() });
 
         expect(screen.getByText("100")).toBeInTheDocument();
-        expect(screen.getByText("80 active")).toBeInTheDocument();
+        expect(screen.getByText("analytics.cards.activeCount")).toBeInTheDocument();
         expect(screen.getByText("500")).toBeInTheDocument();
         expect(screen.getByText("1000")).toBeInTheDocument();
-        expect(screen.getByText("2500 net balance")).toBeInTheDocument();
+        expect(screen.getByText("analytics.cards.netBalance")).toBeInTheDocument();
         expect(screen.getByText("200")).toBeInTheDocument();
         expect(screen.getByText("95")).toBeInTheDocument();
         expect(screen.getByText("5")).toBeInTheDocument();
@@ -273,7 +271,7 @@ describe("AdminAnalyticsPage", () => {
         render(<AdminAnalyticsPage />, { wrapper: createWrapper() });
 
         expect(screen.getAllByText("0").length).toBeGreaterThan(0);
-        expect(screen.getByText("Last 30 days")).toBeInTheDocument();
+        expect(screen.getByText("analytics.lastDays.30d")).toBeInTheDocument();
     });
 
     it("renders chart with zero AI operations without errors", () => {
@@ -302,15 +300,15 @@ describe("AdminAnalyticsPage", () => {
         render(<AdminAnalyticsPage />, { wrapper: createWrapper() });
 
         // With Recharts BarChart, the section still renders
-        expect(screen.getByText("AI Operations Breakdown")).toBeInTheDocument();
+        expect(screen.getByText("analytics.aiBreakdown.title")).toBeInTheDocument();
     });
 
     it("renders trend charts and invokes axis/tooltip formatters", () => {
         render(<AdminAnalyticsPage />, { wrapper: createWrapper() });
 
-        expect(screen.getByText("AI Operations Trend")).toBeInTheDocument();
-        expect(screen.getByText("Token Usage Trend")).toBeInTheDocument();
-        expect(screen.getByText("User Growth")).toBeInTheDocument();
+        expect(screen.getByText("analytics.aiTrend.title")).toBeInTheDocument();
+        expect(screen.getByText("analytics.tokenTrend.title")).toBeInTheDocument();
+        expect(screen.getByText("analytics.userGrowth.title")).toBeInTheDocument();
         expect(screen.getAllByTestId("line-chart").length).toBeGreaterThan(0);
         expect(screen.getByTestId("area-chart")).toBeInTheDocument();
     });
@@ -330,8 +328,12 @@ describe("AdminAnalyticsPage", () => {
 
         render(<AdminAnalyticsPage />, { wrapper: createWrapper() });
 
-        expect(screen.queryByText("AI Operations Trend")).not.toBeInTheDocument();
-        expect(screen.queryByText("Token Usage Trend")).not.toBeInTheDocument();
-        expect(screen.queryByText("User Growth")).not.toBeInTheDocument();
+        expect(screen.queryByText("analytics.aiTrend.title")).not.toBeInTheDocument();
+        expect(
+            screen.queryByText("analytics.tokenTrend.title"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByText("analytics.userGrowth.title"),
+        ).not.toBeInTheDocument();
     });
 });

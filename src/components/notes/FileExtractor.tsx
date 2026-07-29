@@ -2,6 +2,7 @@ import { useRef, useEffect, useState } from "react";
 import { Upload } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { useExtractFile } from "@/hooks/useExtractFile";
 import { useClientConfig } from "@/hooks/useClientConfig";
@@ -10,7 +11,6 @@ import { cn } from "@/lib/utils";
 const ALLOWED_TYPES = ["application/pdf", "text/plain", "text/markdown"];
 const ALLOWED_EXTENSIONS = [".pdf", ".txt", ".md"];
 const MAX_SIZE_BYTES = 10 * 1024 * 1024;
-const STAGES = ["Uploading…", "Parsing content…", "Creating note…"];
 const STAGE_INTERVAL_MS = 1200;
 
 interface IFileExtractorProps {
@@ -19,11 +19,18 @@ interface IFileExtractorProps {
 }
 
 export function FileExtractor({ onNoteCreated, className }: IFileExtractorProps) {
+    const { t } = useTranslation("notes");
     const inputRef = useRef<HTMLInputElement>(null);
     const extractFile = useExtractFile();
     const { features } = useClientConfig();
     const isPending = extractFile.isPending;
     const [stageIndex, setStageIndex] = useState(0);
+
+    const STAGES = [
+        t("extractor.stages.uploading"),
+        t("extractor.stages.parsing"),
+        t("extractor.stages.creating"),
+    ];
 
     useEffect(() => {
         if (!isPending) {
@@ -34,7 +41,7 @@ export function FileExtractor({ onNoteCreated, className }: IFileExtractorProps)
             setStageIndex((i) => (i + 1) % STAGES.length);
         }, STAGE_INTERVAL_MS);
         return () => clearInterval(id);
-    }, [isPending]);
+    }, [isPending, STAGES.length]);
 
     if (!features.fileExtractionEnabled) {
         return null;
@@ -43,10 +50,10 @@ export function FileExtractor({ onNoteCreated, className }: IFileExtractorProps)
     const validate = (file: File): string | null => {
         const ext = file.name.substring(file.name.lastIndexOf(".")).toLowerCase();
         if (!ALLOWED_TYPES.includes(file.type) && !ALLOWED_EXTENSIONS.includes(ext)) {
-            return "Only PDF, TXT, and MD files are supported.";
+            return t("extractor.errors.unsupportedType");
         }
         if (file.size > MAX_SIZE_BYTES) {
-            return "File must be smaller than 10 MB.";
+            return t("extractor.errors.tooLarge");
         }
         return null;
     };
@@ -63,7 +70,9 @@ export function FileExtractor({ onNoteCreated, className }: IFileExtractorProps)
         }
 
         const result = await extractFile.mutateAsync(file);
-        toast.success(`"${result.data.title}" created from ${file.name}`);
+        toast.success(
+            t("extractor.success", { title: result.data.title, filename: file.name }),
+        );
         onNoteCreated(result.data.noteId);
         e.target.value = "";
     };
@@ -110,7 +119,7 @@ export function FileExtractor({ onNoteCreated, className }: IFileExtractorProps)
                 ) : (
                     <>
                         <Upload className="size-4" />
-                        Upload Document
+                        {t("extractor.button")}
                     </>
                 )}
             </Button>

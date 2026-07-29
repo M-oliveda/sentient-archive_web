@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 import { useState, useCallback, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 interface UserFiltersBarProps {
     onSearchChange: (search: string) => void;
@@ -19,6 +20,7 @@ export function UserFiltersBar({
     onReset,
     isLoading = false,
 }: UserFiltersBarProps) {
+    const { t } = useTranslation("admin");
     const [search, setSearch] = useState("");
     const [role, setRole] = useState<"all" | "client" | "admin">("all");
     const [status, setStatus] = useState<"all" | "active" | "inactive">("all");
@@ -56,15 +58,27 @@ export function UserFiltersBar({
 
     const hasActiveFilters = search || role !== "all" || status !== "all";
 
+    const roleLabels: Record<"all" | "client" | "admin", string> = {
+        all: t("users.filters.allRoles"),
+        admin: t("users.filters.admins"),
+        client: t("users.filters.clients"),
+    };
+
+    const statusLabels: Record<"all" | "active" | "inactive", string> = {
+        all: t("users.filters.allStatuses"),
+        active: t("users.filters.active"),
+        inactive: t("users.filters.inactive"),
+    };
+
     return (
         <div className="space-y-4">
             <div className="flex flex-col gap-4 sm:flex-row">
                 <div className="min-w-0 flex-1">
                     <label className="text-foreground mb-2 block text-sm font-medium">
-                        Search
+                        {t("users.filters.search")}
                     </label>
                     <Input
-                        placeholder="Search by email or name..."
+                        placeholder={t("users.filters.searchPlaceholder")}
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         disabled={isLoading}
@@ -75,7 +89,7 @@ export function UserFiltersBar({
 
             <div className="flex flex-wrap gap-2">
                 <div className="text-foreground flex items-center text-sm font-medium">
-                    Filters:
+                    {t("users.filters.filtersLabel")}
                 </div>
 
                 {/* Role filter */}
@@ -87,11 +101,7 @@ export function UserFiltersBar({
                             className="cursor-pointer px-3 py-1 text-xs font-medium"
                             onClick={() => handleRoleChange(r)}
                         >
-                            {r === "all"
-                                ? "All Roles"
-                                : r === "admin"
-                                  ? "Admins"
-                                  : "Clients"}
+                            {roleLabels[r]}
                         </Badge>
                     ))}
                 </div>
@@ -105,11 +115,7 @@ export function UserFiltersBar({
                             className="cursor-pointer px-3 py-1 text-xs font-medium"
                             onClick={() => handleStatusChange(s)}
                         >
-                            {s === "all"
-                                ? "All Statuses"
-                                : s === "active"
-                                  ? "Active"
-                                  : "Inactive"}
+                            {statusLabels[s]}
                         </Badge>
                     ))}
                 </div>
@@ -123,7 +129,7 @@ export function UserFiltersBar({
                         className="ml-auto h-8 gap-2 px-2 text-xs"
                     >
                         <X className="h-3 w-3" />
-                        Clear
+                        {t("users.filters.clear")}
                     </Button>
                 )}
             </div>

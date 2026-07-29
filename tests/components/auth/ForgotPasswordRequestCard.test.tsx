@@ -12,17 +12,17 @@ describe("ForgotPasswordRequestCard", () => {
         const mockOnSubmit = jest.fn();
         render(<ForgotPasswordRequestCard onSubmit={mockOnSubmit} isLoading={false} />);
 
-        expect(screen.getByText("Reset Your Password")).toBeInTheDocument();
+        expect(screen.getByText("forgotPassword.requestTitle")).toBeInTheDocument();
         expect(
-            screen.getByText(/Enter your email address and we'll send you a link/),
+            screen.getByText("forgotPassword.requestDescription"),
         ).toBeInTheDocument();
-        expect(screen.getByLabelText("Email address")).toBeInTheDocument();
+        expect(screen.getByLabelText("forgotPassword.emailLabel")).toBeInTheDocument();
         expect(
-            screen.getByRole("button", { name: "Send Reset Link" }),
+            screen.getByRole("button", { name: "forgotPassword.submitButton" }),
         ).toBeInTheDocument();
-        expect(screen.getByText("Remember your password?")).toBeInTheDocument();
-        expect(screen.getByText("Sign in")).toBeInTheDocument();
-        expect(screen.getByText("SentientArchive")).toBeInTheDocument();
+        expect(screen.getByText("forgotPassword.rememberPassword")).toBeInTheDocument();
+        expect(screen.getByText("forgotPassword.signInLink")).toBeInTheDocument();
+        expect(screen.getByText("shared.appName")).toBeInTheDocument();
     });
 
     test("validates empty email", async () => {
@@ -30,7 +30,7 @@ describe("ForgotPasswordRequestCard", () => {
         render(<ForgotPasswordRequestCard onSubmit={mockOnSubmit} isLoading={false} />);
 
         const submitButton = screen.getByRole("button", {
-            name: "Send Reset Link",
+            name: "forgotPassword.submitButton",
         });
 
         // Button should be disabled when email is empty
@@ -43,11 +43,13 @@ describe("ForgotPasswordRequestCard", () => {
         render(<ForgotPasswordRequestCard onSubmit={mockOnSubmit} isLoading={false} />);
 
         const form = screen
-            .getByRole("button", { name: "Send Reset Link" })
+            .getByRole("button", { name: "forgotPassword.submitButton" })
             .closest("form");
         fireEvent.submit(form!);
 
-        expect(screen.getByText("Please enter your email address")).toBeInTheDocument();
+        expect(
+            screen.getByText("forgotPassword.validation.emailRequired"),
+        ).toBeInTheDocument();
         expect(mockOnSubmit).not.toHaveBeenCalled();
     });
 
@@ -55,11 +57,11 @@ describe("ForgotPasswordRequestCard", () => {
         const mockOnSubmit = jest.fn().mockResolvedValue(undefined);
         render(<ForgotPasswordRequestCard onSubmit={mockOnSubmit} isLoading={false} />);
 
-        const emailInput = screen.getByLabelText("Email address");
+        const emailInput = screen.getByLabelText("forgotPassword.emailLabel");
         fireEvent.change(emailInput, { target: { value: "invalidemail" } });
 
         const submitButton = screen.getByRole("button", {
-            name: "Send Reset Link",
+            name: "forgotPassword.submitButton",
         });
 
         // Button should be enabled now since email is not empty
@@ -69,7 +71,7 @@ describe("ForgotPasswordRequestCard", () => {
 
         await waitFor(() => {
             expect(
-                screen.getByText("Please enter a valid email address"),
+                screen.getByText("forgotPassword.validation.emailInvalid"),
             ).toBeInTheDocument();
         });
 
@@ -80,11 +82,11 @@ describe("ForgotPasswordRequestCard", () => {
         const mockOnSubmit = jest.fn().mockResolvedValue(undefined);
         render(<ForgotPasswordRequestCard onSubmit={mockOnSubmit} isLoading={false} />);
 
-        const emailInput = screen.getByLabelText("Email address");
+        const emailInput = screen.getByLabelText("forgotPassword.emailLabel");
         fireEvent.change(emailInput, { target: { value: "test@example.com" } });
 
         const submitButton = screen.getByRole("button", {
-            name: "Send Reset Link",
+            name: "forgotPassword.submitButton",
         });
         fireEvent.click(submitButton);
 
@@ -97,11 +99,11 @@ describe("ForgotPasswordRequestCard", () => {
         const mockOnSubmit = jest.fn().mockRejectedValue(new Error("Network error"));
         render(<ForgotPasswordRequestCard onSubmit={mockOnSubmit} isLoading={false} />);
 
-        const emailInput = screen.getByLabelText("Email address");
+        const emailInput = screen.getByLabelText("forgotPassword.emailLabel");
         fireEvent.change(emailInput, { target: { value: "test@example.com" } });
 
         const submitButton = screen.getByRole("button", {
-            name: "Send Reset Link",
+            name: "forgotPassword.submitButton",
         });
         fireEvent.click(submitButton);
 
@@ -114,14 +116,16 @@ describe("ForgotPasswordRequestCard", () => {
         const mockOnSubmit = jest.fn().mockRejectedValue("Network error");
         render(<ForgotPasswordRequestCard onSubmit={mockOnSubmit} isLoading={false} />);
 
-        const emailInput = screen.getByLabelText("Email address");
+        const emailInput = screen.getByLabelText("forgotPassword.emailLabel");
         fireEvent.change(emailInput, { target: { value: "test@example.com" } });
 
-        fireEvent.click(screen.getByRole("button", { name: "Send Reset Link" }));
+        fireEvent.click(
+            screen.getByRole("button", { name: "forgotPassword.submitButton" }),
+        );
 
         await waitFor(() => {
             expect(
-                screen.getByText("Failed to send reset link. Please try again."),
+                screen.getByText("forgotPassword.validation.sendFailed"),
             ).toBeInTheDocument();
         });
     });
@@ -130,8 +134,10 @@ describe("ForgotPasswordRequestCard", () => {
         const mockOnSubmit = jest.fn();
         render(<ForgotPasswordRequestCard onSubmit={mockOnSubmit} isLoading={true} />);
 
-        const emailInput = screen.getByLabelText("Email address");
-        const submitButton = screen.getByRole("button", { name: "Sending..." });
+        const emailInput = screen.getByLabelText("forgotPassword.emailLabel");
+        const submitButton = screen.getByRole("button", {
+            name: "forgotPassword.submittingButton",
+        });
 
         expect(emailInput).toBeDisabled();
         expect(submitButton).toBeDisabled();
@@ -142,17 +148,17 @@ describe("ForgotPasswordRequestCard", () => {
         render(<ForgotPasswordRequestCard onSubmit={mockOnSubmit} isLoading={false} />);
 
         // First, enter an invalid email and submit
-        const emailInput = screen.getByLabelText("Email address");
+        const emailInput = screen.getByLabelText("forgotPassword.emailLabel");
         fireEvent.change(emailInput, { target: { value: "invalidemail" } });
 
         const submitButton = screen.getByRole("button", {
-            name: "Send Reset Link",
+            name: "forgotPassword.submitButton",
         });
         fireEvent.click(submitButton);
 
         await waitFor(() => {
             expect(
-                screen.getByText("Please enter a valid email address"),
+                screen.getByText("forgotPassword.validation.emailInvalid"),
             ).toBeInTheDocument();
         });
 
@@ -161,7 +167,7 @@ describe("ForgotPasswordRequestCard", () => {
 
         await waitFor(() => {
             expect(
-                screen.queryByText("Please enter a valid email address"),
+                screen.queryByText("forgotPassword.validation.emailInvalid"),
             ).not.toBeInTheDocument();
         });
     });
@@ -171,7 +177,7 @@ describe("ForgotPasswordRequestCard", () => {
         render(<ForgotPasswordRequestCard onSubmit={mockOnSubmit} isLoading={false} />);
 
         const submitButton = screen.getByRole("button", {
-            name: "Send Reset Link",
+            name: "forgotPassword.submitButton",
         });
         expect(submitButton).toBeDisabled();
     });

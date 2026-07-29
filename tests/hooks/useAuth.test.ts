@@ -4,6 +4,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { useAuth } from "@/hooks/useAuth";
 import { useAuthStore } from "@/stores/authStore";
 import { authService } from "@/lib/auth-service";
+import i18n from "@/lib/i18n";
 
 jest.mock("firebase/auth");
 jest.mock("firebase/firestore");
@@ -14,6 +15,13 @@ jest.mock("@/lib/firebase", () => ({
 jest.mock("@/lib/auth-service", () => ({
     authService: {
         createUserDocument: jest.fn().mockResolvedValue(undefined),
+    },
+}));
+jest.mock("@/lib/i18n", () => ({
+    __esModule: true,
+    default: {
+        language: "en",
+        changeLanguage: jest.fn().mockResolvedValue(undefined),
     },
 }));
 
@@ -267,5 +275,90 @@ describe("useAuth", () => {
         });
 
         consoleErrorSpy.mockRestore();
+    });
+
+    it("should sync i18n language from user preferences when different", async () => {
+        const mockFirebaseUser = {
+            uid: "test-uid",
+            email: "test@example.com",
+            displayName: "Test User",
+            photoURL: null,
+        };
+
+        let authCallback: ((user: unknown) => void) | undefined;
+
+        (onAuthStateChanged as jest.Mock).mockImplementation((_auth, callback) => {
+            authCallback = callback;
+            return jest.fn();
+        });
+
+        (getDoc as jest.Mock).mockResolvedValue({
+            data: () => ({
+                role: "client",
+                isActive: true,
+                tokenBalance: 20,
+                preferences: {
+                    language: "es",
+                    theme: "light",
+                    notificationsEnabled: true,
+                },
+            }),
+        });
+
+        (doc as jest.Mock).mockReturnValue({});
+
+        renderHook(() => useAuth());
+
+        await act(async () => {
+            authCallback?.(mockFirebaseUser);
+        });
+
+        await waitFor(() => {
+            expect(i18n.changeLanguage).toHaveBeenCalledWith("es");
+            expect(useAuthStore.getState().user?.preferences?.language).toBe("es");
+        });
+    });
+
+    it("should not change i18n language when preference matches current language", async () => {
+        const mockFirebaseUser = {
+            uid: "test-uid",
+            email: "test@example.com",
+            displayName: "Test User",
+            photoURL: null,
+        };
+
+        let authCallback: ((user: unknown) => void) | undefined;
+
+        (onAuthStateChanged as jest.Mock).mockImplementation((_auth, callback) => {
+            authCallback = callback;
+            return jest.fn();
+        });
+
+        (getDoc as jest.Mock).mockResolvedValue({
+            data: () => ({
+                role: "client",
+                isActive: true,
+                tokenBalance: 20,
+                preferences: {
+                    language: "en",
+                    theme: "light",
+                    notificationsEnabled: true,
+                },
+            }),
+        });
+
+        (doc as jest.Mock).mockReturnValue({});
+
+        renderHook(() => useAuth());
+
+        await act(async () => {
+            authCallback?.(mockFirebaseUser);
+        });
+
+        await waitFor(() => {
+            expect(useAuthStore.getState().user).toBeTruthy();
+        });
+
+        expect(i18n.changeLanguage).not.toHaveBeenCalled();
     });
 });
