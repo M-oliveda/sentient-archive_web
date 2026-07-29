@@ -1,0 +1,21 @@
+{
+  "page": {
+    "eyebrow": "Account",
+    "title": "Settings",
+    "subtitle": "Manage your account settings, preferences, and billing."
+  },
+  "profile": "Profile",
+  "preferences": "Preferences",
+  "card": {
+    "fullName": "Full Name",
+    "username": "Username",
+    "save": "Save Changes",
+    "saving": "Saving...",
+    "updateSuccess": "Profile updated",
+    "updateError": "Failed to update profile"
+  },
+  "validation": {
+    "displayNameRequired": "Full name is required",
+    "displayNameTooLong": "Full name cannot exceed 80 characters"
+  }
+}

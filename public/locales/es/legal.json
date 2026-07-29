@@ -1,0 +1,53 @@
+{
+  "terms": "Términos de Servicio",
+  "privacy": "Política de Privacidad",
+  "page": {
+    "eyebrow": "Documentación Legal",
+    "title": "Términos de Servicio y Política de Privacidad",
+    "version": "Versión 1",
+    "lastUpdated": "Última actualización: 2026/06/22",
+    "scrollToTop": "Volver arriba",
+    "introduction": {
+      "title": "1. Introducción",
+      "p1": "Bienvenido a SentientArchive. Estos Términos de Servicio (\"Términos\") rigen su acceso y uso del Knowledge OS impulsado por IA de SentientArchive (el \"Servicio\"). Al acceder o usar nuestro Servicio, usted acepta quedar vinculado por estos Términos y nuestra Política de Privacidad.",
+      "p2": "SentientArchive está diseñado para ser su socio cognitivo, organizando la información mediante procesamiento neuronal avanzado. Nuestra misión es garantizar que su conocimiento personal permanezca seguro, privado y eternamente accesible."
+    },
+    "dataCollection": {
+      "title": "2. Recopilación de Datos",
+      "intro": "Para ofrecer la experiencia de SentientArchive, recopilamos información específica sobre sus interacciones con el OS. Esto incluye:",
+      "items": {
+        "semanticInput": {
+          "label": "Entrada semántica:",
+          "description": "Texto, documentos y archivos que carga en su archivo privado."
+        },
+        "metadata": {
+          "label": "Metadatos:",
+          "description": "Información técnica sobre cómo la IA procesa sus consultas para su optimización."
+        },
+        "deviceIdentity": {
+          "label": "Identidad del dispositivo:",
+          "description": "Identificadores mínimos necesarios para una sincronización segura entre múltiples dispositivos."
+        }
+      },
+      "quote": "\"No vendemos los datos de su archivo personal a terceros. Su conocimiento es solo suyo.\""
+    },
+    "userObligations": {
+      "title": "3. Obligaciones del Usuario",
+      "p1": "Como usuario de SentientArchive, usted acepta mantener la seguridad de sus claves de cifrado y credenciales de cuenta. Usted es responsable de toda actividad que ocurra bajo su identificador único.",
+      "p2": "Usted acepta no usar SentientArchive para almacenar:",
+      "items": {
+        "illegal": "Contenido ilegal o materiales que violen la legislación internacional.",
+        "malicious": "Código malicioso, virus o agentes de IA disruptivos.",
+        "ip": "Contenido que infrinja la propiedad intelectual de terceros."
+      }
+    },
+    "termination": {
+      "title": "4. Terminación",
+      "p1": "Puede cancelar su cuenta de SentientArchive en cualquier momento. Tras la cancelación, tendrá un plazo de 30 días para exportar sus datos en un formato JSON-LD portable. Después de este período, todos los datos cifrados se eliminarán de forma permanente de nuestros nodos distribuidos."
+    },
+    "contact": {
+      "title": "5. Información de Contacto",
+      "p1": "Las preguntas sobre los Términos o la Política de Privacidad deben enviarse a:"
+    }
+  }
+}

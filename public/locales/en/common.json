@@ -1,0 +1,33 @@
+{
+  "appName": "SentientArchive",
+  "loading": "Loading...",
+  "error": "An error occurred",
+  "save": "Save",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "edit": "Edit",
+  "create": "Create",
+  "search": "Search",
+  "back": "Back",
+  "close": "Close",
+  "submit": "Submit",
+  "confirm": "Confirm",
+  "yes": "Yes",
+  "no": "No",
+  "actions": "Actions",
+  "status": "Status",
+  "date": "Date",
+  "name": "Name",
+  "email": "Email",
+  "description": "Description",
+  "timeAgo": {
+    "seconds": "{{count}}s ago",
+    "minutes": "{{count}}m ago",
+    "hours": "{{count}}h ago",
+    "days": "{{count}}d ago"
+  },
+  "tokens": {
+    "unit": "{{amount}} TKN",
+    "unitCompact": "{{amount}}k TKN"
+  }
+}

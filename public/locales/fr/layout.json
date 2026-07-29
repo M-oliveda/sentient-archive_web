@@ -1,0 +1,14 @@
+{
+  "dashboard": "Tableau de bord",
+  "notes": "Notes",
+  "aiFeatures": "Fonctionnalités IA",
+  "tokens": "Jetons",
+  "activity": "Activité",
+  "settings": "Paramètres",
+  "admin": "Administration",
+  "users": "Utilisateurs",
+  "tokenRequests": "Demandes de jetons",
+  "analytics": "Analyses",
+  "systemConfig": "Configuration système",
+  "activityLogs": "Journaux d'activité"
+}

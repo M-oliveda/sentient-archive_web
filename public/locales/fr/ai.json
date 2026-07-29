@@ -1,0 +1,62 @@
+{
+  "features": "Fonctionnalités IA",
+  "assistant": "Assistant IA",
+  "hub": {
+    "badge": "Centre des fonctionnalités IA",
+    "title": "Boostez votre connaissance",
+    "subtitle": "Obtenez des insights approfondis, générez des résumés et organisez vos idées instantanément avec notre boîte à outils IA.",
+    "availableBalance": "Solde disponible",
+    "tokens": "jetons",
+    "topUp": "Recharger des jetons",
+    "noFeatures": "Aucune fonctionnalité IA n'est actuellement disponible. Veuillez réessayer plus tard.",
+    "featuresAriaLabel": "Fonctionnalités IA",
+    "tokenCost": "{{count}} jetons",
+    "openNote": "Ouvrez une note pour utiliser",
+    "howTokensWork": "Comment fonctionnent les jetons",
+    "features": {
+      "summarize": {
+        "name": "Résumé intelligent",
+        "description": "Utilisez l'IA pour générer un résumé concis et utile de n'importe quelle note."
+      },
+      "autoTag": {
+        "name": "Étiquetage sémantique automatique",
+        "description": "Organisez automatiquement vos notes. L'IA analyse le contexte et ajoute des étiquettes pertinentes pour améliorer la recherche."
+      },
+      "flashcards": {
+        "name": "Générateur de flashcards",
+        "description": "Transformez vos notes d'étude ou votre documentation technique en flashcards de rappel actif instantanément."
+      },
+      "ragQuery": {
+        "name": "Questions-réponses",
+        "description": "Posez des questions sur toute votre archive. L'IA récupère les notes pertinentes et génère une réponse contextuelle."
+      }
+    },
+    "steps": {
+      "select": {
+        "title": "Choisissez une fonctionnalité",
+        "description": "Ouvrez n'importe quelle note, cliquez sur le bouton de l'assistant IA et choisissez l'outil adapté à votre tâche depuis le centre."
+      },
+      "spend": {
+        "title": "Dépensez des jetons",
+        "description": "Les jetons sont déduits de votre solde selon la complexité de l'opération."
+      },
+      "insights": {
+        "title": "Obtenez des insights",
+        "description": "Recevez des résultats instantanés générés directement depuis vos archives."
+      }
+    }
+  },
+  "rag": {
+    "title": "Questions-réponses",
+    "description": "Posez une question et l'IA cherchera dans toutes vos notes pour générer une réponse contextuelle.",
+    "placeholder": "Posez n'importe quelle question sur vos notes… (Ctrl+Entrée pour envoyer)",
+    "searching": "Recherche dans vos notes…",
+    "ask": "Demander ({{count}} jetons)",
+    "notEnoughTokens": "Jetons insuffisants",
+    "answer": "Réponse",
+    "errors": {
+      "unavailable": "Le service IA est temporairement indisponible. Veuillez réessayer plus tard.",
+      "generic": "Une erreur s'est produite. Veuillez réessayer."
+    }
+  }
+}

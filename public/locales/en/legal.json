@@ -1,0 +1,53 @@
+{
+  "terms": "Terms of Service",
+  "privacy": "Privacy Policy",
+  "page": {
+    "eyebrow": "Legal Documentation",
+    "title": "Terms of Service & Privacy Policy",
+    "version": "Version 1",
+    "lastUpdated": "Last Updated: 2026/06/22",
+    "scrollToTop": "Scroll to top",
+    "introduction": {
+      "title": "1. Introduction",
+      "p1": "Welcome to SentientArchive. These Terms of Service (\"Terms\") govern your access to and use of the SentientArchive AI-Powered Knowledge OS (the \"Service\"). By accessing or using our Service, you agree to be bound by these Terms and our Privacy Policy.",
+      "p2": "SentientArchive is designed to be your cognitive partner, organizing information through advanced neural processing. Our mission is to ensure that your personal knowledge remains secure, private, and eternally accessible."
+    },
+    "dataCollection": {
+      "title": "2. Data Collection",
+      "intro": "To provide the SentientArchive experience, we collect specific information regarding your interactions with the OS. This includes:",
+      "items": {
+        "semanticInput": {
+          "label": "Semantic Input:",
+          "description": "Text, documents, and files you upload to your private archive."
+        },
+        "metadata": {
+          "label": "Metadata:",
+          "description": "Technical information about how the AI processes your queries for optimization."
+        },
+        "deviceIdentity": {
+          "label": "Device Identity:",
+          "description": "Minimal identifiers required for secure multi-device synchronization."
+        }
+      },
+      "quote": "\"We do not sell your personal archive data to third parties. Your knowledge is yours alone.\""
+    },
+    "userObligations": {
+      "title": "3. User Obligations",
+      "p1": "As a user of SentientArchive, you agree to maintain the security of your encryption keys and account credentials. You are responsible for all activity that occurs under your unique identifier.",
+      "p2": "You agree not to use SentientArchive to store:",
+      "items": {
+        "illegal": "Illegal content or materials that violate international law.",
+        "malicious": "Malicious code, viruses, or disruptive AI agents.",
+        "ip": "Content that infringes upon the intellectual property of others."
+      }
+    },
+    "termination": {
+      "title": "4. Termination",
+      "p1": "You may terminate your SentientArchive account at any time. Upon termination, you will have a 30-day window to export your data in a portable JSON-LD format. After this period, all encrypted data will be permanently purged from our distributed nodes."
+    },
+    "contact": {
+      "title": "5. Contact Information",
+      "p1": "Questions about the Terms or Privacy Policy should be sent to me:"
+    }
+  }
+}

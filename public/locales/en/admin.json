@@ -1,0 +1,257 @@
+{
+  "users": {
+    "title": "User Management",
+    "totalUsers": "{{formatted}} total users",
+    "totalUsersLoading": "— total users",
+    "showing": "Showing {{start}}-{{end}} of {{total}} users",
+    "loadError": "Failed to load users. Please try again.",
+    "loading": "Loading users...",
+    "empty": "No users found.",
+    "prevPage": "Previous page",
+    "nextPage": "Next page",
+    "page": "Page {{page}}",
+    "deactivated": "User deactivated",
+    "activated": "User activated",
+    "statusUpdateError": "Failed to update user status",
+    "adminRevoked": "Admin role revoked",
+    "adminGranted": "Admin role granted",
+    "roleUpdateError": "Failed to update user role",
+    "updated": "User updated successfully",
+    "updateError": "Failed to update user",
+    "filters": {
+      "search": "Search",
+      "searchPlaceholder": "Search by email or name...",
+      "filtersLabel": "Filters:",
+      "allRoles": "All Roles",
+      "admins": "Admins",
+      "clients": "Clients",
+      "allStatuses": "All Statuses",
+      "active": "Active",
+      "inactive": "Inactive",
+      "clear": "Clear"
+    },
+    "table": {
+      "user": "User",
+      "role": "Role",
+      "tokenBalance": "Token Balance",
+      "lastActive": "Last Active",
+      "status": "Status",
+      "actions": "Actions",
+      "admin": "Admin",
+      "client": "Client",
+      "edit": "Edit",
+      "revokeAdmin": "Revoke Admin",
+      "grantAdmin": "Grant Admin",
+      "low": "Low",
+      "actionsFor": "Actions for {{name}}",
+      "toggleActive": "Toggle active status for {{name}}"
+    },
+    "edit": {
+      "title": "Edit User",
+      "description": "Update user details: {{email}}",
+      "role": "Role",
+      "status": "Status",
+      "tokenBalance": "Token Balance",
+      "active": "Active",
+      "inactive": "Inactive",
+      "client": "client",
+      "admin": "admin",
+      "cancel": "Cancel",
+      "save": "Save Changes",
+      "saving": "Saving..."
+    }
+  },
+  "tokenRequests": {
+    "title": "Token Requests",
+    "loading": "Loading token requests...",
+    "loadError": "Failed to load token requests. Please try again.",
+    "empty": "No token requests found.",
+    "loadMore": "Load More",
+    "showing": "Showing {{count}} of {{total}}",
+    "tabs": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "denied": "Denied",
+      "allHistory": "All History"
+    },
+    "urgentCount": "{{count}} Urgent (Low Balance)",
+    "approveSuccess": "Token request approved",
+    "approveError": "Failed to approve request",
+    "rejectSuccess": "Token request rejected",
+    "rejectError": "Failed to reject request",
+    "approveModal": {
+      "title": "Approve Token Request",
+      "from": "From {{name}}",
+      "amount": "Amount",
+      "originalRequest": "Original request: {{amount}} tokens",
+      "notes": "Notes (Optional)",
+      "notesPlaceholder": "Approval notes...",
+      "cancel": "Cancel",
+      "approve": "Approve",
+      "approving": "Approving..."
+    },
+    "rejectModal": {
+      "title": "Reject Token Request",
+      "from": "From {{name}}",
+      "reason": "Reason (Optional)",
+      "reasonPlaceholder": "Rejection reason...",
+      "cancel": "Cancel",
+      "reject": "Reject",
+      "rejecting": "Rejecting..."
+    },
+    "card": {
+      "urgent": "Urgent!",
+      "current": "Current",
+      "requested": "Requested",
+      "justification": "Justification:",
+      "lastGrant": "Last grant: {{time}}",
+      "approve": "Approve",
+      "reject": "Reject",
+      "denied": "Denied",
+      "approved": "approved",
+      "unknownUser": "Unknown User"
+    }
+  },
+  "activityLogs": {
+    "eyebrow": "System Activity",
+    "title": "Activity Logs",
+    "subtitle": "Monitor all system activities across all users",
+    "tabs": {
+      "all": "All Activity",
+      "ai": "AI Operations",
+      "tokens": "Tokens",
+      "notes": "Notes",
+      "folders": "Folders"
+    },
+    "searchPlaceholder": "Search by user email, action, or description...",
+    "clear": "Clear",
+    "loading": "Loading activity logs...",
+    "loadError": "Failed to load activity logs. Please try again.",
+    "empty": "No activity logs found. Try adjusting your filters.",
+    "showing": "Showing {{count}} of {{total}} activities",
+    "loadMore": "Load More"
+  },
+  "analytics": {
+    "title": "Analytics",
+    "subtitle": "System-wide usage statistics and insights",
+    "loading": "Loading analytics...",
+    "loadError": "Failed to load analytics. Please try again.",
+    "period": "Period:",
+    "ranges": {
+      "7d": "7 days",
+      "30d": "30 days",
+      "90d": "90 days"
+    },
+    "lastDays": {
+      "7d": "Last 7 days",
+      "30d": "Last 30 days",
+      "90d": "Last 90 days"
+    },
+    "cards": {
+      "totalUsers": "Total Users",
+      "activeCount": "{{count}} active",
+      "totalNotes": "Total Notes",
+      "notesCreated": "Created by users",
+      "tokensSpent": "Tokens Spent",
+      "netBalance": "{{count}} net balance",
+      "aiOperations": "AI Operations"
+    },
+    "aiBreakdown": {
+      "title": "AI Operations Breakdown",
+      "description": "Usage by operation type",
+      "summarization": "Summarization",
+      "autoTagging": "Auto-Tagging",
+      "flashcards": "Flashcards",
+      "qa": "Q&A"
+    },
+    "aiTrend": {
+      "title": "AI Operations Trend",
+      "description": "Operations over time ({{range}})"
+    },
+    "tokenTrend": {
+      "title": "Token Usage Trend",
+      "description": "Granted vs spent ({{range}})",
+      "granted": "Granted",
+      "spent": "Spent"
+    },
+    "userGrowth": {
+      "title": "User Growth",
+      "description": "Total and new users ({{range}})",
+      "totalUsers": "Total Users"
+    },
+    "distribution": {
+      "title": "User Distribution",
+      "description": "User count by role and status",
+      "clients": "Clients",
+      "admins": "Admins",
+      "active": "Active",
+      "inactive": "Inactive"
+    }
+  },
+  "systemConfig": {
+    "title": "System Configuration",
+    "subtitle": "Manage global settings, AI models, and feature flags.",
+    "loading": "Loading system configuration...",
+    "save": "Save Changes",
+    "saving": "Saving...",
+    "saveSuccess": "Configuration updated successfully",
+    "saveError": "Failed to update configuration",
+    "ai": {
+      "title": "AI Configuration",
+      "model": "Default Gemini Model",
+      "modelHint": "Selected model will be used for all general purpose queries.",
+      "operationalLimits": "Operational Limits",
+      "maxTokens": "Max tokens / Op",
+      "maxOpsHour": "Max Ops / User / Hour",
+      "fileExtractionsDay": "File Extractions / Day",
+      "temperature": "Temperature",
+      "temperatureHint": "Recommended: 1.0 for Gemini 3+, 0.7 for earlier models",
+      "thinkingLevel": "Thinking Level (Gemini 3+)",
+      "thinkingLevelHint": "Controls reasoning depth for Gemini 3+ models",
+      "thinkingMinimal": "Minimal (Lowest latency)",
+      "thinkingLow": "Low (Fast responses)",
+      "thinkingMedium": "Medium (Balanced)",
+      "thinkingHigh": "High (Deep reasoning)",
+      "thinkingBudget": "Thinking Budget (Gemini 2.5)",
+      "thinkingBudgetHint": "-1 = Dynamic, 0 = Disabled, >0 = Specific token count (Gemini 2.5 only)"
+    },
+    "tokens": {
+      "title": "Token Economy",
+      "featureCosts": "Feature Costs (Tokens)",
+      "autoTagging": "Auto-tagging",
+      "autoTaggingHint": "per item",
+      "summarization": "Summarization",
+      "summarizationHint": "per 1k words",
+      "flashcards": "Flashcards",
+      "flashcardsHint": "per set",
+      "ragQuery": "Q&A Query",
+      "ragQueryHint": "per query",
+      "newUserGrants": "New User Grants",
+      "production": "Production",
+      "staging": "Staging",
+      "development": "Development",
+      "local": "Local"
+    },
+    "features": {
+      "title": "Feature Flags",
+      "on": "ON",
+      "off": "OFF",
+      "summarization": "Summarization",
+      "summarizationDesc": "Allow users to generate note summaries",
+      "autoTagging": "Auto-Tagging",
+      "autoTaggingDesc": "Allow automatic tag suggestions for notes",
+      "flashcards": "Flashcards",
+      "flashcardsDesc": "Allow flashcard generation from notes",
+      "ragQuery": "Q&A / RAG Query",
+      "ragQueryDesc": "Allow knowledge-base question answering",
+      "fileExtraction": "File Extraction",
+      "fileExtractionDesc": "Allow PDF/TXT/MD content extraction"
+    },
+    "meta": {
+      "lastModifiedBy": "Last modified by",
+      "on": "on",
+      "lastUpdated": "Last updated",
+      "version": "Version {{version}}"
+    }
+  }
+}

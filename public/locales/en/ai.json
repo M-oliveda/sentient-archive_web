@@ -1,0 +1,62 @@
+{
+  "features": "AI Features",
+  "assistant": "AI Assistant",
+  "hub": {
+    "badge": "AI Features Hub",
+    "title": "Supercharge Your Knowledge",
+    "subtitle": "Unlock deep insights, generate summaries, and organize your chaotic thoughts instantly with our AI-powered toolset.",
+    "availableBalance": "Available Balance",
+    "tokens": "tokens",
+    "topUp": "Top Up Tokens",
+    "noFeatures": "No AI features are currently available. Please check back later.",
+    "featuresAriaLabel": "AI features",
+    "tokenCost": "{{count}} tokens",
+    "openNote": "Open a note to use",
+    "howTokensWork": "How Tokens Work",
+    "features": {
+      "summarize": {
+        "name": "Smart Summarization",
+        "description": "Use AI to generate a concise and useful summarization of any note."
+      },
+      "autoTag": {
+        "name": "Semantic Auto-Tagging",
+        "description": "Automatically organize your notes. The AI analyzes context and appends relevant tags to improve search ability."
+      },
+      "flashcards": {
+        "name": "Flash Generator",
+        "description": "Turn your study notes or technical documentation into active recall flashcards instantly."
+      },
+      "ragQuery": {
+        "name": "Knowledge Q&A",
+        "description": "Ask questions across your entire archive. The AI retrieves relevant notes and generates a contextual answer."
+      }
+    },
+    "steps": {
+      "select": {
+        "title": "Select a Feature",
+        "description": "Open any note, click the AI assistant button, and choose the AI tool that fits your current task from the hub."
+      },
+      "spend": {
+        "title": "Spend Tokens",
+        "description": "Tokens are deducted from your wallet based on the complexity of the operation."
+      },
+      "insights": {
+        "title": "Get Insights",
+        "description": "Receive instant results generated directly from your archives."
+      }
+    }
+  },
+  "rag": {
+    "title": "Knowledge Q&A",
+    "description": "Ask a question and the AI will search across all your notes to generate a contextual answer.",
+    "placeholder": "Ask anything about your notes… (Ctrl+Enter to submit)",
+    "searching": "Searching your notes…",
+    "ask": "Ask ({{count}} tokens)",
+    "notEnoughTokens": "Not enough tokens",
+    "answer": "Answer",
+    "errors": {
+      "unavailable": "AI service is temporarily unavailable. Please try again later.",
+      "generic": "Something went wrong. Please try again."
+    }
+  }
+}

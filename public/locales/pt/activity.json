@@ -1,0 +1,27 @@
+{
+  "page": {
+    "eyebrow": "Atividade",
+    "title": "Registro de atividade",
+    "subtitle": "Acompanhe todas as suas ações, operações de IA e o histórico de uso de tokens."
+  },
+  "stats": {
+    "actionsToday": "Ações hoje",
+    "aiOpsThisWeek": "Ops de IA esta semana",
+    "totalActions": "Total de ações"
+  },
+  "filters": {
+    "searchPlaceholder": "Pesquisar registros...",
+    "searchAriaLabel": "Pesquisar registros",
+    "all": "Tudo",
+    "ai": "Ops de IA",
+    "tokens": "Tokens",
+    "notes": "Notas",
+    "folders": "Pastas"
+  },
+  "timeline": {
+    "today": "Hoje, {{date}}",
+    "error": "Não foi possível carregar a atividade. Tente novamente.",
+    "empty": "Ainda não há atividade. Notas, pastas e operações de IA aparecerão aqui."
+  },
+  "recent": "Atividade recente"
+}

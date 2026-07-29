@@ -1,0 +1,130 @@
+{
+  "nav": {
+    "features": "Features",
+    "howItWorks": "How it Works",
+    "tokenSystem": "Token System",
+    "logIn": "Log In",
+    "getStarted": "Get Started",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "navigationMenu": "Navigation menu",
+    "newVersionTitle": "New Version 1.0",
+    "newVersionDescription": "Experience the next evolution of knowledge management."
+  },
+  "hero": {
+    "badge": "v1.0 is now live",
+    "title": "Unlock the wisdom in",
+    "titleAccent": "your digital archive.",
+    "description": "SentientArchive turns your scattered documents into a conversational knowledge base. Stop searching, start asking.",
+    "cta": "Start for Free"
+  },
+  "why": {
+    "title": "Why SentientArchive?",
+    "subtitle": "Designed for researchers, writers, and knowledge workers who need more than just storage.",
+    "items": {
+      "cognitiveSearch": {
+        "title": "Cognitive Search",
+        "description": "Don't just match keywords. Our AI understands the intent behind your query and surfaces relevant concepts."
+      },
+      "autoLinking": {
+        "title": "Auto-Linking",
+        "description": "New entries are automatically connected to existing knowledge nodes, creating a web of insight without manual effort."
+      },
+      "privateByDesign": {
+        "title": "Private by Design",
+        "description": "Your knowledge base is encrypted locally. Not even our AI models train on your personal data without consent."
+      }
+    }
+  },
+  "features": {
+    "title": "Everything You Need to Build Your Knowledge Empire",
+    "subtitle": "Powerful AI features to help you capture, organize, and learn from your notes without the friction.",
+    "tokenCost": "{{count}} tokens",
+    "items": {
+      "realTimeSearch": {
+        "title": "Real-Time Search",
+        "description": "Find exactly what you are looking for in milliseconds with semantic search capabilities."
+      },
+      "activityTracking": {
+        "title": "Activity Tracking",
+        "description": "Visualize your learning habits and track your productivity with growth over time."
+      },
+      "smartNoteTaking": {
+        "title": "Smart Note-Taking",
+        "description": "Capture ideas instantly with our distraction-free editor designed for speed and clarity."
+      },
+      "hierarchicalFolders": {
+        "title": "Hierarchical Folders",
+        "description": "Organize your thoughts with infinite nested folders and smart categories."
+      },
+      "aiSummarization": {
+        "title": "AI Summarization",
+        "description": "Condense long articles and papers into concise summaries automatically."
+      },
+      "flashcardGeneration": {
+        "title": "Flashcard Generation",
+        "description": "Automatically generate study flashcards from your notes to reinforce learning and retention."
+      },
+      "autoTagging": {
+        "title": "Auto-Tagging",
+        "description": "Let AI organize your library by automatically assigning relevant tags and categories."
+      },
+      "knowledgeQa": {
+        "title": "Knowledge Q&A",
+        "description": "Ask questions to your knowledge base and get answers based on your notes."
+      }
+    }
+  },
+  "howItWorks": {
+    "title": "How It Works",
+    "subtitle": "Start building your second brain in three simple steps",
+    "stepLabel": "Step {{number}}",
+    "cta": "Start For Free",
+    "steps": {
+      "createAccount": {
+        "title": "Create Your Account",
+        "description": "Sign up and receive 20 free tokens to explore all AI features. No credit card required."
+      },
+      "captureKnowledge": {
+        "title": "Capture Your Knowledge",
+        "description": "Write notes in Markdown, upload documents, or import existing content into organized folders."
+      },
+      "unlockInsights": {
+        "title": "Unlock AI Insights",
+        "description": "Let AI summarize, tag, generate flashcards, and chat with your notes."
+      }
+    }
+  },
+  "tokens": {
+    "title": "Simple Token-Based System",
+    "freeStartBefore": "Every new user starts with",
+    "freeStartHighlight": "20 free",
+    "freeStartAfter": "tokens to explore all AI features.",
+    "operationCost": "Each AI operation costs a small number of tokens based on complexity.",
+    "requestMore": "Need more? Simply request additional tokens from your dashboard.",
+    "costs": {
+      "autoTagging": {
+        "label": "Auto-Tagging",
+        "cost": "1 token"
+      },
+      "summarization": {
+        "label": "Summarization",
+        "cost": "2 tokens"
+      },
+      "flashcards": {
+        "label": "Flashcards",
+        "cost": "3 tokens"
+      },
+      "qaChat": {
+        "label": "Q&A Chat",
+        "cost": "4 tokens per query"
+      }
+    }
+  },
+  "footer": {
+    "tagline": "AI-Powered Knowledge OS. Capturing insights for the future of intelligence.",
+    "copyrightBefore": "© {{year}} SentientArchive. All rights reserved. A",
+    "author": "M-Oliveda",
+    "copyrightAfter": "project."
+  }
+}

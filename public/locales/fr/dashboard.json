@@ -1,0 +1,50 @@
+{
+  "client": {
+    "welcome": "Bienvenue, {{firstName}}",
+    "welcomeFallback": "là",
+    "subtitle": "Votre base de connaissances est organisée et prête pour les insights.",
+    "lowBalance": {
+      "message": "Votre solde de jetons est faible.",
+      "link": "Demander plus de jetons",
+      "suffix": "pour continuer à utiliser les fonctionnalités IA."
+    },
+    "actions": {
+      "newNote": "Nouvelle Note"
+    },
+    "stats": {
+      "ariaLabel": "Aperçu des statistiques",
+      "notes": "Notes",
+      "tokens": "Jetons",
+      "lastEdited": "Dernière Modification",
+      "requestMore": "Demander Plus"
+    },
+    "recentNotes": {
+      "title": "Notes Récentes",
+      "showMore": "Afficher Plus",
+      "empty": "Pas encore de notes. Créez votre première note !",
+      "folderFallback": "Notes"
+    }
+  },
+  "admin": {
+    "title": "Tableau de Bord Admin",
+    "subtitle": "Aperçu du Système et Surveillance de la Santé",
+    "stats": {
+      "ariaLabel": "Statistiques du système",
+      "totalUsers": "Total des Utilisateurs",
+      "totalNotes": "Total des Notes",
+      "totalTokens": "Total des Jetons",
+      "totalAiOps": "Total des Opérations IA"
+    },
+    "health": {
+      "title": "Santé du Système",
+      "ariaLabel": "Santé du système",
+      "operational": "Opérationnel",
+      "inDanger": "En Danger",
+      "down": "Hors Service"
+    },
+    "activity": {
+      "title": "Activité Récente",
+      "ariaLabel": "Activité récente"
+    }
+  }
+}

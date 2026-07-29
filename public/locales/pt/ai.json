@@ -1,0 +1,62 @@
+{
+  "features": "Recursos de IA",
+  "assistant": "Assistente de IA",
+  "hub": {
+    "badge": "Central de recursos de IA",
+    "title": "Potencialize seu conhecimento",
+    "subtitle": "Obtenha insights profundos, gere resumos e organize suas ideias instantaneamente com nosso conjunto de ferramentas de IA.",
+    "availableBalance": "Saldo disponível",
+    "tokens": "tokens",
+    "topUp": "Recarregar tokens",
+    "noFeatures": "Nenhum recurso de IA está disponível no momento. Tente novamente mais tarde.",
+    "featuresAriaLabel": "Recursos de IA",
+    "tokenCost": "{{count}} tokens",
+    "openNote": "Abra uma nota para usar",
+    "howTokensWork": "Como os tokens funcionam",
+    "features": {
+      "summarize": {
+        "name": "Resumo inteligente",
+        "description": "Use a IA para gerar um resumo conciso e útil de qualquer nota."
+      },
+      "autoTag": {
+        "name": "Marcação semântica automática",
+        "description": "Organize suas notas automaticamente. A IA analisa o contexto e adiciona tags relevantes para melhorar a busca."
+      },
+      "flashcards": {
+        "name": "Gerador de flashcards",
+        "description": "Transforme suas anotações de estudo ou documentação técnica em flashcards de recordação ativa instantaneamente."
+      },
+      "ragQuery": {
+        "name": "Perguntas e respostas",
+        "description": "Faça perguntas em todo o seu arquivo. A IA recupera notas relevantes e gera uma resposta contextual."
+      }
+    },
+    "steps": {
+      "select": {
+        "title": "Selecione um recurso",
+        "description": "Abra qualquer nota, clique no botão do assistente de IA e escolha a ferramenta adequada à sua tarefa na central."
+      },
+      "spend": {
+        "title": "Gaste tokens",
+        "description": "Os tokens são deduzidos da sua carteira com base na complexidade da operação."
+      },
+      "insights": {
+        "title": "Obtenha insights",
+        "description": "Receba resultados instantâneos gerados diretamente dos seus arquivos."
+      }
+    }
+  },
+  "rag": {
+    "title": "Perguntas e respostas",
+    "description": "Faça uma pergunta e a IA pesquisará em todas as suas notas para gerar uma resposta contextual.",
+    "placeholder": "Pergunte qualquer coisa sobre suas notas… (Ctrl+Enter para enviar)",
+    "searching": "Pesquisando nas suas notas…",
+    "ask": "Perguntar ({{count}} tokens)",
+    "notEnoughTokens": "Tokens insuficientes",
+    "answer": "Resposta",
+    "errors": {
+      "unavailable": "O serviço de IA está temporariamente indisponível. Tente novamente mais tarde.",
+      "generic": "Algo deu errado. Tente novamente."
+    }
+  }
+}
