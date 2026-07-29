@@ -12,7 +12,7 @@ const mockStats = {
     systemHealth: [
         { service: "Core API", status: "Operational" as const },
         { service: "Gemini Quota", status: "In Danger" as const },
-        { service: "Firestore", status: "Degraded" as const },
+        { service: "Firestore", status: "Operational" as const },
         { service: "Auth", status: "Down" as const },
     ],
     recentActivity: [
@@ -38,7 +38,7 @@ describe("AdminDashboardHome", () => {
             isLoading: false,
         });
         render(<AdminDashboardHome />);
-        expect(screen.getByText("Admin Dashboard")).toBeInTheDocument();
+        expect(screen.getByText("admin.title")).toBeInTheDocument();
     });
 
     it("renders System Overview subtitle", () => {
@@ -47,9 +47,7 @@ describe("AdminDashboardHome", () => {
             isLoading: false,
         });
         render(<AdminDashboardHome />);
-        expect(
-            screen.getByText("System Overview & Health Monitoring"),
-        ).toBeInTheDocument();
+        expect(screen.getByText("admin.subtitle")).toBeInTheDocument();
     });
 
     it("renders all four stat card labels", () => {
@@ -58,10 +56,10 @@ describe("AdminDashboardHome", () => {
             isLoading: false,
         });
         render(<AdminDashboardHome />);
-        expect(screen.getByText("Total Users")).toBeInTheDocument();
-        expect(screen.getByText("Total Notes")).toBeInTheDocument();
-        expect(screen.getByText("Total Tokens")).toBeInTheDocument();
-        expect(screen.getByText("Total AI Operations")).toBeInTheDocument();
+        expect(screen.getByText("admin.stats.totalUsers")).toBeInTheDocument();
+        expect(screen.getByText("admin.stats.totalNotes")).toBeInTheDocument();
+        expect(screen.getByText("admin.stats.totalTokens")).toBeInTheDocument();
+        expect(screen.getByText("admin.stats.totalAiOps")).toBeInTheDocument();
     });
 
     it("shows loading dashes while data is loading", () => {
@@ -108,15 +106,29 @@ describe("AdminDashboardHome", () => {
             isLoading: false,
         });
         render(<AdminDashboardHome />);
-        expect(screen.getByText("System Health")).toBeInTheDocument();
+        expect(screen.getByText("admin.health.title")).toBeInTheDocument();
         expect(screen.getByText("Core API")).toBeInTheDocument();
-        expect(screen.getByText("Operational")).toBeInTheDocument();
         expect(screen.getByText("Gemini Quota")).toBeInTheDocument();
-        expect(screen.getByText("In Danger")).toBeInTheDocument();
         expect(screen.getByText("Firestore")).toBeInTheDocument();
-        expect(screen.getByText("Degraded")).toBeInTheDocument();
         expect(screen.getByText("Auth")).toBeInTheDocument();
-        expect(screen.getByText("Down")).toBeInTheDocument();
+        // Status badges - multiple services can have the same status
+        const operational = screen.getAllByText("admin.health.operational");
+        expect(operational.length).toBeGreaterThan(0);
+        expect(screen.getByText("admin.health.inDanger")).toBeInTheDocument();
+        expect(screen.getByText("admin.health.down")).toBeInTheDocument();
+    });
+
+    it("renders Degraded health status with outline badge and raw status label", () => {
+        (useAdminStats as jest.Mock).mockReturnValue({
+            data: {
+                ...mockStats,
+                systemHealth: [{ service: "Storage", status: "Degraded" as const }],
+            },
+            isLoading: false,
+        });
+        render(<AdminDashboardHome />);
+        expect(screen.getByText("Storage")).toBeInTheDocument();
+        expect(screen.getByText("Degraded")).toBeInTheDocument();
     });
 
     it("renders empty System Health list when no data", () => {
@@ -125,7 +137,7 @@ describe("AdminDashboardHome", () => {
             isLoading: false,
         });
         render(<AdminDashboardHome />);
-        expect(screen.getByText("System Health")).toBeInTheDocument();
+        expect(screen.getByText("admin.health.title")).toBeInTheDocument();
         expect(screen.queryByText("Core API")).not.toBeInTheDocument();
     });
 
@@ -135,7 +147,7 @@ describe("AdminDashboardHome", () => {
             isLoading: false,
         });
         render(<AdminDashboardHome />);
-        expect(screen.getByText("Recent Activity")).toBeInTheDocument();
+        expect(screen.getByText("admin.activity.title")).toBeInTheDocument();
         expect(screen.getByText("Sarah K.")).toBeInTheDocument();
         expect(screen.getByText("Mike R.")).toBeInTheDocument();
     });
@@ -146,7 +158,7 @@ describe("AdminDashboardHome", () => {
             isLoading: false,
         });
         render(<AdminDashboardHome />);
-        expect(screen.getByText("Recent Activity")).toBeInTheDocument();
+        expect(screen.getByText("admin.activity.title")).toBeInTheDocument();
         expect(screen.queryByText("Sarah K.")).not.toBeInTheDocument();
     });
 });

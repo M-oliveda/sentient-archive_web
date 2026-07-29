@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ChevronLeft, ChevronRight, Users } from "lucide-react";
 import { AdminUsersTable, EditUserModal, UserFiltersBar } from "@/components/admin";
 import type { AdminUsersQueryParams } from "@/hooks/useAdminUsers";
@@ -16,6 +17,7 @@ import { toast } from "sonner";
 import { DEFAULT_PAGE_SIZE, buildPageItems, resolvePageOffset } from "@/lib/pagination";
 
 export function AdminUsersPage() {
+    const { t } = useTranslation("admin");
     const [queryParams, setQueryParams] = useState<AdminUsersQueryParams>({
         sortBy: "createdAt",
         sortOrder: "desc",
@@ -54,9 +56,11 @@ export function AdminUsersPage() {
                 userId: user.uid,
                 updates: { isActive: !user.isActive },
             });
-            toast.success(user.isActive ? "User deactivated" : "User activated");
+            toast.success(
+                user.isActive ? t("users.deactivated") : t("users.activated"),
+            );
         } catch {
-            toast.error("Failed to update user status");
+            toast.error(t("users.statusUpdateError"));
         }
     };
 
@@ -68,10 +72,12 @@ export function AdminUsersPage() {
                 updates: { role: newRole },
             });
             toast.success(
-                user.role === "admin" ? "Admin role revoked" : "Admin role granted",
+                user.role === "admin"
+                    ? t("users.adminRevoked")
+                    : t("users.adminGranted"),
             );
         } catch {
-            toast.error("Failed to update user role");
+            toast.error(t("users.roleUpdateError"));
         }
     };
 
@@ -137,11 +143,17 @@ export function AdminUsersPage() {
         <section className="space-y-4 sm:space-y-5">
             <header className="space-y-1">
                 <h1 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl">
-                    User Management
+                    {t("users.title")}
                 </h1>
                 <p className="text-muted-foreground flex items-center gap-1 text-base sm:text-lg">
                     <Users className="size-4 shrink-0" aria-hidden="true" />
-                    <span>{isLoading ? "—" : total.toLocaleString()} total users</span>
+                    <span>
+                        {isLoading
+                            ? t("users.totalUsersLoading")
+                            : t("users.totalUsers", {
+                                  formatted: total.toLocaleString(),
+                              })}
+                    </span>
                 </p>
             </header>
 
@@ -168,8 +180,11 @@ export function AdminUsersPage() {
 
                     <div className="flex flex-col items-center gap-2 pt-1 sm:flex-row sm:justify-between sm:gap-4">
                         <p className="text-muted-foreground text-center text-sm sm:text-left">
-                            Showing {rangeStart}-{rangeEnd} of {total.toLocaleString()}{" "}
-                            users
+                            {t("users.showing", {
+                                start: rangeStart,
+                                end: rangeEnd,
+                                total: total.toLocaleString(),
+                            })}
                         </p>
 
                         <Pagination className="mx-0 w-full justify-center sm:w-auto sm:justify-end">
@@ -182,7 +197,7 @@ export function AdminUsersPage() {
                                         className="size-8"
                                         disabled={!canGoPrevious}
                                         onClick={() => goToPage(currentPage - 1)}
-                                        aria-label="Previous page"
+                                        aria-label={t("users.prevPage")}
                                     >
                                         <ChevronLeft className="size-4" />
                                     </Button>
@@ -206,7 +221,9 @@ export function AdminUsersPage() {
                                                 size="icon"
                                                 disabled={isLoading}
                                                 onClick={() => goToPage(item)}
-                                                aria-label={`Page ${item}`}
+                                                aria-label={t("users.page", {
+                                                    page: item,
+                                                })}
                                                 aria-current={
                                                     item === currentPage
                                                         ? "page"
@@ -232,7 +249,7 @@ export function AdminUsersPage() {
                                         className="size-8"
                                         disabled={!canGoNext}
                                         onClick={() => goToPage(currentPage + 1)}
-                                        aria-label="Next page"
+                                        aria-label={t("users.nextPage")}
                                     >
                                         <ChevronRight className="size-4" />
                                     </Button>
@@ -255,12 +272,14 @@ export function AdminUsersPage() {
 }
 
 function AlertError() {
+    const { t } = useTranslation("admin");
+
     return (
         <div
             className="border-error/40 bg-error/5 text-error rounded-3xl border px-4 py-6 text-sm"
             role="alert"
         >
-            Failed to load users. Please try again.
+            {t("users.loadError")}
         </div>
     );
 }

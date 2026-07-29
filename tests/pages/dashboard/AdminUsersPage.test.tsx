@@ -140,6 +140,16 @@ const createWrapper = () => {
 
 const mutateAsync = jest.fn().mockResolvedValue({});
 
+function getPageButton(page: number): HTMLElement {
+    const button = screen
+        .getAllByRole("button", { name: "users.page" })
+        .find((el) => el.textContent === String(page));
+    if (!button) {
+        throw new Error(`Page button ${page} not found`);
+    }
+    return button;
+}
+
 const setupMocks = (
     overrides: Partial<ReturnType<typeof useAdminUsersHook.useAdminUsers>> = {},
 ) => {
@@ -175,9 +185,9 @@ describe("AdminUsersPage", () => {
 
         render(<AdminUsersPage />, { wrapper: createWrapper() });
 
-        expect(screen.getByText("User Management")).toBeInTheDocument();
-        expect(screen.getByText("2 total users")).toBeInTheDocument();
-        expect(screen.getByText("Showing 1-2 of 2 users")).toBeInTheDocument();
+        expect(screen.getByText("users.title")).toBeInTheDocument();
+        expect(screen.getByText("users.totalUsers")).toBeInTheDocument();
+        expect(screen.getByText("users.showing")).toBeInTheDocument();
     });
 
     it("renders users table with data", async () => {
@@ -196,7 +206,7 @@ describe("AdminUsersPage", () => {
 
         render(<AdminUsersPage />, { wrapper: createWrapper() });
 
-        expect(screen.getByText("— total users")).toBeInTheDocument();
+        expect(screen.getByText("users.totalUsersLoading")).toBeInTheDocument();
     });
 
     it("shows error state when fetch fails", () => {
@@ -204,9 +214,7 @@ describe("AdminUsersPage", () => {
 
         render(<AdminUsersPage />, { wrapper: createWrapper() });
 
-        expect(
-            screen.getByText("Failed to load users. Please try again."),
-        ).toBeInTheDocument();
+        expect(screen.getByText("users.loadError")).toBeInTheDocument();
     });
 
     it("opens edit modal and saves user", async () => {
@@ -215,13 +223,15 @@ describe("AdminUsersPage", () => {
 
         render(<AdminUsersPage />, { wrapper: createWrapper() });
 
-        await user.click(screen.getAllByRole("menuitem", { name: "Edit" })[0]!);
+        await user.click(
+            screen.getAllByRole("menuitem", { name: "users.table.edit" })[0]!,
+        );
 
         await waitFor(() => {
-            expect(screen.getByText("Edit User")).toBeInTheDocument();
+            expect(screen.getByText("users.edit.title")).toBeInTheDocument();
         });
 
-        await user.click(screen.getByRole("button", { name: "Save Changes" }));
+        await user.click(screen.getByRole("button", { name: "users.edit.save" }));
 
         await waitFor(() => {
             expect(mutateAsync).toHaveBeenCalledWith({
@@ -232,7 +242,7 @@ describe("AdminUsersPage", () => {
                     tokenBalance: 100,
                 }),
             });
-            expect(toast.success).toHaveBeenCalledWith("User updated successfully");
+            expect(toast.success).toHaveBeenCalledWith("users.updated");
         });
     });
 
@@ -243,9 +253,9 @@ describe("AdminUsersPage", () => {
         render(<AdminUsersPage />, { wrapper: createWrapper() });
 
         await user.click(
-            screen.getByRole("switch", {
-                name: "Toggle active status for Test",
-            }),
+            screen.getAllByRole("switch", {
+                name: "users.table.toggleActive",
+            })[0]!,
         );
 
         await waitFor(() => {
@@ -253,7 +263,7 @@ describe("AdminUsersPage", () => {
                 userId: "user1",
                 updates: { isActive: false },
             });
-            expect(toast.success).toHaveBeenCalledWith("User deactivated");
+            expect(toast.success).toHaveBeenCalledWith("users.deactivated");
         });
     });
 
@@ -265,13 +275,13 @@ describe("AdminUsersPage", () => {
         render(<AdminUsersPage />, { wrapper: createWrapper() });
 
         await user.click(
-            screen.getByRole("switch", {
-                name: "Toggle active status for Test",
-            }),
+            screen.getAllByRole("switch", {
+                name: "users.table.toggleActive",
+            })[0]!,
         );
 
         await waitFor(() => {
-            expect(toast.error).toHaveBeenCalledWith("Failed to update user status");
+            expect(toast.error).toHaveBeenCalledWith("users.statusUpdateError");
         });
     });
 
@@ -281,24 +291,28 @@ describe("AdminUsersPage", () => {
 
         render(<AdminUsersPage />, { wrapper: createWrapper() });
 
-        await user.click(screen.getByRole("menuitem", { name: "Grant Admin" }));
+        await user.click(
+            screen.getByRole("menuitem", { name: "users.table.grantAdmin" }),
+        );
 
         await waitFor(() => {
             expect(mutateAsync).toHaveBeenCalledWith({
                 userId: "user1",
                 updates: { role: "admin" },
             });
-            expect(toast.success).toHaveBeenCalledWith("Admin role granted");
+            expect(toast.success).toHaveBeenCalledWith("users.adminGranted");
         });
 
-        await user.click(screen.getByRole("menuitem", { name: "Revoke Admin" }));
+        await user.click(
+            screen.getByRole("menuitem", { name: "users.table.revokeAdmin" }),
+        );
 
         await waitFor(() => {
             expect(mutateAsync).toHaveBeenCalledWith({
                 userId: "user2",
                 updates: { role: "client" },
             });
-            expect(toast.success).toHaveBeenCalledWith("Admin role revoked");
+            expect(toast.success).toHaveBeenCalledWith("users.adminRevoked");
         });
     });
 
@@ -309,10 +323,12 @@ describe("AdminUsersPage", () => {
 
         render(<AdminUsersPage />, { wrapper: createWrapper() });
 
-        await user.click(screen.getByRole("menuitem", { name: "Grant Admin" }));
+        await user.click(
+            screen.getByRole("menuitem", { name: "users.table.grantAdmin" }),
+        );
 
         await waitFor(() => {
-            expect(toast.error).toHaveBeenCalledWith("Failed to update user role");
+            expect(toast.error).toHaveBeenCalledWith("users.roleUpdateError");
         });
     });
 
@@ -331,7 +347,7 @@ describe("AdminUsersPage", () => {
 
         await user.click(
             screen.getByRole("switch", {
-                name: "Toggle active status for Test",
+                name: "users.table.toggleActive",
             }),
         );
 
@@ -340,7 +356,7 @@ describe("AdminUsersPage", () => {
                 userId: "user1",
                 updates: { isActive: true },
             });
-            expect(toast.success).toHaveBeenCalledWith("User activated");
+            expect(toast.success).toHaveBeenCalledWith("users.activated");
         });
     });
 
@@ -359,11 +375,13 @@ describe("AdminUsersPage", () => {
 
         render(<AdminUsersPage />, { wrapper: createWrapper() });
 
-        expect(screen.getByText("Showing 1-20 of 50 users")).toBeInTheDocument();
-        expect(screen.getByRole("button", { name: "Previous page" })).toBeDisabled();
-        expect(screen.getByRole("button", { name: "Next page" })).not.toBeDisabled();
+        expect(screen.getByText("users.showing")).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: "users.prevPage" })).toBeDisabled();
+        expect(
+            screen.getByRole("button", { name: "users.nextPage" }),
+        ).not.toBeDisabled();
 
-        await user.click(screen.getByRole("button", { name: "Next page" }));
+        await user.click(screen.getByRole("button", { name: "users.nextPage" }));
 
         await waitFor(() => {
             expect(mockUseAdminUsers).toHaveBeenCalledWith(
@@ -371,7 +389,7 @@ describe("AdminUsersPage", () => {
             );
         });
 
-        await user.click(screen.getByRole("button", { name: "Previous page" }));
+        await user.click(screen.getByRole("button", { name: "users.prevPage" }));
 
         await waitFor(() => {
             expect(mockUseAdminUsers).toHaveBeenCalledWith(
@@ -395,7 +413,7 @@ describe("AdminUsersPage", () => {
 
         render(<AdminUsersPage />, { wrapper: createWrapper() });
 
-        await user.click(screen.getByRole("button", { name: "Page 3" }));
+        await user.click(getPageButton(3));
 
         await waitFor(() => {
             expect(mockUseAdminUsers).toHaveBeenCalledWith(
@@ -419,20 +437,20 @@ describe("AdminUsersPage", () => {
 
         render(<AdminUsersPage />, { wrapper: createWrapper() });
 
-        await user.click(screen.getByRole("button", { name: "Page 3" }));
+        await user.click(getPageButton(3));
 
         await waitFor(() => {
-            expect(screen.getByRole("button", { name: "Page 8" })).toBeInTheDocument();
+            expect(getPageButton(8)).toBeInTheDocument();
         });
 
-        await user.click(screen.getByRole("button", { name: "Page 8" }));
+        await user.click(getPageButton(8));
 
         await waitFor(() => {
             expect(mockUseAdminUsers).toHaveBeenCalledWith(
                 expect.objectContaining({ offset: 140 }),
             );
-            expect(screen.getByRole("button", { name: "Page 6" })).toBeInTheDocument();
-            expect(screen.getByRole("button", { name: "Page 7" })).toBeInTheDocument();
+            expect(getPageButton(6)).toBeInTheDocument();
+            expect(getPageButton(7)).toBeInTheDocument();
             expect(screen.getByText("…")).toBeInTheDocument();
         });
     });
@@ -452,16 +470,16 @@ describe("AdminUsersPage", () => {
 
         render(<AdminUsersPage />, { wrapper: createWrapper() });
 
-        await user.click(screen.getByRole("button", { name: "Page 3" }));
-        await user.click(screen.getByRole("button", { name: "Next page" }));
+        await user.click(getPageButton(3));
+        await user.click(screen.getByRole("button", { name: "users.nextPage" }));
 
         await waitFor(() => {
             expect(mockUseAdminUsers).toHaveBeenCalledWith(
                 expect.objectContaining({ offset: 60 }),
             );
-            expect(screen.getByRole("button", { name: "Page 3" })).toBeInTheDocument();
-            expect(screen.getByRole("button", { name: "Page 4" })).toBeInTheDocument();
-            expect(screen.getByRole("button", { name: "Page 5" })).toBeInTheDocument();
+            expect(getPageButton(3)).toBeInTheDocument();
+            expect(getPageButton(4)).toBeInTheDocument();
+            expect(getPageButton(5)).toBeInTheDocument();
             expect(screen.getAllByText("…")).toHaveLength(2);
         });
     });
@@ -475,7 +493,7 @@ describe("AdminUsersPage", () => {
         render(<AdminUsersPage />, { wrapper: createWrapper() });
 
         const callCountBefore = mockUseAdminUsers.mock.calls.length;
-        await user.click(screen.getByRole("button", { name: "Page 1" }));
+        await user.click(getPageButton(1));
 
         expect(mockUseAdminUsers.mock.calls.length).toBe(callCountBefore);
         expect(mockUseAdminUsers).toHaveBeenLastCalledWith(
@@ -494,9 +512,9 @@ describe("AdminUsersPage", () => {
 
         render(<AdminUsersPage />, { wrapper: createWrapper() });
 
-        expect(screen.getByRole("button", { name: "Next page" })).toBeDisabled();
-        expect(screen.getByText("0 total users")).toBeInTheDocument();
-        expect(screen.getByText("Showing 0-0 of 0 users")).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: "users.nextPage" })).toBeDisabled();
+        expect(screen.getByText("users.totalUsers")).toBeInTheDocument();
+        expect(screen.getByText("users.showing")).toBeInTheDocument();
     });
 
     it("applies search, role, and status filters then resets them", async () => {
@@ -506,7 +524,7 @@ describe("AdminUsersPage", () => {
         render(<AdminUsersPage />, { wrapper: createWrapper() });
 
         await user.type(
-            screen.getByPlaceholderText("Search by email or name..."),
+            screen.getByPlaceholderText("users.filters.searchPlaceholder"),
             "alice",
         );
 
@@ -519,7 +537,7 @@ describe("AdminUsersPage", () => {
             );
         });
 
-        await user.click(screen.getByText("Admins"));
+        await user.click(screen.getByText("users.filters.admins"));
         await waitFor(() => {
             expect(mockUseAdminUsers).toHaveBeenCalledWith(
                 expect.objectContaining({
@@ -529,7 +547,7 @@ describe("AdminUsersPage", () => {
             );
         });
 
-        await user.click(screen.getByText("Clients"));
+        await user.click(screen.getByText("users.filters.clients"));
         await waitFor(() => {
             expect(mockUseAdminUsers).toHaveBeenCalledWith(
                 expect.objectContaining({
@@ -539,7 +557,7 @@ describe("AdminUsersPage", () => {
             );
         });
 
-        await user.click(screen.getByText("All Roles"));
+        await user.click(screen.getByText("users.filters.allRoles"));
         await waitFor(() => {
             expect(mockUseAdminUsers).toHaveBeenCalledWith(
                 expect.objectContaining({
@@ -549,7 +567,7 @@ describe("AdminUsersPage", () => {
             );
         });
 
-        await user.click(screen.getByText("Active"));
+        await user.click(screen.getByText("users.filters.active"));
         await waitFor(() => {
             expect(mockUseAdminUsers).toHaveBeenCalledWith(
                 expect.objectContaining({
@@ -559,7 +577,7 @@ describe("AdminUsersPage", () => {
             );
         });
 
-        await user.click(screen.getByText("Inactive"));
+        await user.click(screen.getByText("users.filters.inactive"));
         await waitFor(() => {
             expect(mockUseAdminUsers).toHaveBeenCalledWith(
                 expect.objectContaining({
@@ -569,7 +587,7 @@ describe("AdminUsersPage", () => {
             );
         });
 
-        await user.click(screen.getByText("All Statuses"));
+        await user.click(screen.getByText("users.filters.allStatuses"));
         await waitFor(() => {
             expect(mockUseAdminUsers).toHaveBeenCalledWith(
                 expect.objectContaining({
@@ -579,7 +597,7 @@ describe("AdminUsersPage", () => {
             );
         });
 
-        await user.click(screen.getByRole("button", { name: /clear/i }));
+        await user.click(screen.getByRole("button", { name: "users.filters.clear" }));
 
         await waitFor(() => {
             expect(mockUseAdminUsers).toHaveBeenCalledWith(
@@ -607,7 +625,9 @@ describe("AdminUsersPage", () => {
 
         render(<AdminUsersPage />, { wrapper: createWrapper() });
 
-        const searchInput = screen.getByPlaceholderText("Search by email or name...");
+        const searchInput = screen.getByPlaceholderText(
+            "users.filters.searchPlaceholder",
+        );
         await user.type(searchInput, "bob");
 
         await waitFor(() => {

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Bot, Coins, Lock, Save } from "lucide-react";
 import { apiRequest } from "@/lib/api-client";
@@ -64,48 +65,65 @@ const AI_MODELS = [
 
 const TOKEN_COST_FIELDS: Array<{
     key: keyof ISystemConfig["tokens"]["costs"];
-    label: string;
-    hint: string;
+    labelKey: string;
+    hintKey: string;
 }> = [
-    { key: "autoTag", label: "Auto-tagging", hint: "per item" },
-    { key: "summarize", label: "Summarization", hint: "per 1k words" },
-    { key: "flashcards", label: "Flashcards", hint: "per set" },
-    { key: "ragQuery", label: "Q&A Query", hint: "per query" },
+    {
+        key: "autoTag",
+        labelKey: "systemConfig.tokens.autoTagging",
+        hintKey: "systemConfig.tokens.autoTaggingHint",
+    },
+    {
+        key: "summarize",
+        labelKey: "systemConfig.tokens.summarization",
+        hintKey: "systemConfig.tokens.summarizationHint",
+    },
+    {
+        key: "flashcards",
+        labelKey: "systemConfig.tokens.flashcards",
+        hintKey: "systemConfig.tokens.flashcardsHint",
+    },
+    {
+        key: "ragQuery",
+        labelKey: "systemConfig.tokens.ragQuery",
+        hintKey: "systemConfig.tokens.ragQueryHint",
+    },
 ];
 
 const FEATURE_FLAGS: Array<{
     key: keyof ISystemConfig["features"];
-    label: string;
-    description: string;
+    labelKey: string;
+    descriptionKey: string;
 }> = [
     {
         key: "summarizeEnabled",
-        label: "Summarization",
-        description: "Allow users to generate note summaries",
+        labelKey: "systemConfig.features.summarization",
+        descriptionKey: "systemConfig.features.summarizationDesc",
     },
     {
         key: "autoTagEnabled",
-        label: "Auto-Tagging",
-        description: "Allow automatic tag suggestions for notes",
+        labelKey: "systemConfig.features.autoTagging",
+        descriptionKey: "systemConfig.features.autoTaggingDesc",
     },
     {
         key: "flashcardsEnabled",
-        label: "Flashcards",
-        description: "Allow flashcard generation from notes",
+        labelKey: "systemConfig.features.flashcards",
+        descriptionKey: "systemConfig.features.flashcardsDesc",
     },
     {
         key: "ragQueryEnabled",
-        label: "Q&A / RAG Query",
-        description: "Allow knowledge-base question answering",
+        labelKey: "systemConfig.features.ragQuery",
+        descriptionKey: "systemConfig.features.ragQueryDesc",
     },
     {
         key: "fileExtractionEnabled",
-        label: "File Extraction",
-        description: "Allow PDF/TXT/MD content extraction",
+        labelKey: "systemConfig.features.fileExtraction",
+        descriptionKey: "systemConfig.features.fileExtractionDesc",
     },
 ];
 
 export function AdminSystemConfigPage() {
+    const { t } = useTranslation("admin");
     const queryClient = useQueryClient();
     const [formData, setFormData] = useState<ISystemConfig | null>(null);
     const [originalData, setOriginalData] = useState<ISystemConfig | null>(null);
@@ -138,7 +156,7 @@ export function AdminSystemConfigPage() {
             return response.data;
         },
         onSuccess: (updated) => {
-            toast.success("Configuration updated successfully");
+            toast.success(t("systemConfig.saveSuccess"));
             queryClient.invalidateQueries({ queryKey: ["system-config"] });
             queryClient.invalidateQueries({ queryKey: ["client-config"] });
             setFormData(updated);
@@ -146,9 +164,7 @@ export function AdminSystemConfigPage() {
         },
         onError: (error) => {
             toast.error(
-                error instanceof Error
-                    ? error.message
-                    : "Failed to update configuration",
+                error instanceof Error ? error.message : t("systemConfig.saveError"),
             );
         },
     });
@@ -255,9 +271,7 @@ export function AdminSystemConfigPage() {
     if (isLoading || !formData || !originalData) {
         return (
             <div className="flex items-center justify-center py-12">
-                <div className="text-muted-foreground">
-                    Loading system configuration...
-                </div>
+                <div className="text-muted-foreground">{t("systemConfig.loading")}</div>
             </div>
         );
     }
@@ -284,10 +298,10 @@ export function AdminSystemConfigPage() {
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="space-y-2">
                     <h1 className="text-foreground text-4xl font-bold tracking-tight">
-                        System Configuration
+                        {t("systemConfig.title")}
                     </h1>
                     <p className="text-muted-foreground text-lg">
-                        Manage global settings, AI models, and feature flags.
+                        {t("systemConfig.subtitle")}
                     </p>
                 </div>
                 <Button
@@ -295,7 +309,9 @@ export function AdminSystemConfigPage() {
                     disabled={updateMutation.isPending || !hasChanges}
                     className="gap-2 self-start"
                 >
-                    {updateMutation.isPending ? "Saving..." : "Save Changes"}
+                    {updateMutation.isPending
+                        ? t("systemConfig.saving")
+                        : t("systemConfig.save")}
                     <Save className="size-4" />
                 </Button>
             </div>
@@ -305,13 +321,13 @@ export function AdminSystemConfigPage() {
                 <header className="border-border flex items-center gap-3 border-b px-4 py-4 sm:px-6">
                     <Bot className="text-foreground size-6" />
                     <h2 className="text-foreground text-xl font-bold">
-                        AI Configuration
+                        {t("systemConfig.ai.title")}
                     </h2>
                 </header>
 
                 <div className="space-y-8 p-4 sm:p-6">
                     <div className="space-y-2">
-                        <Label htmlFor="ai-model">Default Gemini Model</Label>
+                        <Label htmlFor="ai-model">{t("systemConfig.ai.model")}</Label>
                         <NativeSelect
                             id="ai-model"
                             className="w-full"
@@ -330,17 +346,19 @@ export function AdminSystemConfigPage() {
                             ))}
                         </NativeSelect>
                         <p id="ai-model-hint" className="text-muted-foreground text-xs">
-                            Selected model will be used for all general purpose queries.
+                            {t("systemConfig.ai.modelHint")}
                         </p>
                     </div>
 
                     <div className="space-y-4">
                         <h3 className="text-muted-foreground text-sm font-bold tracking-wider uppercase">
-                            Operational Limits
+                            {t("systemConfig.ai.operationalLimits")}
                         </h3>
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                             <div className="space-y-2">
-                                <Label htmlFor="max-tokens">Max tokens / Op</Label>
+                                <Label htmlFor="max-tokens">
+                                    {t("systemConfig.ai.maxTokens")}
+                                </Label>
                                 <Input
                                     id="max-tokens"
                                     type="number"
@@ -358,7 +376,7 @@ export function AdminSystemConfigPage() {
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="ai-requests-hour">
-                                    Max Ops / User / Hour
+                                    {t("systemConfig.ai.maxOpsHour")}
                                 </Label>
                                 <Input
                                     id="ai-requests-hour"
@@ -377,7 +395,7 @@ export function AdminSystemConfigPage() {
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="file-extractions-day">
-                                    File Extractions / Day
+                                    {t("systemConfig.ai.fileExtractionsDay")}
                                 </Label>
                                 <Input
                                     id="file-extractions-day"
@@ -397,7 +415,9 @@ export function AdminSystemConfigPage() {
                         </div>
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div className="space-y-2">
-                                <Label htmlFor="temperature">Temperature</Label>
+                                <Label htmlFor="temperature">
+                                    {t("systemConfig.ai.temperature")}
+                                </Label>
                                 <Input
                                     id="temperature"
                                     type="number"
@@ -415,13 +435,12 @@ export function AdminSystemConfigPage() {
                                     className="[appearance:textfield] rounded-3xl [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                                 />
                                 <p className="text-muted-foreground text-xs">
-                                    Recommended: 1.0 for Gemini 3+, 0.7 for earlier
-                                    models
+                                    {t("systemConfig.ai.temperatureHint")}
                                 </p>
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="thinking-level">
-                                    Thinking Level (Gemini 3+)
+                                    {t("systemConfig.ai.thinkingLevel")}
                                 </Label>
                                 <NativeSelect
                                     id="thinking-level"
@@ -433,26 +452,26 @@ export function AdminSystemConfigPage() {
                                     disabled={updateMutation.isPending}
                                 >
                                     <NativeSelectOption value="minimal">
-                                        Minimal (Lowest latency)
+                                        {t("systemConfig.ai.thinkingMinimal")}
                                     </NativeSelectOption>
                                     <NativeSelectOption value="low">
-                                        Low (Fast responses)
+                                        {t("systemConfig.ai.thinkingLow")}
                                     </NativeSelectOption>
                                     <NativeSelectOption value="medium">
-                                        Medium (Balanced)
+                                        {t("systemConfig.ai.thinkingMedium")}
                                     </NativeSelectOption>
                                     <NativeSelectOption value="high">
-                                        High (Deep reasoning)
+                                        {t("systemConfig.ai.thinkingHigh")}
                                     </NativeSelectOption>
                                 </NativeSelect>
                                 <p className="text-muted-foreground text-xs">
-                                    Controls reasoning depth for Gemini 3+ models
+                                    {t("systemConfig.ai.thinkingLevelHint")}
                                 </p>
                             </div>
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="thinking-budget">
-                                Thinking Budget (Gemini 2.5)
+                                {t("systemConfig.ai.thinkingBudget")}
                             </Label>
                             <Input
                                 id="thinking-budget"
@@ -469,8 +488,7 @@ export function AdminSystemConfigPage() {
                                 className="max-w-xs [appearance:textfield] rounded-3xl [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                             />
                             <p className="text-muted-foreground text-xs">
-                                -1 = Dynamic, 0 = Disabled, {">"}0 = Specific token
-                                count (Gemini 2.5 only)
+                                {t("systemConfig.ai.thinkingBudgetHint")}
                             </p>
                         </div>
                     </div>
@@ -480,7 +498,7 @@ export function AdminSystemConfigPage() {
                     <footer className="border-border text-muted-foreground border-t px-4 py-3 text-xs sm:px-6">
                         {formData.lastUpdatedBy && (
                             <span>
-                                Last modified by{" "}
+                                {t("systemConfig.meta.lastModifiedBy")}{" "}
                                 <span className="text-foreground font-bold">
                                     {formData.lastUpdatedBy}
                                 </span>
@@ -488,11 +506,18 @@ export function AdminSystemConfigPage() {
                         )}
                         {formData.lastUpdatedAt && (
                             <span>
-                                {formData.lastUpdatedBy ? " on " : "Last updated "}
+                                {formData.lastUpdatedBy
+                                    ? ` ${t("systemConfig.meta.on")} `
+                                    : `${t("systemConfig.meta.lastUpdated")} `}
                                 {new Date(formData.lastUpdatedAt).toLocaleDateString()}
                             </span>
                         )}
-                        <span className="ml-2">· Version {formData.version}</span>
+                        <span className="ml-2">
+                            ·{" "}
+                            {t("systemConfig.meta.version", {
+                                version: formData.version,
+                            })}
+                        </span>
                     </footer>
                 )}
             </section>
@@ -503,21 +528,23 @@ export function AdminSystemConfigPage() {
                     <div className="bg-success/20 flex size-10 items-center justify-center rounded-2xl">
                         <Coins className="text-success size-5" />
                     </div>
-                    <h2 className="text-foreground text-xl font-bold">Token Economy</h2>
+                    <h2 className="text-foreground text-xl font-bold">
+                        {t("systemConfig.tokens.title")}
+                    </h2>
                 </header>
 
                 <div className="space-y-8 p-4 sm:p-6">
                     <div className="space-y-4">
                         <h3 className="text-muted-foreground text-sm font-bold tracking-wider uppercase">
-                            Feature Costs (Tokens)
+                            {t("systemConfig.tokens.featureCosts")}
                         </h3>
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            {TOKEN_COST_FIELDS.map(({ key, label, hint }) => (
+                            {TOKEN_COST_FIELDS.map(({ key, labelKey, hintKey }) => (
                                 <div
                                     key={key}
                                     className="bg-muted/40 border-border space-y-2 rounded-3xl border p-4"
                                 >
-                                    <Label htmlFor={`cost-${key}`}>{label}</Label>
+                                    <Label htmlFor={`cost-${key}`}>{t(labelKey)}</Label>
                                     <Input
                                         id={`cost-${key}`}
                                         type="number"
@@ -533,7 +560,7 @@ export function AdminSystemConfigPage() {
                                         className="[appearance:textfield] rounded-xl text-xl font-bold [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                                     />
                                     <p className="text-muted-foreground text-xs">
-                                        {hint}
+                                        {t(hintKey)}
                                     </p>
                                 </div>
                             ))}
@@ -542,19 +569,33 @@ export function AdminSystemConfigPage() {
 
                     <div className="space-y-4">
                         <h3 className="text-muted-foreground text-sm font-bold tracking-wider uppercase">
-                            New User Grants
+                            {t("systemConfig.tokens.newUserGrants")}
                         </h3>
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
                             {(
                                 [
-                                    { key: "production", label: "Production" },
-                                    { key: "staging", label: "Staging" },
-                                    { key: "development", label: "Development" },
-                                    { key: "local", label: "Local" },
+                                    {
+                                        key: "production",
+                                        labelKey: "systemConfig.tokens.production",
+                                    },
+                                    {
+                                        key: "staging",
+                                        labelKey: "systemConfig.tokens.staging",
+                                    },
+                                    {
+                                        key: "development",
+                                        labelKey: "systemConfig.tokens.development",
+                                    },
+                                    {
+                                        key: "local",
+                                        labelKey: "systemConfig.tokens.local",
+                                    },
                                 ] as const
-                            ).map(({ key, label }) => (
+                            ).map(({ key, labelKey }) => (
                                 <div key={key} className="space-y-2">
-                                    <Label htmlFor={`grant-${key}`}>{label}</Label>
+                                    <Label htmlFor={`grant-${key}`}>
+                                        {t(labelKey)}
+                                    </Label>
                                     <Input
                                         id={`grant-${key}`}
                                         type="number"
@@ -580,12 +621,15 @@ export function AdminSystemConfigPage() {
             <section className="bg-card border-border overflow-hidden rounded-2xl border">
                 <header className="border-border flex items-center gap-3 border-b px-4 py-4 sm:px-6">
                     <Lock className="text-foreground size-6" />
-                    <h2 className="text-foreground text-xl font-bold">Feature Flags</h2>
+                    <h2 className="text-foreground text-xl font-bold">
+                        {t("systemConfig.features.title")}
+                    </h2>
                 </header>
 
                 <div className="divide-border divide-y">
-                    {FEATURE_FLAGS.map(({ key, label, description }) => {
+                    {FEATURE_FLAGS.map(({ key, labelKey, descriptionKey }) => {
                         const enabled = Boolean(displayFeatures[key]);
+                        const label = t(labelKey);
                         return (
                             <div
                                 key={key}
@@ -596,7 +640,7 @@ export function AdminSystemConfigPage() {
                                         {label}
                                     </p>
                                     <p className="text-muted-foreground text-xs">
-                                        {description}
+                                        {t(descriptionKey)}
                                     </p>
                                 </div>
                                 <div className="flex items-center gap-3">
@@ -608,7 +652,9 @@ export function AdminSystemConfigPage() {
                                                 : "text-muted-foreground",
                                         )}
                                     >
-                                        {enabled ? "ON" : "OFF"}
+                                        {enabled
+                                            ? t("systemConfig.features.on")
+                                            : t("systemConfig.features.off")}
                                     </span>
                                     <Switch
                                         checked={enabled}

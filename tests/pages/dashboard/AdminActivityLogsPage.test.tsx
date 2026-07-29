@@ -118,26 +118,24 @@ describe("AdminActivityLogsPage", () => {
     it("renders page header", () => {
         render(<AdminActivityLogsPage />, { wrapper: createWrapper() });
 
-        expect(screen.getByText("Activity Logs")).toBeInTheDocument();
-        expect(screen.getByText("System Activity")).toBeInTheDocument();
-        expect(
-            screen.getByText("Monitor all system activities across all users"),
-        ).toBeInTheDocument();
+        expect(screen.getByText("activityLogs.title")).toBeInTheDocument();
+        expect(screen.getByText("activityLogs.eyebrow")).toBeInTheDocument();
+        expect(screen.getByText("activityLogs.subtitle")).toBeInTheDocument();
     });
 
     it("renders category tabs and activity entries", () => {
         render(<AdminActivityLogsPage />, { wrapper: createWrapper() });
 
-        expect(screen.getByText("All Activity")).toBeInTheDocument();
-        expect(screen.getByText("AI Operations")).toBeInTheDocument();
-        expect(screen.getByText("Tokens")).toBeInTheDocument();
-        expect(screen.getByText("Notes")).toBeInTheDocument();
-        expect(screen.getByText("Folders")).toBeInTheDocument();
+        expect(screen.getByText("activityLogs.tabs.all")).toBeInTheDocument();
+        expect(screen.getByText("activityLogs.tabs.ai")).toBeInTheDocument();
+        expect(screen.getByText("activityLogs.tabs.tokens")).toBeInTheDocument();
+        expect(screen.getByText("activityLogs.tabs.notes")).toBeInTheDocument();
+        expect(screen.getByText("activityLogs.tabs.folders")).toBeInTheDocument();
 
         expect(screen.getByText("Summarized a note")).toBeInTheDocument();
         expect(screen.getByText("Tokens granted")).toBeInTheDocument();
         expect(screen.getByText("Test User")).toBeInTheDocument();
-        expect(screen.getByText("Showing 5 of 5 activities")).toBeInTheDocument();
+        expect(screen.getByText("activityLogs.showing")).toBeInTheDocument();
     });
 
     it("shows loading state when there are no entries yet", () => {
@@ -148,7 +146,7 @@ describe("AdminActivityLogsPage", () => {
 
         render(<AdminActivityLogsPage />, { wrapper: createWrapper() });
 
-        expect(screen.getByText("Loading activity logs...")).toBeInTheDocument();
+        expect(screen.getByText("activityLogs.loading")).toBeInTheDocument();
     });
 
     it("shows error state", () => {
@@ -161,9 +159,7 @@ describe("AdminActivityLogsPage", () => {
 
         render(<AdminActivityLogsPage />, { wrapper: createWrapper() });
 
-        expect(
-            screen.getByText("Failed to load activity logs. Please try again."),
-        ).toBeInTheDocument();
+        expect(screen.getByText("activityLogs.loadError")).toBeInTheDocument();
     });
 
     it("shows empty state when there are no matching logs", () => {
@@ -175,9 +171,7 @@ describe("AdminActivityLogsPage", () => {
 
         render(<AdminActivityLogsPage />, { wrapper: createWrapper() });
 
-        expect(
-            screen.getByText("No activity logs found. Try adjusting your filters."),
-        ).toBeInTheDocument();
+        expect(screen.getByText("activityLogs.empty")).toBeInTheDocument();
     });
 
     it("changes category filter and resets limit", async () => {
@@ -186,7 +180,7 @@ describe("AdminActivityLogsPage", () => {
 
         render(<AdminActivityLogsPage />, { wrapper: createWrapper() });
 
-        await user.click(screen.getByText("AI Operations"));
+        await user.click(screen.getByText("activityLogs.tabs.ai"));
 
         await waitFor(() => {
             expect(mockUseAdminActivityLogs).toHaveBeenCalledWith(
@@ -205,9 +199,7 @@ describe("AdminActivityLogsPage", () => {
 
         render(<AdminActivityLogsPage />, { wrapper: createWrapper() });
 
-        const input = screen.getByPlaceholderText(
-            "Search by user email, action, or description...",
-        );
+        const input = screen.getByPlaceholderText("activityLogs.searchPlaceholder");
         await user.type(input, "summary");
 
         await waitFor(() => {
@@ -219,9 +211,11 @@ describe("AdminActivityLogsPage", () => {
             );
         });
 
-        expect(screen.getByRole("button", { name: "Clear" })).toBeInTheDocument();
+        expect(
+            screen.getByRole("button", { name: "activityLogs.clear" }),
+        ).toBeInTheDocument();
 
-        await user.click(screen.getByRole("button", { name: "Clear" }));
+        await user.click(screen.getByRole("button", { name: "activityLogs.clear" }));
 
         await waitFor(() => {
             expect(mockUseAdminActivityLogs).toHaveBeenCalledWith(
@@ -246,9 +240,11 @@ describe("AdminActivityLogsPage", () => {
 
         render(<AdminActivityLogsPage />, { wrapper: createWrapper() });
 
-        expect(screen.getByText("Showing 5 of 120 activities")).toBeInTheDocument();
+        expect(screen.getByText("activityLogs.showing")).toBeInTheDocument();
 
-        await user.click(screen.getByRole("button", { name: /load more/i }));
+        await user.click(
+            screen.getByRole("button", { name: /activityLogs\.loadMore/i }),
+        );
 
         await waitFor(() => {
             expect(mockUseAdminActivityLogs).toHaveBeenCalledWith(
@@ -272,7 +268,9 @@ describe("AdminActivityLogsPage", () => {
 
         render(<AdminActivityLogsPage />, { wrapper: createWrapper() });
 
-        expect(screen.getByRole("button", { name: /load more/i })).toBeDisabled();
+        expect(
+            screen.getByRole("button", { name: /activityLogs\.loadMore/i }),
+        ).toBeDisabled();
     });
 
     it("falls back to FileText icon and default color for unknown hints", () => {

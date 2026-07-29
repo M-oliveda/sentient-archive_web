@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
     Card,
     CardContent,
@@ -33,24 +34,25 @@ import {
 } from "recharts";
 
 export function AdminAnalyticsPage() {
+    const { t, i18n } = useTranslation("admin");
     const [dateRange, setDateRange] = useState<AnalyticsDateRange>("30d");
     const { data: analytics, isLoading, isError } = useAdminAnalytics(dateRange);
 
-    const getDateRangeText = () => {
-        switch (dateRange) {
-            case "7d":
-                return "Last 7 days";
-            case "30d":
-                return "Last 30 days";
-            case "90d":
-                return "Last 90 days";
-        }
-    };
+    const getDateRangeText = () => t(`analytics.lastDays.${dateRange}`);
+
+    const formatShortDate = (date: string) =>
+        new Date(date).toLocaleDateString(i18n.language, {
+            month: "short",
+            day: "numeric",
+        });
+
+    const formatFullDate = (date: string) =>
+        new Date(date).toLocaleDateString(i18n.language);
 
     if (isLoading) {
         return (
             <div className="flex items-center justify-center py-12">
-                <div className="text-muted-foreground">Loading analytics...</div>
+                <div className="text-muted-foreground">{t("analytics.loading")}</div>
             </div>
         );
     }
@@ -58,9 +60,7 @@ export function AdminAnalyticsPage() {
     if (isError) {
         return (
             <div className="flex items-center justify-center py-12">
-                <div className="text-destructive">
-                    Failed to load analytics. Please try again.
-                </div>
+                <div className="text-destructive">{t("analytics.loadError")}</div>
             </div>
         );
     }
@@ -68,16 +68,18 @@ export function AdminAnalyticsPage() {
     return (
         <section className="space-y-8">
             <div className="space-y-2">
-                <h1 className="text-foreground text-4xl font-bold">Analytics</h1>
+                <h1 className="text-foreground text-4xl font-bold">
+                    {t("analytics.title")}
+                </h1>
                 <p className="text-muted-foreground text-lg">
-                    System-wide usage statistics and insights
+                    {t("analytics.subtitle")}
                 </p>
             </div>
 
             {/* Date range selector */}
             <div className="flex flex-wrap gap-2">
                 <span className="text-foreground flex items-center text-sm font-medium">
-                    Period:
+                    {t("analytics.period")}
                 </span>
                 {(["7d", "30d", "90d"] as const).map((range) => (
                     <Badge
@@ -86,11 +88,7 @@ export function AdminAnalyticsPage() {
                         className="cursor-pointer px-3 py-2 text-sm font-medium"
                         onClick={() => setDateRange(range)}
                     >
-                        {range === "7d"
-                            ? "7 days"
-                            : range === "30d"
-                              ? "30 days"
-                              : "90 days"}
+                        {t(`analytics.ranges.${range}`)}
                     </Badge>
                 ))}
             </div>
@@ -101,7 +99,7 @@ export function AdminAnalyticsPage() {
                     <CardHeader className="pb-2">
                         <CardTitle className="flex items-center gap-2 text-sm font-medium">
                             <Users className="text-muted-foreground h-4 w-4" />
-                            Total Users
+                            {t("analytics.cards.totalUsers")}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -109,7 +107,9 @@ export function AdminAnalyticsPage() {
                             {analytics?.users?.total || 0}
                         </div>
                         <p className="text-muted-foreground mt-1 text-xs">
-                            {analytics?.users?.active || 0} active
+                            {t("analytics.cards.activeCount", {
+                                count: analytics?.users?.active || 0,
+                            })}
                         </p>
                     </CardContent>
                 </Card>
@@ -118,7 +118,7 @@ export function AdminAnalyticsPage() {
                     <CardHeader className="pb-2">
                         <CardTitle className="flex items-center gap-2 text-sm font-medium">
                             <FileText className="text-muted-foreground h-4 w-4" />
-                            Total Notes
+                            {t("analytics.cards.totalNotes")}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -126,7 +126,7 @@ export function AdminAnalyticsPage() {
                             {analytics?.notes?.total || 0}
                         </div>
                         <p className="text-muted-foreground mt-1 text-xs">
-                            Created by users
+                            {t("analytics.cards.notesCreated")}
                         </p>
                     </CardContent>
                 </Card>
@@ -135,7 +135,7 @@ export function AdminAnalyticsPage() {
                     <CardHeader className="pb-2">
                         <CardTitle className="flex items-center gap-2 text-sm font-medium">
                             <Coins className="text-muted-foreground h-4 w-4" />
-                            Tokens Spent
+                            {t("analytics.cards.tokensSpent")}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -143,7 +143,9 @@ export function AdminAnalyticsPage() {
                             {analytics?.tokens?.totalSpent || 0}
                         </div>
                         <p className="text-muted-foreground mt-1 text-xs">
-                            {analytics?.tokens?.netBalance || 0} net balance
+                            {t("analytics.cards.netBalance", {
+                                count: analytics?.tokens?.netBalance || 0,
+                            })}
                         </p>
                     </CardContent>
                 </Card>
@@ -152,7 +154,7 @@ export function AdminAnalyticsPage() {
                     <CardHeader className="pb-2">
                         <CardTitle className="flex items-center gap-2 text-sm font-medium">
                             <Bot className="text-muted-foreground h-4 w-4" />
-                            AI Operations
+                            {t("analytics.cards.aiOperations")}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -171,32 +173,34 @@ export function AdminAnalyticsPage() {
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <BarChart3 className="h-5 w-5" />
-                        AI Operations Breakdown
+                        {t("analytics.aiBreakdown.title")}
                     </CardTitle>
-                    <CardDescription>Usage by operation type</CardDescription>
+                    <CardDescription>
+                        {t("analytics.aiBreakdown.description")}
+                    </CardDescription>
                 </CardHeader>
                 <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
                         <BarChart
                             data={[
                                 {
-                                    name: "Summarization",
+                                    name: t("analytics.aiBreakdown.summarization"),
                                     count:
                                         analytics?.aiOperations?.byType?.summarize || 0,
                                 },
                                 {
-                                    name: "Auto-Tagging",
+                                    name: t("analytics.aiBreakdown.autoTagging"),
                                     count:
                                         analytics?.aiOperations?.byType?.autoTag || 0,
                                 },
                                 {
-                                    name: "Flashcards",
+                                    name: t("analytics.aiBreakdown.flashcards"),
                                     count:
                                         analytics?.aiOperations?.byType?.flashcards ||
                                         0,
                                 },
                                 {
-                                    name: "Q&A",
+                                    name: t("analytics.aiBreakdown.qa"),
                                     count:
                                         analytics?.aiOperations?.byType?.ragQuery || 0,
                                 },
@@ -235,10 +239,12 @@ export function AdminAnalyticsPage() {
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <TrendingUp className="h-5 w-5" />
-                            AI Operations Trend
+                            {t("analytics.aiTrend.title")}
                         </CardTitle>
                         <CardDescription>
-                            Operations over time ({getDateRangeText()})
+                            {t("analytics.aiTrend.description", {
+                                range: getDateRangeText(),
+                            })}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -254,12 +260,7 @@ export function AdminAnalyticsPage() {
                                 <XAxis
                                     dataKey="date"
                                     className="text-muted-foreground text-xs"
-                                    tickFormatter={(date) =>
-                                        new Date(date).toLocaleDateString("en-US", {
-                                            month: "short",
-                                            day: "numeric",
-                                        })
-                                    }
+                                    tickFormatter={formatShortDate}
                                 />
                                 <YAxis className="text-muted-foreground text-xs" />
                                 <Tooltip
@@ -268,9 +269,7 @@ export function AdminAnalyticsPage() {
                                         border: "1px solid hsl(var(--border))",
                                         borderRadius: "0.5rem",
                                     }}
-                                    labelFormatter={(date) =>
-                                        new Date(date).toLocaleDateString()
-                                    }
+                                    labelFormatter={formatFullDate}
                                 />
                                 <Line
                                     type="monotone"
@@ -291,10 +290,12 @@ export function AdminAnalyticsPage() {
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <Coins className="h-5 w-5" />
-                            Token Usage Trend
+                            {t("analytics.tokenTrend.title")}
                         </CardTitle>
                         <CardDescription>
-                            Granted vs spent ({getDateRangeText()})
+                            {t("analytics.tokenTrend.description", {
+                                range: getDateRangeText(),
+                            })}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -310,12 +311,7 @@ export function AdminAnalyticsPage() {
                                 <XAxis
                                     dataKey="date"
                                     className="text-muted-foreground text-xs"
-                                    tickFormatter={(date) =>
-                                        new Date(date).toLocaleDateString("en-US", {
-                                            month: "short",
-                                            day: "numeric",
-                                        })
-                                    }
+                                    tickFormatter={formatShortDate}
                                 />
                                 <YAxis className="text-muted-foreground text-xs" />
                                 <Tooltip
@@ -324,9 +320,7 @@ export function AdminAnalyticsPage() {
                                         border: "1px solid hsl(var(--border))",
                                         borderRadius: "0.5rem",
                                     }}
-                                    labelFormatter={(date) =>
-                                        new Date(date).toLocaleDateString()
-                                    }
+                                    labelFormatter={formatFullDate}
                                 />
                                 <Legend />
                                 <Line
@@ -334,7 +328,7 @@ export function AdminAnalyticsPage() {
                                     dataKey="granted"
                                     stroke="hsl(var(--success))"
                                     strokeWidth={2}
-                                    name="Granted"
+                                    name={t("analytics.tokenTrend.granted")}
                                     dot={{ fill: "hsl(var(--success))" }}
                                 />
                                 <Line
@@ -342,7 +336,7 @@ export function AdminAnalyticsPage() {
                                     dataKey="spent"
                                     stroke="hsl(var(--error))"
                                     strokeWidth={2}
-                                    name="Spent"
+                                    name={t("analytics.tokenTrend.spent")}
                                     dot={{ fill: "hsl(var(--error))" }}
                                 />
                             </LineChart>
@@ -357,10 +351,12 @@ export function AdminAnalyticsPage() {
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <Activity className="h-5 w-5" />
-                            User Growth
+                            {t("analytics.userGrowth.title")}
                         </CardTitle>
                         <CardDescription>
-                            Total and new users ({getDateRangeText()})
+                            {t("analytics.userGrowth.description", {
+                                range: getDateRangeText(),
+                            })}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -396,12 +392,7 @@ export function AdminAnalyticsPage() {
                                 <XAxis
                                     dataKey="date"
                                     className="text-muted-foreground text-xs"
-                                    tickFormatter={(date) =>
-                                        new Date(date).toLocaleDateString("en-US", {
-                                            month: "short",
-                                            day: "numeric",
-                                        })
-                                    }
+                                    tickFormatter={formatShortDate}
                                 />
                                 <YAxis className="text-muted-foreground text-xs" />
                                 <Tooltip
@@ -410,9 +401,7 @@ export function AdminAnalyticsPage() {
                                         border: "1px solid hsl(var(--border))",
                                         borderRadius: "0.5rem",
                                     }}
-                                    labelFormatter={(date) =>
-                                        new Date(date).toLocaleDateString()
-                                    }
+                                    labelFormatter={formatFullDate}
                                 />
                                 <Legend />
                                 <Area
@@ -421,7 +410,7 @@ export function AdminAnalyticsPage() {
                                     stroke="hsl(var(--primary))"
                                     fillOpacity={1}
                                     fill="url(#colorTotal)"
-                                    name="Total Users"
+                                    name={t("analytics.userGrowth.totalUsers")}
                                 />
                             </AreaChart>
                         </ResponsiveContainer>
@@ -432,8 +421,10 @@ export function AdminAnalyticsPage() {
             {/* User Distribution */}
             <Card>
                 <CardHeader>
-                    <CardTitle>User Distribution</CardTitle>
-                    <CardDescription>User count by role and status</CardDescription>
+                    <CardTitle>{t("analytics.distribution.title")}</CardTitle>
+                    <CardDescription>
+                        {t("analytics.distribution.description")}
+                    </CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -442,7 +433,7 @@ export function AdminAnalyticsPage() {
                                 {analytics?.users?.clients || 0}
                             </div>
                             <div className="text-muted-foreground mt-1 text-xs">
-                                Clients
+                                {t("analytics.distribution.clients")}
                             </div>
                         </div>
                         <div className="bg-muted/30 rounded-lg p-4 text-center">
@@ -450,7 +441,7 @@ export function AdminAnalyticsPage() {
                                 {analytics?.users?.admins || 0}
                             </div>
                             <div className="text-muted-foreground mt-1 text-xs">
-                                Admins
+                                {t("analytics.distribution.admins")}
                             </div>
                         </div>
                         <div className="bg-muted/30 rounded-lg p-4 text-center">
@@ -458,7 +449,7 @@ export function AdminAnalyticsPage() {
                                 {analytics?.users?.active || 0}
                             </div>
                             <div className="text-muted-foreground mt-1 text-xs">
-                                Active
+                                {t("analytics.distribution.active")}
                             </div>
                         </div>
                         <div className="bg-muted/30 rounded-lg p-4 text-center">
@@ -466,7 +457,7 @@ export function AdminAnalyticsPage() {
                                 {analytics?.users?.inactive || 0}
                             </div>
                             <div className="text-muted-foreground mt-1 text-xs">
-                                Inactive
+                                {t("analytics.distribution.inactive")}
                             </div>
                         </div>
                     </div>
