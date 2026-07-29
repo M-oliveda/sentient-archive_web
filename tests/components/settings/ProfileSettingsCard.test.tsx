@@ -10,6 +10,14 @@ jest.mock("sonner", () => ({
     },
 }));
 
+jest.mock("@/lib/i18n", () => ({
+    __esModule: true,
+    default: {
+        language: "en",
+        t: (key: string) => key,
+    },
+}));
+
 jest.mock("@/hooks/useUpdateProfile", () => ({
     useUpdateProfile: jest.fn(),
 }));
@@ -64,6 +72,7 @@ describe("ProfileSettingsCard", () => {
                 screen.getByTestId("profile-display-name-error"),
             ).toBeInTheDocument();
         });
+        expect(screen.getByText("validation.displayNameRequired")).toBeInTheDocument();
         expect(mockMutateAsync).not.toHaveBeenCalled();
     });
 
@@ -86,7 +95,7 @@ describe("ProfileSettingsCard", () => {
                 displayName: "Jane Doe",
             });
         });
-        expect(toast.success).toHaveBeenCalledWith("Profile updated");
+        expect(toast.success).toHaveBeenCalledWith("card.updateSuccess");
     });
 
     it("shows error toast when mutation fails", async () => {
@@ -127,7 +136,7 @@ describe("ProfileSettingsCard", () => {
         fireEvent.click(screen.getByTestId("profile-save-button"));
 
         await waitFor(() => {
-            expect(toast.error).toHaveBeenCalledWith("Failed to update profile");
+            expect(toast.error).toHaveBeenCalledWith("card.updateError");
         });
     });
 
@@ -170,8 +179,24 @@ describe("ProfileSettingsCard", () => {
         );
 
         expect(screen.getByTestId("profile-save-button")).toHaveTextContent(
-            "Saving...",
+            "card.saving",
         );
         expect(screen.getByTestId("profile-save-button")).toBeDisabled();
+    });
+
+    it("renders translated field labels and save button", () => {
+        render(
+            <ProfileSettingsCard
+                displayName="John Doe"
+                email="john@example.com"
+                photoURL={null}
+            />,
+        );
+
+        expect(screen.getByText("card.fullName")).toBeInTheDocument();
+        expect(screen.getByText("card.username")).toBeInTheDocument();
+        expect(screen.getByTestId("profile-save-button")).toHaveTextContent(
+            "card.save",
+        );
     });
 });
