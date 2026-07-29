@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import path from "path";
+import { visualizer } from "rollup-plugin-visualizer";
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -13,7 +14,15 @@ export default defineConfig({
         }),
         react(),
         tailwindcss(),
-    ],
+        process.env.ANALYZE === "true"
+            ? visualizer({
+                  filename: "dist/bundle-stats.html",
+                  open: false,
+                  gzipSize: true,
+                  brotliSize: true,
+              })
+            : undefined,
+    ].filter(Boolean),
     resolve: {
         alias: {
             "@": path.resolve(__dirname, "./src"),
@@ -48,6 +57,7 @@ export default defineConfig({
                     vendor: ["react", "react-dom"],
                     router: ["@tanstack/react-router"],
                     firebase: ["firebase/app", "firebase/auth", "firebase/firestore"],
+                    charts: ["recharts"],
                 },
             },
         },

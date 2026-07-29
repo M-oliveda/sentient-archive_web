@@ -68,8 +68,8 @@ describe("AdminDashboardHome", () => {
             isLoading: true,
         });
         render(<AdminDashboardHome />);
-        const dashes = screen.getAllByText("—");
-        expect(dashes).toHaveLength(4);
+        expect(screen.queryByText("admin.stats.totalUsers")).not.toBeInTheDocument();
+        expect(document.querySelectorAll('[data-slot="skeleton"]').length).toBe(4);
     });
 
     it("renders stat values from API data", () => {

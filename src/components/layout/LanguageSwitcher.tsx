@@ -5,6 +5,7 @@
  */
 
 import { Languages } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -28,6 +29,7 @@ function resolveLanguage(language: string): SupportedLanguage {
 }
 
 export function LanguageSwitcher() {
+    const { t } = useTranslation("layout");
     const { currentLanguage, supportedLanguages, changeLanguage } = useLanguage();
     const { mutate: updateLanguage } = useUpdateLanguage();
     const { isAuthenticated } = useAuthStore();
@@ -53,7 +55,7 @@ export function LanguageSwitcher() {
                         variant="ghost"
                         size="sm"
                         className="gap-1.5 px-2"
-                        aria-label="Select language"
+                        aria-label={t("selectLanguage")}
                     />
                 }
             >

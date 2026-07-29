@@ -186,7 +186,7 @@ describe("AdminAnalyticsPage", () => {
 
         render(<AdminAnalyticsPage />, { wrapper: createWrapper() });
 
-        expect(screen.getByText("analytics.loading")).toBeInTheDocument();
+        expect(screen.getByTestId("admin-analytics-loading")).toBeInTheDocument();
     });
 
     it("shows error state when analytics fail to load", () => {

@@ -18,6 +18,12 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:staging": "E2E_TARGET=staging playwright test",
+    "test:e2e:preview": "E2E_TARGET=preview playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:public": "E2E_SKIP_AUTH=1 playwright test --project=local-chromium e2e/public e2e/auth/login.spec.ts e2e/auth/protected-routes.spec.ts e2e/a11y e2e/i18n",
+    "analyze": "ANALYZE=true vite build",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -71,10 +77,12 @@
     "zustand": "^5.0.3"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.12.1",
     "@babel/preset-env": "^7.29.0",
     "@babel/preset-react": "^7.28.5",
     "@babel/preset-typescript": "^7.28.5",
     "@eslint/js": "^9.18.0",
+    "@playwright/test": "^1.62.0",
     "@tailwindcss/vite": "^4.0.0",
     "@tanstack/react-query-devtools": "^5.64.1",
     "@tanstack/router-devtools": "^1.95.1",
@@ -89,6 +97,7 @@
     "@vitejs/plugin-react": "^4.3.4",
     "babel-jest": "^30.2.0",
     "babel-plugin-transform-import-meta": "^2.3.3",
+    "dotenv": "^17.4.2",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
@@ -104,6 +113,7 @@
     "msw": "^2.7.0",
     "prettier": "^3.4.2",
     "prettier-plugin-tailwindcss": "^0.8.0",
+    "rollup-plugin-visualizer": "^7.0.1",
     "tailwindcss": "^4.0.0",
     "ts-jest": "^29.2.5",
     "typescript": "~5.7.3",

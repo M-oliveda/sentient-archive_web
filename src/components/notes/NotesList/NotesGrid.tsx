@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { NoteCard } from "@/components/notes/NoteCard";
-import { Spinner } from "@/components/ui/spinner";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { INote } from "@/types/note";
 
 interface INotesGridProps {
@@ -22,8 +22,15 @@ export function NotesGrid({
 
     if (isLoading) {
         return (
-            <div className="flex min-h-0 flex-1 items-center justify-center">
-                <Spinner className="size-6" />
+            <div
+                className="min-h-0 flex-1 overflow-y-auto"
+                data-testid="notes-grid-loading"
+            >
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                        <Skeleton key={i} className="h-40 rounded-2xl" />
+                    ))}
+                </div>
             </div>
         );
     }

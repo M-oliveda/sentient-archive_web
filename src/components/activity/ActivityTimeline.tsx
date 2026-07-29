@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ActivityTimelineItem } from "./ActivityTimelineItem";
 import type { IActivityEntry } from "@/types/activity";
 
@@ -74,7 +75,7 @@ export function ActivityTimeline({
         return (
             <div className="space-y-4" data-testid="activity-timeline-loading">
                 {Array.from({ length: 3 }).map((_, i) => (
-                    <div key={i} className="bg-muted h-24 animate-pulse rounded-2xl" />
+                    <Skeleton key={i} className="h-24 rounded-2xl" />
                 ))}
             </div>
         );

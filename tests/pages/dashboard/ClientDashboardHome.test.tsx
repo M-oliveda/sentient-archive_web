@@ -174,6 +174,7 @@ describe("ClientDashboardHome", () => {
         render(<ClientDashboardHome />);
         const dashes = screen.getAllByText("—");
         expect(dashes.length).toBeGreaterThanOrEqual(2);
+        expect(screen.getByTestId("recent-notes-loading")).toBeInTheDocument();
     });
 
     it("shows empty state message when no notes exist", () => {

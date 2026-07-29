@@ -10,5 +10,8 @@
   "tokenRequests": "Demandes de jetons",
   "analytics": "Analyses",
   "systemConfig": "Configuration système",
-  "activityLogs": "Journaux d'activité"
+  "activityLogs": "Journaux d'activité",
+  "logout": "Se déconnecter",
+  "selectLanguage": "Sélectionner la langue",
+  "mainNavigation": "Navigation principale"
 }

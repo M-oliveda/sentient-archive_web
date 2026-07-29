@@ -9,68 +9,28 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from "./routes/__root";
-import { Route as IndexRouteImport } from "./routes/index";
-import { Route as ActivityRouteImport } from "./routes/activity";
-import { Route as AiFeaturesRouteImport } from "./routes/ai-features";
-import { Route as DashboardRouteImport } from "./routes/dashboard";
-import { Route as ForgotPasswordRouteImport } from "./routes/forgot-password";
-import { Route as LoginRouteImport } from "./routes/login";
-import { Route as NotesRouteImport } from "./routes/notes";
-import { Route as SettingsRouteImport } from "./routes/settings";
-import { Route as SignupRouteImport } from "./routes/signup";
-import { Route as TermsAndPrivacyRouteImport } from "./routes/terms-and-privacy";
 import { Route as TokensRouteImport } from "./routes/tokens";
-import { Route as AdminActivityLogsRouteImport } from "./routes/admin.activity-logs";
-import { Route as AdminAnalyticsRouteImport } from "./routes/admin.analytics";
-import { Route as AdminSettingsRouteImport } from "./routes/admin.settings";
-import { Route as AdminTokenEconomyRouteImport } from "./routes/admin.token-economy";
-import { Route as AdminUsersRouteImport } from "./routes/admin.users";
+import { Route as TermsAndPrivacyRouteImport } from "./routes/terms-and-privacy";
+import { Route as SignupRouteImport } from "./routes/signup";
+import { Route as SettingsRouteImport } from "./routes/settings";
+import { Route as NotesRouteImport } from "./routes/notes";
+import { Route as LoginRouteImport } from "./routes/login";
+import { Route as ForgotPasswordRouteImport } from "./routes/forgot-password";
+import { Route as DashboardRouteImport } from "./routes/dashboard";
+import { Route as AiFeaturesRouteImport } from "./routes/ai-features";
+import { Route as ActivityRouteImport } from "./routes/activity";
+import { Route as IndexRouteImport } from "./routes/index";
 import { Route as NotesIndexRouteImport } from "./routes/notes.index";
 import { Route as NotesNoteIdRouteImport } from "./routes/notes.$noteId";
+import { Route as AdminUsersRouteImport } from "./routes/admin.users";
+import { Route as AdminTokenEconomyRouteImport } from "./routes/admin.token-economy";
+import { Route as AdminSettingsRouteImport } from "./routes/admin.settings";
+import { Route as AdminAnalyticsRouteImport } from "./routes/admin.analytics";
+import { Route as AdminActivityLogsRouteImport } from "./routes/admin.activity-logs";
 
-const IndexRoute = IndexRouteImport.update({
-    id: "/",
-    path: "/",
-    getParentRoute: () => rootRouteImport,
-} as any);
-const ActivityRoute = ActivityRouteImport.update({
-    id: "/activity",
-    path: "/activity",
-    getParentRoute: () => rootRouteImport,
-} as any);
-const AiFeaturesRoute = AiFeaturesRouteImport.update({
-    id: "/ai-features",
-    path: "/ai-features",
-    getParentRoute: () => rootRouteImport,
-} as any);
-const DashboardRoute = DashboardRouteImport.update({
-    id: "/dashboard",
-    path: "/dashboard",
-    getParentRoute: () => rootRouteImport,
-} as any);
-const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
-    id: "/forgot-password",
-    path: "/forgot-password",
-    getParentRoute: () => rootRouteImport,
-} as any);
-const LoginRoute = LoginRouteImport.update({
-    id: "/login",
-    path: "/login",
-    getParentRoute: () => rootRouteImport,
-} as any);
-const NotesRoute = NotesRouteImport.update({
-    id: "/notes",
-    path: "/notes",
-    getParentRoute: () => rootRouteImport,
-} as any);
-const SettingsRoute = SettingsRouteImport.update({
-    id: "/settings",
-    path: "/settings",
-    getParentRoute: () => rootRouteImport,
-} as any);
-const SignupRoute = SignupRouteImport.update({
-    id: "/signup",
-    path: "/signup",
+const TokensRoute = TokensRouteImport.update({
+    id: "/tokens",
+    path: "/tokens",
     getParentRoute: () => rootRouteImport,
 } as any);
 const TermsAndPrivacyRoute = TermsAndPrivacyRouteImport.update({
@@ -78,34 +38,49 @@ const TermsAndPrivacyRoute = TermsAndPrivacyRouteImport.update({
     path: "/terms-and-privacy",
     getParentRoute: () => rootRouteImport,
 } as any);
-const TokensRoute = TokensRouteImport.update({
-    id: "/tokens",
-    path: "/tokens",
+const SignupRoute = SignupRouteImport.update({
+    id: "/signup",
+    path: "/signup",
     getParentRoute: () => rootRouteImport,
 } as any);
-const AdminActivityLogsRoute = AdminActivityLogsRouteImport.update({
-    id: "/admin/activity-logs",
-    path: "/admin/activity-logs",
+const SettingsRoute = SettingsRouteImport.update({
+    id: "/settings",
+    path: "/settings",
     getParentRoute: () => rootRouteImport,
 } as any);
-const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
-    id: "/admin/analytics",
-    path: "/admin/analytics",
+const NotesRoute = NotesRouteImport.update({
+    id: "/notes",
+    path: "/notes",
     getParentRoute: () => rootRouteImport,
 } as any);
-const AdminSettingsRoute = AdminSettingsRouteImport.update({
-    id: "/admin/settings",
-    path: "/admin/settings",
+const LoginRoute = LoginRouteImport.update({
+    id: "/login",
+    path: "/login",
     getParentRoute: () => rootRouteImport,
 } as any);
-const AdminTokenEconomyRoute = AdminTokenEconomyRouteImport.update({
-    id: "/admin/token-economy",
-    path: "/admin/token-economy",
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+    id: "/forgot-password",
+    path: "/forgot-password",
     getParentRoute: () => rootRouteImport,
 } as any);
-const AdminUsersRoute = AdminUsersRouteImport.update({
-    id: "/admin/users",
-    path: "/admin/users",
+const DashboardRoute = DashboardRouteImport.update({
+    id: "/dashboard",
+    path: "/dashboard",
+    getParentRoute: () => rootRouteImport,
+} as any);
+const AiFeaturesRoute = AiFeaturesRouteImport.update({
+    id: "/ai-features",
+    path: "/ai-features",
+    getParentRoute: () => rootRouteImport,
+} as any);
+const ActivityRoute = ActivityRouteImport.update({
+    id: "/activity",
+    path: "/activity",
+    getParentRoute: () => rootRouteImport,
+} as any);
+const IndexRoute = IndexRouteImport.update({
+    id: "/",
+    path: "/",
     getParentRoute: () => rootRouteImport,
 } as any);
 const NotesIndexRoute = NotesIndexRouteImport.update({
@@ -117,6 +92,31 @@ const NotesNoteIdRoute = NotesNoteIdRouteImport.update({
     id: "/$noteId",
     path: "/$noteId",
     getParentRoute: () => NotesRoute,
+} as any);
+const AdminUsersRoute = AdminUsersRouteImport.update({
+    id: "/admin/users",
+    path: "/admin/users",
+    getParentRoute: () => rootRouteImport,
+} as any);
+const AdminTokenEconomyRoute = AdminTokenEconomyRouteImport.update({
+    id: "/admin/token-economy",
+    path: "/admin/token-economy",
+    getParentRoute: () => rootRouteImport,
+} as any);
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+    id: "/admin/settings",
+    path: "/admin/settings",
+    getParentRoute: () => rootRouteImport,
+} as any);
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
+    id: "/admin/analytics",
+    path: "/admin/analytics",
+    getParentRoute: () => rootRouteImport,
+} as any);
+const AdminActivityLogsRoute = AdminActivityLogsRouteImport.update({
+    id: "/admin/activity-logs",
+    path: "/admin/activity-logs",
+    getParentRoute: () => rootRouteImport,
 } as any);
 
 export interface FileRoutesByFullPath {
@@ -262,67 +262,11 @@ export interface RootRouteChildren {
 
 declare module "@tanstack/react-router" {
     interface FileRoutesByPath {
-        "/": {
-            id: "/";
-            path: "/";
-            fullPath: "/";
-            preLoaderRoute: typeof IndexRouteImport;
-            parentRoute: typeof rootRouteImport;
-        };
-        "/activity": {
-            id: "/activity";
-            path: "/activity";
-            fullPath: "/activity";
-            preLoaderRoute: typeof ActivityRouteImport;
-            parentRoute: typeof rootRouteImport;
-        };
-        "/ai-features": {
-            id: "/ai-features";
-            path: "/ai-features";
-            fullPath: "/ai-features";
-            preLoaderRoute: typeof AiFeaturesRouteImport;
-            parentRoute: typeof rootRouteImport;
-        };
-        "/dashboard": {
-            id: "/dashboard";
-            path: "/dashboard";
-            fullPath: "/dashboard";
-            preLoaderRoute: typeof DashboardRouteImport;
-            parentRoute: typeof rootRouteImport;
-        };
-        "/forgot-password": {
-            id: "/forgot-password";
-            path: "/forgot-password";
-            fullPath: "/forgot-password";
-            preLoaderRoute: typeof ForgotPasswordRouteImport;
-            parentRoute: typeof rootRouteImport;
-        };
-        "/login": {
-            id: "/login";
-            path: "/login";
-            fullPath: "/login";
-            preLoaderRoute: typeof LoginRouteImport;
-            parentRoute: typeof rootRouteImport;
-        };
-        "/notes": {
-            id: "/notes";
-            path: "/notes";
-            fullPath: "/notes";
-            preLoaderRoute: typeof NotesRouteImport;
-            parentRoute: typeof rootRouteImport;
-        };
-        "/settings": {
-            id: "/settings";
-            path: "/settings";
-            fullPath: "/settings";
-            preLoaderRoute: typeof SettingsRouteImport;
-            parentRoute: typeof rootRouteImport;
-        };
-        "/signup": {
-            id: "/signup";
-            path: "/signup";
-            fullPath: "/signup";
-            preLoaderRoute: typeof SignupRouteImport;
+        "/tokens": {
+            id: "/tokens";
+            path: "/tokens";
+            fullPath: "/tokens";
+            preLoaderRoute: typeof TokensRouteImport;
             parentRoute: typeof rootRouteImport;
         };
         "/terms-and-privacy": {
@@ -332,46 +276,67 @@ declare module "@tanstack/react-router" {
             preLoaderRoute: typeof TermsAndPrivacyRouteImport;
             parentRoute: typeof rootRouteImport;
         };
-        "/tokens": {
-            id: "/tokens";
-            path: "/tokens";
-            fullPath: "/tokens";
-            preLoaderRoute: typeof TokensRouteImport;
+        "/signup": {
+            id: "/signup";
+            path: "/signup";
+            fullPath: "/signup";
+            preLoaderRoute: typeof SignupRouteImport;
             parentRoute: typeof rootRouteImport;
         };
-        "/admin/activity-logs": {
-            id: "/admin/activity-logs";
-            path: "/admin/activity-logs";
-            fullPath: "/admin/activity-logs";
-            preLoaderRoute: typeof AdminActivityLogsRouteImport;
+        "/settings": {
+            id: "/settings";
+            path: "/settings";
+            fullPath: "/settings";
+            preLoaderRoute: typeof SettingsRouteImport;
             parentRoute: typeof rootRouteImport;
         };
-        "/admin/analytics": {
-            id: "/admin/analytics";
-            path: "/admin/analytics";
-            fullPath: "/admin/analytics";
-            preLoaderRoute: typeof AdminAnalyticsRouteImport;
+        "/notes": {
+            id: "/notes";
+            path: "/notes";
+            fullPath: "/notes";
+            preLoaderRoute: typeof NotesRouteImport;
             parentRoute: typeof rootRouteImport;
         };
-        "/admin/settings": {
-            id: "/admin/settings";
-            path: "/admin/settings";
-            fullPath: "/admin/settings";
-            preLoaderRoute: typeof AdminSettingsRouteImport;
+        "/login": {
+            id: "/login";
+            path: "/login";
+            fullPath: "/login";
+            preLoaderRoute: typeof LoginRouteImport;
             parentRoute: typeof rootRouteImport;
         };
-        "/admin/token-economy": {
-            id: "/admin/token-economy";
-            path: "/admin/token-economy";
-            fullPath: "/admin/token-economy";
-            preLoaderRoute: typeof AdminTokenEconomyRouteImport;
+        "/forgot-password": {
+            id: "/forgot-password";
+            path: "/forgot-password";
+            fullPath: "/forgot-password";
+            preLoaderRoute: typeof ForgotPasswordRouteImport;
             parentRoute: typeof rootRouteImport;
         };
-        "/admin/users": {
-            id: "/admin/users";
-            path: "/admin/users";
-            fullPath: "/admin/users";
-            preLoaderRoute: typeof AdminUsersRouteImport;
+        "/dashboard": {
+            id: "/dashboard";
+            path: "/dashboard";
+            fullPath: "/dashboard";
+            preLoaderRoute: typeof DashboardRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
+        "/ai-features": {
+            id: "/ai-features";
+            path: "/ai-features";
+            fullPath: "/ai-features";
+            preLoaderRoute: typeof AiFeaturesRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
+        "/activity": {
+            id: "/activity";
+            path: "/activity";
+            fullPath: "/activity";
+            preLoaderRoute: typeof ActivityRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
+        "/": {
+            id: "/";
+            path: "/";
+            fullPath: "/";
+            preLoaderRoute: typeof IndexRouteImport;
             parentRoute: typeof rootRouteImport;
         };
         "/notes/": {
@@ -387,6 +352,41 @@ declare module "@tanstack/react-router" {
             fullPath: "/notes/$noteId";
             preLoaderRoute: typeof NotesNoteIdRouteImport;
             parentRoute: typeof NotesRoute;
+        };
+        "/admin/users": {
+            id: "/admin/users";
+            path: "/admin/users";
+            fullPath: "/admin/users";
+            preLoaderRoute: typeof AdminUsersRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
+        "/admin/token-economy": {
+            id: "/admin/token-economy";
+            path: "/admin/token-economy";
+            fullPath: "/admin/token-economy";
+            preLoaderRoute: typeof AdminTokenEconomyRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
+        "/admin/settings": {
+            id: "/admin/settings";
+            path: "/admin/settings";
+            fullPath: "/admin/settings";
+            preLoaderRoute: typeof AdminSettingsRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
+        "/admin/analytics": {
+            id: "/admin/analytics";
+            path: "/admin/analytics";
+            fullPath: "/admin/analytics";
+            preLoaderRoute: typeof AdminAnalyticsRouteImport;
+            parentRoute: typeof rootRouteImport;
+        };
+        "/admin/activity-logs": {
+            id: "/admin/activity-logs";
+            path: "/admin/activity-logs";
+            fullPath: "/admin/activity-logs";
+            preLoaderRoute: typeof AdminActivityLogsRouteImport;
+            parentRoute: typeof rootRouteImport;
         };
     }
 }

@@ -1,5 +1,6 @@
 import { ArrowUp } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import type { IActivityStats } from "@/types/activity";
 
@@ -51,11 +52,11 @@ function StatsSkeleton() {
     return (
         <div className="flex flex-col gap-4" data-testid="activity-stats-loading">
             <div className="flex gap-2">
-                <div className="bg-muted h-30 flex-1 animate-pulse rounded-2xl" />
-                <div className="bg-muted h-30 flex-1 animate-pulse rounded-2xl" />
+                <Skeleton className="h-30 flex-1 rounded-2xl" />
+                <Skeleton className="h-30 flex-1 rounded-2xl" />
             </div>
-            <div className="bg-muted h-30w-full animate-pulse rounded-2xl md:hidden" />
-            <div className="bg-muted hidden h-30 flex-1 animate-pulse rounded-2xl md:block" />
+            <Skeleton className="h-30 w-full rounded-2xl md:hidden" />
+            <Skeleton className="hidden h-30 flex-1 rounded-2xl md:block" />
         </div>
     );
 }
