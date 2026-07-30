@@ -48,6 +48,13 @@ describe("StatsCard", () => {
         expect(container.firstChild).toHaveClass("bg-muted");
     });
 
+    it("merges a custom className onto the card", () => {
+        const { container } = render(
+            <StatsCard icon={MockIcon} label="Notes" value={5} className="h-full" />,
+        );
+        expect(container.firstChild).toHaveClass("h-full");
+    });
+
     it("applies accent variant styling", () => {
         const { container } = render(
             <StatsCard icon={MockIcon} label="Notes" value={5} variant="accent" />,
