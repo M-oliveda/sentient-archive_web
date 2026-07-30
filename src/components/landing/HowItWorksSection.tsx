@@ -23,6 +23,8 @@ const STEPS = [
 
 const STEP_DURATION = 1500;
 
+const HIGHLIGHT_TRANSITION = { duration: 0.5, ease: "easeInOut" as const };
+
 export function HowItWorksSection() {
     const { t } = useTranslation("landing");
     const gridRef = useRef<HTMLDivElement>(null);
@@ -77,23 +79,17 @@ export function HowItWorksSection() {
                 >
                     {STEPS.map(({ id, icon: Icon }, index) => {
                         const isActive = activeStep === null || activeStep === index;
+                        const isHighlighted = activeStep === index;
+                        const dimFilter =
+                            activeStep !== null && activeStep !== index
+                                ? "grayscale(1)"
+                                : "grayscale(0)";
+
                         return (
-                            // Outer div: drives the stagger entry via variants
+                            // Outer: stagger entry only — never transform this, or dashes move
                             <motion.div key={id} variants={fadeInUp}>
-                                {/* Inner div: drives the ongoing highlight animation */}
-                                <motion.div
-                                    animate={{
-                                        opacity: isActive ? 1 : 0.45,
-                                        scale: activeStep === index ? 1.02 : 1,
-                                        filter:
-                                            activeStep !== null && activeStep !== index
-                                                ? "grayscale(1)"
-                                                : "grayscale(0)",
-                                    }}
-                                    transition={{ duration: 0.5, ease: "easeInOut" }}
-                                    className="flex h-75 flex-col items-center"
-                                >
-                                    {/* Icon floating above card with dashed connectors */}
+                                <div className="flex h-75 flex-col items-center">
+                                    {/* Icon row: connectors stay static; only the badge animates */}
                                     <div className="relative mb-4 flex w-full items-center justify-center">
                                         {/* Vertical connector upward (mobile only, non-first) */}
                                         {index > 0 && (
@@ -103,17 +99,32 @@ export function HowItWorksSection() {
                                         {index > 0 && (
                                             <div className="border-muted-foreground/30 absolute top-1/2 right-1/2 -left-3 hidden -translate-y-1/2 border-t-2 border-dashed sm:block" />
                                         )}
-                                        <div className="ring-border bg-muted relative z-10 flex size-12 items-center justify-center rounded-xl ring-1">
+                                        <motion.div
+                                            animate={{
+                                                opacity: isActive ? 1 : 0.45,
+                                                filter: dimFilter,
+                                            }}
+                                            transition={HIGHLIGHT_TRANSITION}
+                                            className="ring-border bg-muted relative z-10 flex size-12 items-center justify-center rounded-xl ring-1"
+                                        >
                                             <Icon className="text-foreground size-6" />
-                                        </div>
+                                        </motion.div>
                                         {/* Horizontal connector right (desktop only, non-last) */}
                                         {index < STEPS.length - 1 && (
                                             <div className="border-muted-foreground/30 absolute top-1/2 -right-3 left-1/2 hidden -translate-y-1/2 border-t-2 border-dashed sm:block" />
                                         )}
                                     </div>
 
-                                    {/* Card — flex-1 fills remaining column height for equal card sizes */}
-                                    <div className="bg-muted relative flex w-full flex-1 flex-col justify-center overflow-hidden rounded-2xl p-6 text-center">
+                                    {/* Card — scale + brightness only live here */}
+                                    <motion.div
+                                        animate={{
+                                            opacity: isActive ? 1 : 0.45,
+                                            scale: isHighlighted ? 1.04 : 1,
+                                            filter: dimFilter,
+                                        }}
+                                        transition={HIGHLIGHT_TRANSITION}
+                                        className="bg-muted relative flex w-full flex-1 flex-col justify-center overflow-hidden rounded-2xl p-6 text-center"
+                                    >
                                         <p className="text-muted-foreground/10 pointer-events-none absolute top-2 right-4 text-6xl font-bold select-none">
                                             0{index + 1}
                                         </p>
@@ -128,8 +139,8 @@ export function HowItWorksSection() {
                                         <p className="text-muted-foreground text-sm">
                                             {t(`howItWorks.steps.${id}.description`)}
                                         </p>
-                                    </div>
-                                </motion.div>
+                                    </motion.div>
+                                </div>
                             </motion.div>
                         );
                     })}
