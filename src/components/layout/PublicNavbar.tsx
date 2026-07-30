@@ -101,12 +101,12 @@ export function PublicNavbar() {
                     aria-label={t("nav.navigationMenu")}
                     inert={!mobileOpen}
                     className={cn(
-                        "bg-background absolute top-0 right-0 flex h-screen w-77.5 flex-col transition-transform duration-300 ease-in-out",
+                        "bg-background absolute top-0 right-0 flex h-dvh max-h-dvh w-77.5 flex-col transition-transform duration-300 ease-in-out",
                         mobileOpen ? "translate-x-0" : "translate-x-full",
                     )}
                 >
                     {/* Header */}
-                    <div className="flex h-17 items-center justify-between px-6 py-4">
+                    <div className="flex h-17 shrink-0 items-center justify-between px-6 py-4">
                         <SentientArchiveLogo onClick={() => setMobileOpen(false)} />
                         <button
                             className="text-foreground flex size-10 items-center justify-center rounded-full transition-opacity hover:opacity-80"
@@ -149,8 +149,8 @@ export function PublicNavbar() {
                         </div>
                     </div>
 
-                    {/* Footer */}
-                    <div className="flex flex-col gap-5 px-10 pb-8">
+                    {/* Footer — pinned above mobile browser chrome / home indicator */}
+                    <div className="flex shrink-0 flex-col gap-4 px-10 pt-2 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
                         <div className="flex justify-center">
                             <LanguageSwitcher />
                         </div>
