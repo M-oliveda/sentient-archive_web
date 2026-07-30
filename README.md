@@ -228,7 +228,7 @@ This project uses Husky to enforce quality standards:
 
 ## Testing
 
-We enforce **100% Jest coverage** (branches/functions/lines/statements) in CI.
+The project enforces **100% Jest coverage** (branches/functions/lines/statements) in CI.
 
 ### Tools
 
