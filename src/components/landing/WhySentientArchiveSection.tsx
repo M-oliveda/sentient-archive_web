@@ -48,7 +48,7 @@ export function WhySentientArchiveSection() {
                         <motion.div
                             key={id}
                             variants={fadeInUp}
-                            className="bg-muted rounded-2xl p-6"
+                            className="bg-muted flex flex-col items-center rounded-2xl p-6 text-center md:items-start md:text-left"
                         >
                             <div className="mb-4 flex size-10 items-center justify-center rounded-xl bg-[hsl(var(--brand-300))]/40">
                                 <Icon className="text-foreground size-5" />

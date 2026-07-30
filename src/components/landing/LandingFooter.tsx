@@ -21,7 +21,7 @@ export function LandingFooter() {
                             rel="noopener noreferrer"
                             className="hover:underline"
                         >
-                            <span className="text-brand-500 hover:text-brand-500 mr-1 font-medium hover:underline">
+                            <span className="text-brand-500 hover:text-brand-500 font-medium hover:underline">
                                 {t("footer.author")}
                             </span>
                         </a>{" "}

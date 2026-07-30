@@ -93,7 +93,7 @@ export function FeaturesSection() {
                             whileHover="hovered"
                             initial="rest"
                             animate="rest"
-                            className="bg-muted group relative flex cursor-default flex-col rounded-2xl p-5"
+                            className="bg-muted group relative flex cursor-default flex-col rounded-2xl p-5 text-center md:items-start md:text-left"
                             style={{ willChange: "transform" }}
                         >
                             {/* Hover background overlay */}
@@ -112,7 +112,7 @@ export function FeaturesSection() {
                                     hovered: { scale: 1.1 },
                                 }}
                                 transition={{ duration: 0.2 }}
-                                className="bg-brand-300/30 group-hover:bg-brand-300/60 mb-3 flex size-9 items-center justify-center rounded-lg transition-colors duration-200"
+                                className="bg-brand-300/30 group-hover:bg-brand-300/60 mx-auto mb-3 flex size-9 items-center justify-center rounded-lg transition-colors duration-200 md:mx-0"
                             >
                                 <motion.span
                                     variants={{
@@ -126,14 +126,14 @@ export function FeaturesSection() {
                                 </motion.span>
                             </motion.div>
 
-                            <h3 className="text-foreground group-hover:text-brand-300 mb-1.5 font-bold transition-colors duration-200">
+                            <h3 className="text-foreground group-hover:text-brand-800 mb-1.5 font-bold transition-colors duration-200">
                                 {t(`features.items.${id}.title`)}
                             </h3>
                             <p className="text-muted-foreground flex-1 text-xs">
                                 {t(`features.items.${id}.description`)}
                             </p>
                             {tokenCost !== undefined && (
-                                <span className="text-foreground bg-brand-300/40 group-hover:bg-brand-300/70 mt-3 inline-flex w-fit items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors duration-200">
+                                <span className="text-foreground bg-brand-300/40 group-hover:bg-brand-300/70 mx-auto mt-3 inline-flex w-fit items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors duration-200 md:mx-0">
                                     <Bot className="size-3" />
                                     {t("features.tokenCost", { count: tokenCost })}
                                 </span>
