@@ -58,6 +58,9 @@ const mockNote = {
     updatedAt: new Date("2024-01-01"),
 };
 
+/** Stats render in both the mobile carousel and the desktop grid. */
+const STATS_LAYOUT_COUNT = 2;
+
 describe("ClientDashboardHome", () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -135,19 +138,31 @@ describe("ClientDashboardHome", () => {
 
     it("renders stats section with token balance from store", () => {
         render(<ClientDashboardHome />);
-        expect(screen.getByText("2,450")).toBeInTheDocument();
+        expect(screen.getAllByText("2,450")).toHaveLength(STATS_LAYOUT_COUNT);
     });
 
     it("renders notes count from real data", () => {
         render(<ClientDashboardHome />);
-        expect(screen.getByText("5")).toBeInTheDocument();
+        expect(screen.getAllByText("5")).toHaveLength(STATS_LAYOUT_COUNT);
     });
 
     it("renders last edited note title and note card from real data", () => {
         render(<ClientDashboardHome />);
         // Full title in RecentNoteCard; truncated in Last Edited stat card
         expect(screen.getByText("Meeting Minutes: Q3 Planning")).toBeInTheDocument();
-        expect(screen.getByText("Meeting Mi...")).toBeInTheDocument();
+        expect(screen.getAllByText("Meeting Mi...")).toHaveLength(STATS_LAYOUT_COUNT);
+    });
+
+    it("renders a mobile carousel with navigation controls", () => {
+        render(<ClientDashboardHome />);
+
+        expect(document.querySelector('[data-slot="carousel"]')).toBeInTheDocument();
+        expect(
+            screen.getByRole("region", { name: "client.stats.ariaLabel" }),
+        ).toBeInTheDocument();
+        expect(screen.getByText("Previous slide")).toBeInTheDocument();
+        expect(screen.getByText("Next slide")).toBeInTheDocument();
+        expect(document.querySelectorAll('[data-slot="carousel-item"]').length).toBe(3);
     });
 
     it("renders Recent Notes section heading", () => {
@@ -163,7 +178,7 @@ describe("ClientDashboardHome", () => {
     it("shows 0 tokens when user has no token balance", () => {
         (useAuthStore as unknown as jest.Mock).mockReturnValue({ user: null });
         render(<ClientDashboardHome />);
-        expect(screen.getByText("0")).toBeInTheDocument();
+        expect(screen.getAllByText("0")).toHaveLength(STATS_LAYOUT_COUNT);
     });
 
     it("shows loading placeholders when data is loading", () => {
@@ -173,7 +188,8 @@ describe("ClientDashboardHome", () => {
         });
         render(<ClientDashboardHome />);
         const dashes = screen.getAllByText("—");
-        expect(dashes.length).toBeGreaterThanOrEqual(2);
+        // notes + lastEdited in both carousel and grid layouts
+        expect(dashes.length).toBeGreaterThanOrEqual(4);
         expect(screen.getByTestId("recent-notes-loading")).toBeInTheDocument();
     });
 
@@ -236,10 +252,11 @@ describe("ClientDashboardHome", () => {
 
     it("Tokens StatsCard action navigates to /tokens", () => {
         render(<ClientDashboardHome />);
-        const requestMoreButton = screen.getByRole("button", {
+        const requestMoreButtons = screen.getAllByRole("button", {
             name: "client.stats.requestMore",
         });
-        fireEvent.click(requestMoreButton);
+        expect(requestMoreButtons).toHaveLength(STATS_LAYOUT_COUNT);
+        fireEvent.click(requestMoreButtons[0]!);
         expect(mockNavigate).toHaveBeenCalledWith({ to: "/tokens" });
     });
 });

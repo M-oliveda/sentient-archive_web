@@ -1,6 +1,13 @@
 import { Bot, Coins, FileText, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
+import {
+    Carousel,
+    CarouselContent,
+    CarouselItem,
+    CarouselNext,
+    CarouselPrevious,
+} from "@/components/ui/carousel";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { ActivityItem } from "@/components/dashboard/ActivityItem";
@@ -17,6 +24,29 @@ export function AdminDashboardHome() {
     const { t } = useTranslation("dashboard");
     const { data, isLoading } = useAdminStats();
     const stats = data;
+
+    const statsCards = [
+        {
+            icon: Users,
+            label: t("admin.stats.totalUsers"),
+            value: stats?.totalUsers ?? 0,
+        },
+        {
+            icon: FileText,
+            label: t("admin.stats.totalNotes"),
+            value: stats?.totalNotes ?? 0,
+        },
+        {
+            icon: Coins,
+            label: t("admin.stats.totalTokens"),
+            value: stats?.totalTokens ?? 0,
+        },
+        {
+            icon: Bot,
+            label: t("admin.stats.totalAiOps"),
+            value: stats?.totalAIOperations ?? 0,
+        },
+    ];
 
     const translateStatus = (status: ServiceStatus): string => {
         if (status === "Operational") return t("admin.health.operational");
@@ -35,43 +65,58 @@ export function AdminDashboardHome() {
                 <p className="text-muted-foreground mt-2">{t("admin.subtitle")}</p>
             </section>
 
-            {/* Stats grid */}
-            <section
-                className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4"
-                aria-label={t("admin.stats.ariaLabel")}
-            >
-                {isLoading ? (
-                    Array.from({ length: 4 }).map((_, i) => (
-                        <Skeleton key={i} className="h-28 rounded-2xl" />
-                    ))
-                ) : (
-                    <>
-                        <StatsCard
-                            icon={Users}
-                            label={t("admin.stats.totalUsers")}
-                            value={stats?.totalUsers ?? 0}
-                            variant="accent"
-                        />
-                        <StatsCard
-                            icon={FileText}
-                            label={t("admin.stats.totalNotes")}
-                            value={stats?.totalNotes ?? 0}
-                            variant="accent"
-                        />
-                        <StatsCard
-                            icon={Coins}
-                            label={t("admin.stats.totalTokens")}
-                            value={stats?.totalTokens ?? 0}
-                            variant="accent"
-                        />
-                        <StatsCard
-                            icon={Bot}
-                            label={t("admin.stats.totalAiOps")}
-                            value={stats?.totalAIOperations ?? 0}
-                            variant="accent"
-                        />
-                    </>
-                )}
+            {/* Stats — carousel on mobile, grid from md up */}
+            <section aria-label={t("admin.stats.ariaLabel")}>
+                {/* Mobile carousel */}
+                <div className="md:hidden">
+                    <Carousel opts={{ align: "start", containScroll: "trimSnaps" }}>
+                        <CarouselContent className="-ml-3">
+                            {isLoading
+                                ? Array.from({ length: 4 }).map((_, i) => (
+                                      <CarouselItem
+                                          key={i}
+                                          className="basis-[80%] pl-3"
+                                      >
+                                          <Skeleton className="h-28 rounded-2xl" />
+                                      </CarouselItem>
+                                  ))
+                                : statsCards.map((card) => (
+                                      <CarouselItem
+                                          key={card.label}
+                                          className="basis-[80%] pl-3"
+                                      >
+                                          <StatsCard
+                                              icon={card.icon}
+                                              label={card.label}
+                                              value={card.value}
+                                              variant="accent"
+                                          />
+                                      </CarouselItem>
+                                  ))}
+                        </CarouselContent>
+                        <div className="mt-3 flex items-center justify-end gap-2">
+                            <CarouselPrevious className="static size-8 translate-y-0" />
+                            <CarouselNext className="static size-8 translate-y-0" />
+                        </div>
+                    </Carousel>
+                </div>
+
+                {/* Desktop / tablet grid */}
+                <div className="hidden gap-4 md:grid md:grid-cols-3 lg:grid-cols-4">
+                    {isLoading
+                        ? Array.from({ length: 4 }).map((_, i) => (
+                              <Skeleton key={i} className="h-28 rounded-2xl" />
+                          ))
+                        : statsCards.map((card) => (
+                              <StatsCard
+                                  key={card.label}
+                                  icon={card.icon}
+                                  label={card.label}
+                                  value={card.value}
+                                  variant="accent"
+                              />
+                          ))}
+                </div>
             </section>
 
             {/* Lower panels */}
