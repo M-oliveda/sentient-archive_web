@@ -78,6 +78,25 @@ describe("NotesList", () => {
         expect(screen.getByTestId("notes-grid-loading")).toBeInTheDocument();
     });
 
+    it("shows an error message when isError is true", () => {
+        render(
+            <NotesList
+                {...BASE_PROPS}
+                notes={[]}
+                totalNotes={0}
+                isError={true}
+                errorMessage="Firestore index missing"
+            />,
+        );
+        expect(screen.getByTestId("notes-grid-error")).toBeInTheDocument();
+        expect(screen.getByText("Firestore index missing")).toBeInTheDocument();
+    });
+
+    it("shows default error message when isError is true without errorMessage", () => {
+        render(<NotesList {...BASE_PROPS} notes={[]} totalNotes={0} isError={true} />);
+        expect(screen.getByText("list.loadError")).toBeInTheDocument();
+    });
+
     it("calls onSearchChange when the search input changes", () => {
         render(<NotesList {...BASE_PROPS} />);
         fireEvent.change(screen.getByPlaceholderText("list.searchPlaceholder"), {

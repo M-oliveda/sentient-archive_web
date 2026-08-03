@@ -12,6 +12,7 @@
     "searchAriaLabel": "Search notes",
     "empty": "No notes yet.",
     "emptySearch": "No notes match your search.",
+    "loadError": "Could not load notes. Please try again later.",
     "showing": "Showing {{start}}–{{end}} of {{total}} notes",
     "prevPage": "Previous page",
     "nextPage": "Next page",

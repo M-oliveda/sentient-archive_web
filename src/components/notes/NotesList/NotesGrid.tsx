@@ -6,6 +6,8 @@ import type { INote } from "@/types/note";
 interface INotesGridProps {
     notes: INote[];
     isLoading: boolean;
+    isError?: boolean;
+    errorMessage?: string;
     search: string;
     folderMap: Record<string, string>;
     onNoteClick: (noteId: string) => void;
@@ -14,6 +16,8 @@ interface INotesGridProps {
 export function NotesGrid({
     notes,
     isLoading,
+    isError = false,
+    errorMessage,
     search,
     folderMap,
     onNoteClick,
@@ -31,6 +35,20 @@ export function NotesGrid({
                         <Skeleton key={i} className="h-40 rounded-2xl" />
                     ))}
                 </div>
+            </div>
+        );
+    }
+
+    if (isError) {
+        return (
+            <div
+                className="flex min-h-0 flex-1 items-center justify-center"
+                data-testid="notes-grid-error"
+                role="alert"
+            >
+                <p className="text-destructive text-center text-sm">
+                    {errorMessage ?? t("list.loadError")}
+                </p>
             </div>
         );
     }

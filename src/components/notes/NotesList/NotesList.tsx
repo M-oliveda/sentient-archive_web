@@ -7,6 +7,8 @@ import { NotesPagination } from "./NotesPagination";
 interface INotesListProps {
     notes: INote[];
     isLoading: boolean;
+    isError?: boolean;
+    errorMessage?: string;
     search: string;
     sort: NoteSort;
     page: number;
@@ -21,6 +23,8 @@ interface INotesListProps {
 export function NotesList({
     notes,
     isLoading,
+    isError = false,
+    errorMessage,
     search,
     sort,
     page,
@@ -42,6 +46,8 @@ export function NotesList({
             <NotesGrid
                 notes={notes}
                 isLoading={isLoading}
+                isError={isError}
+                errorMessage={errorMessage}
                 search={search}
                 folderMap={folderMap}
                 onNoteClick={onNoteClick}

@@ -12,6 +12,7 @@
     "searchAriaLabel": "Rechercher des notes",
     "empty": "Pas encore de notes.",
     "emptySearch": "Aucune note ne correspond à votre recherche.",
+    "loadError": "Impossible de charger les notes. Veuillez réessayer plus tard.",
     "showing": "Affichage de {{start}}–{{end}} sur {{total}} notes",
     "prevPage": "Page précédente",
     "nextPage": "Page suivante",
