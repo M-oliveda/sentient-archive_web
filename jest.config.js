@@ -35,8 +35,10 @@ export default {
         },
     },
     transform: {
-        "^.+\\.(ts|tsx)$": "babel-jest",
+        "^.+\\.(ts|tsx|js|mjs)$": "babel-jest",
     },
-    transformIgnorePatterns: ["node_modules/(?!(lucide-react|@tanstack|firebase)/)"],
+    transformIgnorePatterns: [
+        "node_modules/(?!(lucide-react|@tanstack|firebase|mdast-util-.*|micromark.*|unist-util-.*|markdown-table|zwitch|ccount|devlop|is-plain-obj|decode-named-character-reference|escape-html|escape-string-regexp|longest-streak)/)",
+    ],
     moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
 };
