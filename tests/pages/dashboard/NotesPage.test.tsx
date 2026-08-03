@@ -298,6 +298,30 @@ describe("NotesPage", () => {
         expect(capturedNotesListProps.isLoading).toBe(true);
     });
 
+    it("passes isError and error message when useNotes fails with an Error", () => {
+        mockUseNotes.mockReturnValue({
+            data: [],
+            isLoading: false,
+            isError: true,
+            error: new Error("Failed to load notes"),
+        });
+        render(<NotesPage />);
+        expect(capturedNotesListProps.isError).toBe(true);
+        expect(capturedNotesListProps.errorMessage).toBe("Failed to load notes");
+    });
+
+    it("passes undefined errorMessage when useNotes error is not an Error", () => {
+        mockUseNotes.mockReturnValue({
+            data: [],
+            isLoading: false,
+            isError: true,
+            error: "something went wrong",
+        });
+        render(<NotesPage />);
+        expect(capturedNotesListProps.isError).toBe(true);
+        expect(capturedNotesListProps.errorMessage).toBeUndefined();
+    });
+
     it("uses an empty notes array when useNotes returns undefined data", () => {
         mockUseNotes.mockReturnValue({ data: undefined, isLoading: false });
         render(<NotesPage />);
