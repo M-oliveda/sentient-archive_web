@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { $convertToMarkdownString } from "@lexical/mdast";
 
 let capturedExtension: unknown = null;
-let capturedOnChange: ((es: unknown) => void) | null = null;
+let capturedOnChange: ((es: unknown, editor: unknown) => void) | null = null;
 
 jest.mock("@lexical/react/LexicalExtensionComposer", () => ({
     LexicalExtensionComposer: ({
@@ -33,7 +33,11 @@ jest.mock("@lexical/react/LexicalCheckListPlugin", () => ({
 }));
 
 jest.mock("@lexical/react/LexicalOnChangePlugin", () => ({
-    OnChangePlugin: ({ onChange }: { onChange: (es: unknown) => void }) => {
+    OnChangePlugin: ({
+        onChange,
+    }: {
+        onChange: (es: unknown, editor: unknown) => void;
+    }) => {
         capturedOnChange = onChange;
         return null;
     },
@@ -118,9 +122,9 @@ describe("MarkdownEditor", () => {
         const onChange = jest.fn();
         render(<MarkdownEditor initialContent="" onChange={onChange} />);
 
-        const mockEditorState = { read: (fn: () => void) => fn() };
+        const mockEditor = { read: (fn: () => void) => fn() };
         act(() => {
-            capturedOnChange?.(mockEditorState);
+            capturedOnChange?.({}, mockEditor);
         });
 
         expect($convertToMarkdownString).toHaveBeenCalledWith();
@@ -154,9 +158,9 @@ describe("MarkdownEditor", () => {
         const onChange = jest.fn();
         render(<MarkdownEditor initialContent="" readOnly onChange={onChange} />);
 
-        const mockEditorState = { read: (fn: () => void) => fn() };
+        const mockEditor = { read: (fn: () => void) => fn() };
         act(() => {
-            capturedOnChange?.(mockEditorState);
+            capturedOnChange?.({}, mockEditor);
         });
 
         expect(onChange).not.toHaveBeenCalled();

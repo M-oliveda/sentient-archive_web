@@ -5,7 +5,7 @@ import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin";
 import { LexicalExtensionComposer } from "@lexical/react/LexicalExtensionComposer";
 import { $convertToMarkdownString } from "@lexical/mdast";
-import type { EditorState } from "lexical";
+import type { EditorState, LexicalEditor } from "lexical";
 import { useTranslation } from "react-i18next";
 import { MarkdownFormattingToolbar } from "./MarkdownFormattingToolbar";
 import { EditorCommandPlugin, type IMarkdownEditorHandle } from "./EditorCommandPlugin";
@@ -43,9 +43,9 @@ export function MarkdownEditor({
         [initialContent, readOnly],
     );
 
-    const handleChange = (editorState: EditorState) => {
+    const handleChange = (_editorState: EditorState, editor: LexicalEditor) => {
         if (readOnly || !onChange) return;
-        editorState.read(() => {
+        editor.read(() => {
             const markdown = $convertToMarkdownString();
             onChange(markdown);
         });
