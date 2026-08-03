@@ -56,12 +56,26 @@ export function MarkdownEditor({
             <div className="flex flex-1 flex-col gap-3 overflow-hidden">
                 {!readOnly && showToolbar && <MarkdownFormattingToolbar />}
                 <div className="relative flex-1 overflow-y-auto">
-                    <ContentEditable
-                        className="editor-content min-h-full"
-                        aria-label={t("editor.contentAriaLabel")}
-                    />
-                    {!readOnly && (
-                        <div className="editor-placeholder">{resolvedPlaceholder}</div>
+                    {readOnly ? (
+                        <ContentEditable
+                            className="editor-content min-h-full"
+                            aria-label={t("editor.contentAriaLabel")}
+                            data-gramm="false"
+                            data-gramm_editor="false"
+                        />
+                    ) : (
+                        <ContentEditable
+                            className="editor-content min-h-full"
+                            aria-label={t("editor.contentAriaLabel")}
+                            data-gramm="false"
+                            data-gramm_editor="false"
+                            aria-placeholder={resolvedPlaceholder}
+                            placeholder={
+                                <div className="editor-placeholder">
+                                    {resolvedPlaceholder}
+                                </div>
+                            }
+                        />
                     )}
                     <ListPlugin />
                     <CheckListPlugin disableTakeFocusOnClick={readOnly} />

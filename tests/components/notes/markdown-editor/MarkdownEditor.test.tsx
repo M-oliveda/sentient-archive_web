@@ -19,8 +19,18 @@ jest.mock("@lexical/react/LexicalExtensionComposer", () => ({
 }));
 
 jest.mock("@lexical/react/LexicalContentEditable", () => ({
-    ContentEditable: (props: React.HTMLAttributes<HTMLDivElement>) => (
-        <div {...props} />
+    ContentEditable: ({
+        placeholder,
+        "aria-placeholder": _ariaPlaceholder,
+        ...props
+    }: React.HTMLAttributes<HTMLDivElement> & {
+        placeholder?: React.ReactNode;
+        "aria-placeholder"?: string;
+    }) => (
+        <>
+            <div {...props} />
+            {placeholder}
+        </>
     ),
 }));
 
