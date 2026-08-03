@@ -5,8 +5,6 @@ import {
     type IMarkdownEditorHandle,
 } from "@/components/notes/markdown-editor/EditorCommandPlugin";
 
-// ── Module mocks ──────────────────────────────────────────────────────────────
-
 const mockUpdate = jest.fn();
 const mockEditor = { update: mockUpdate };
 
@@ -17,13 +15,10 @@ jest.mock("@lexical/react/LexicalComposerContext", () => ({
 const mockConvertFrom = jest.fn();
 const mockConvertTo = jest.fn().mockReturnValue("existing content");
 
-jest.mock("@lexical/markdown", () => ({
+jest.mock("@lexical/mdast", () => ({
     $convertFromMarkdownString: (...args: unknown[]) => mockConvertFrom(...args),
     $convertToMarkdownString: (...args: unknown[]) => mockConvertTo(...args),
-    TRANSFORMERS: [],
 }));
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function makeRef(): React.RefObject<IMarkdownEditorHandle | null> {
     return { current: null };
@@ -33,8 +28,6 @@ function runUpdateCallback() {
     const callback = (mockUpdate as jest.Mock).mock.calls[0][0] as () => void;
     callback();
 }
-
-// ── Tests ─────────────────────────────────────────────────────────────────────
 
 beforeEach(() => {
     jest.clearAllMocks();
@@ -75,7 +68,6 @@ describe("EditorCommandPlugin – prependContent", () => {
         runUpdateCallback();
         expect(mockConvertFrom).toHaveBeenCalledWith(
             "## New Section\n\nexisting content",
-            [],
         );
     });
 });
@@ -95,7 +87,6 @@ describe("EditorCommandPlugin – appendContent", () => {
         runUpdateCallback();
         expect(mockConvertFrom).toHaveBeenCalledWith(
             "existing content\n\n## Flashcards",
-            [],
         );
     });
 });
