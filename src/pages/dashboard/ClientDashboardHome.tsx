@@ -170,10 +170,13 @@ export function ClientDashboardHome() {
                     <h2 className="text-foreground text-xl font-bold">
                         {t("client.recentNotes.title")}
                     </h2>
-                    <button className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-sm font-medium">
+                    <Link
+                        to="/notes"
+                        className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-sm font-medium"
+                    >
                         {t("client.recentNotes.showMore")}
                         <ArrowRight className="size-4" />
-                    </button>
+                    </Link>
                 </div>
                 {!isLoading && recentNotes.length === 0 ? (
                     <p className="text-muted-foreground text-sm">

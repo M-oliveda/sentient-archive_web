@@ -175,6 +175,13 @@ describe("ClientDashboardHome", () => {
         expect(screen.getByText("client.recentNotes.showMore")).toBeInTheDocument();
     });
 
+    it("Show More link navigates to /notes", () => {
+        render(<ClientDashboardHome />);
+        expect(
+            screen.getByRole("link", { name: /client.recentNotes.showMore/ }),
+        ).toHaveAttribute("href", "/notes");
+    });
+
     it("shows 0 tokens when user has no token balance", () => {
         (useAuthStore as unknown as jest.Mock).mockReturnValue({ user: null });
         render(<ClientDashboardHome />);
