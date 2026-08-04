@@ -31,6 +31,9 @@ const mockStats = {
     ],
 };
 
+/** Stats render in both the mobile carousel and the desktop grid. */
+const STATS_LAYOUT_COUNT = 2;
+
 describe("AdminDashboardHome", () => {
     it("renders Admin Dashboard heading", () => {
         (useAdminStats as jest.Mock).mockReturnValue({
@@ -56,20 +59,45 @@ describe("AdminDashboardHome", () => {
             isLoading: false,
         });
         render(<AdminDashboardHome />);
-        expect(screen.getByText("admin.stats.totalUsers")).toBeInTheDocument();
-        expect(screen.getByText("admin.stats.totalNotes")).toBeInTheDocument();
-        expect(screen.getByText("admin.stats.totalTokens")).toBeInTheDocument();
-        expect(screen.getByText("admin.stats.totalAiOps")).toBeInTheDocument();
+        expect(screen.getAllByText("admin.stats.totalUsers")).toHaveLength(
+            STATS_LAYOUT_COUNT,
+        );
+        expect(screen.getAllByText("admin.stats.totalNotes")).toHaveLength(
+            STATS_LAYOUT_COUNT,
+        );
+        expect(screen.getAllByText("admin.stats.totalTokens")).toHaveLength(
+            STATS_LAYOUT_COUNT,
+        );
+        expect(screen.getAllByText("admin.stats.totalAiOps")).toHaveLength(
+            STATS_LAYOUT_COUNT,
+        );
     });
 
-    it("shows loading dashes while data is loading", () => {
+    it("shows loading skeletons while data is loading", () => {
         (useAdminStats as jest.Mock).mockReturnValue({
             data: undefined,
             isLoading: true,
         });
         render(<AdminDashboardHome />);
         expect(screen.queryByText("admin.stats.totalUsers")).not.toBeInTheDocument();
-        expect(document.querySelectorAll('[data-slot="skeleton"]').length).toBe(4);
+        // 4 carousel skeletons + 4 grid skeletons
+        expect(document.querySelectorAll('[data-slot="skeleton"]').length).toBe(8);
+    });
+
+    it("renders a mobile carousel with navigation controls", () => {
+        (useAdminStats as jest.Mock).mockReturnValue({
+            data: mockStats,
+            isLoading: false,
+        });
+        render(<AdminDashboardHome />);
+
+        expect(document.querySelector('[data-slot="carousel"]')).toBeInTheDocument();
+        expect(
+            screen.getByRole("region", { name: "admin.stats.ariaLabel" }),
+        ).toBeInTheDocument();
+        expect(screen.getByText("Previous slide")).toBeInTheDocument();
+        expect(screen.getByText("Next slide")).toBeInTheDocument();
+        expect(document.querySelectorAll('[data-slot="carousel-item"]').length).toBe(4);
     });
 
     it("renders stat values from API data", () => {
@@ -78,10 +106,10 @@ describe("AdminDashboardHome", () => {
             isLoading: false,
         });
         render(<AdminDashboardHome />);
-        expect(screen.getByText("1,240")).toBeInTheDocument();
-        expect(screen.getByText("123")).toBeInTheDocument();
-        expect(screen.getByText("123,000")).toBeInTheDocument();
-        expect(screen.getByText("456")).toBeInTheDocument();
+        expect(screen.getAllByText("1,240")).toHaveLength(STATS_LAYOUT_COUNT);
+        expect(screen.getAllByText("123")).toHaveLength(STATS_LAYOUT_COUNT);
+        expect(screen.getAllByText("123,000")).toHaveLength(STATS_LAYOUT_COUNT);
+        expect(screen.getAllByText("456")).toHaveLength(STATS_LAYOUT_COUNT);
     });
 
     it("renders zeros when loaded data has zero counts", () => {
@@ -97,7 +125,7 @@ describe("AdminDashboardHome", () => {
         });
         render(<AdminDashboardHome />);
         const zeros = screen.getAllByText("0");
-        expect(zeros).toHaveLength(4);
+        expect(zeros).toHaveLength(4 * STATS_LAYOUT_COUNT);
     });
 
     it("renders System Health section with all statuses", () => {

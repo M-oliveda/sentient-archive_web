@@ -11,6 +11,7 @@ interface IStatsCardProps {
     value: string | number;
     action?: IStatsCardAction;
     variant?: "default" | "accent";
+    className?: string;
 }
 
 export function StatsCard({
@@ -19,14 +20,16 @@ export function StatsCard({
     value,
     action,
     variant = "default",
+    className,
 }: IStatsCardProps) {
     const isAccent = variant === "accent";
 
     return (
         <div
             className={cn(
-                "flex min-w-[180px] flex-col gap-2 rounded-2xl p-5",
+                "flex min-w-45 flex-col gap-2 rounded-2xl p-5",
                 isAccent ? "bg-accent" : "bg-muted",
+                className,
             )}
         >
             <div className="flex size-10 items-center justify-center rounded-full bg-white/30">
@@ -61,7 +64,7 @@ export function StatsCard({
                 <button
                     onClick={action.onClick}
                     className={cn(
-                        "mt-1 self-end text-left text-xs font-semibold underline-offset-2 hover:underline",
+                        "mt-auto self-end text-left text-xs font-semibold underline-offset-2 hover:underline",
                         isAccent ? "text-accent-foreground" : "text-foreground",
                     )}
                 >

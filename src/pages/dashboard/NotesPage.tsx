@@ -29,7 +29,12 @@ export function NotesPage() {
         serialize: String,
     });
 
-    const { data: notes = [], isLoading } = useNotes({
+    const {
+        data: notes = [],
+        isLoading,
+        isError,
+        error,
+    } = useNotes({
         folderId: folderId ?? undefined,
         sort,
         search,
@@ -109,6 +114,8 @@ export function NotesPage() {
             <NotesList
                 notes={pagedNotes}
                 isLoading={isLoading}
+                isError={isError}
+                errorMessage={error instanceof Error ? error.message : undefined}
                 search={search}
                 sort={sort}
                 page={page}

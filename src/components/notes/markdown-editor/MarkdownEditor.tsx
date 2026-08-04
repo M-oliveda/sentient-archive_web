@@ -1,22 +1,15 @@
-import { LexicalComposer } from "@lexical/react/LexicalComposer";
-import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { useMemo } from "react";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
-import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
-import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
-import {
-    $convertFromMarkdownString,
-    $convertToMarkdownString,
-    TRANSFORMERS,
-} from "@lexical/markdown";
-import type { EditorState } from "lexical";
+import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin";
+import { LexicalExtensionComposer } from "@lexical/react/LexicalExtensionComposer";
+import { $convertToMarkdownString } from "@lexical/mdast";
+import type { EditorState, LexicalEditor } from "lexical";
 import { useTranslation } from "react-i18next";
-import { editorTheme } from "./editorTheme";
-import { EDITOR_NODES } from "./editorNodes";
 import { MarkdownFormattingToolbar } from "./MarkdownFormattingToolbar";
 import { EditorCommandPlugin, type IMarkdownEditorHandle } from "./EditorCommandPlugin";
+import { createMarkdownEditorExtension } from "./editorExtension";
 
 interface IMarkdownEditorProps {
     initialContent: string;
@@ -38,51 +31,58 @@ export function MarkdownEditor({
     const { t } = useTranslation("notes");
     const resolvedPlaceholder = placeholder ?? t("editor.placeholder");
 
-    const handleChange = (editorState: EditorState) => {
+    const extension = useMemo(
+        () =>
+            createMarkdownEditorExtension({
+                initialContent,
+                readOnly,
+                onError: (error) => {
+                    console.error("[MarkdownEditor]", error);
+                },
+            }),
+        [initialContent, readOnly],
+    );
+
+    const handleChange = (_editorState: EditorState, editor: LexicalEditor) => {
         if (readOnly || !onChange) return;
-        editorState.read(() => {
-            const markdown = $convertToMarkdownString(TRANSFORMERS);
+        editor.read(() => {
+            const markdown = $convertToMarkdownString();
             onChange(markdown);
         });
     };
 
-    const initialConfig = {
-        namespace: "MarkdownEditor",
-        nodes: EDITOR_NODES,
-        theme: editorTheme,
-        editable: !readOnly,
-        editorState: () => $convertFromMarkdownString(initialContent, TRANSFORMERS),
-        onError: (error: Error) => {
-            console.error("[MarkdownEditor]", error);
-        },
-    };
-
     return (
-        <LexicalComposer initialConfig={initialConfig}>
+        <LexicalExtensionComposer extension={extension} contentEditable={null}>
             <div className="flex flex-1 flex-col gap-3 overflow-hidden">
                 {!readOnly && showToolbar && <MarkdownFormattingToolbar />}
                 <div className="relative flex-1 overflow-y-auto">
-                    <RichTextPlugin
-                        contentEditable={
-                            <ContentEditable
-                                className="editor-content min-h-full"
-                                aria-label={t("editor.contentAriaLabel")}
-                            />
-                        }
-                        placeholder={
-                            <div className="editor-placeholder">
-                                {resolvedPlaceholder}
-                            </div>
-                        }
-                        ErrorBoundary={LexicalErrorBoundary}
-                    />
-                    <HistoryPlugin />
+                    {readOnly ? (
+                        <ContentEditable
+                            className="editor-content min-h-full"
+                            aria-label={t("editor.contentAriaLabel")}
+                            data-gramm="false"
+                            data-gramm_editor="false"
+                        />
+                    ) : (
+                        <ContentEditable
+                            className="editor-content min-h-full"
+                            aria-label={t("editor.contentAriaLabel")}
+                            data-gramm="false"
+                            data-gramm_editor="false"
+                            aria-placeholder={resolvedPlaceholder}
+                            placeholder={
+                                <div className="editor-placeholder">
+                                    {resolvedPlaceholder}
+                                </div>
+                            }
+                        />
+                    )}
                     <ListPlugin />
-                    <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
+                    <CheckListPlugin disableTakeFocusOnClick={readOnly} />
                     <OnChangePlugin onChange={handleChange} ignoreSelectionChange />
                     <EditorCommandPlugin editorRef={editorRef} />
                 </div>
             </div>
-        </LexicalComposer>
+        </LexicalExtensionComposer>
     );
 }

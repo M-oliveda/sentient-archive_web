@@ -14,6 +14,9 @@ describe("editorTheme", () => {
         expect(editorTheme.list?.ul).toBe("editor-ul");
         expect(editorTheme.list?.ol).toBe("editor-ol");
         expect(editorTheme.list?.listitem).toBe("editor-listitem");
+        expect(editorTheme.list?.checklist).toBe("editor-checklist");
+        expect(editorTheme.list?.listitemChecked).toBe("editor-listitem-checked");
+        expect(editorTheme.list?.listitemUnchecked).toBe("editor-listitem-unchecked");
         expect(editorTheme.list?.nested?.listitem).toBe("editor-nested-listitem");
     });
 
@@ -29,9 +32,18 @@ describe("editorTheme", () => {
         expect(editorTheme.text?.code).toBe("editor-text-code");
     });
 
-    it("exports class names for code and link", () => {
+    it("exports class names for code, link, and horizontal rule", () => {
         expect(editorTheme.code).toBe("editor-code-block");
         expect(editorTheme.link).toBe("editor-link");
+        expect(editorTheme.hr).toBe("editor-hr");
+    });
+
+    it("exports class names for GFM tables", () => {
+        expect(editorTheme.table).toBe("editor-table");
+        expect(editorTheme.tableCell).toBe("editor-table-cell");
+        expect(editorTheme.tableCellHeader).toBe("editor-table-cell-header");
+        expect(editorTheme.tableRow).toBe("editor-table-row");
+        expect(editorTheme.tableScrollableWrapper).toBe("editor-table-scroll-wrapper");
     });
 
     it("exports a class name for paragraphs", () => {

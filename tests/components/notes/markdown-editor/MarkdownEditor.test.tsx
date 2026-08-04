@@ -1,77 +1,70 @@
 import React, { act } from "react";
 import { render, screen } from "@testing-library/react";
-import {
-    $convertFromMarkdownString,
-    $convertToMarkdownString,
-} from "@lexical/markdown";
+import { $convertToMarkdownString } from "@lexical/mdast";
 
-let capturedInitialConfig: Record<string, unknown> = {};
-let capturedOnChange: ((es: unknown) => void) | null = null;
+let capturedExtension: unknown = null;
+let capturedOnChange: ((es: unknown, editor: unknown) => void) | null = null;
 
-jest.mock("@lexical/react/LexicalComposer", () => ({
-    LexicalComposer: ({
-        initialConfig,
+jest.mock("@lexical/react/LexicalExtensionComposer", () => ({
+    LexicalExtensionComposer: ({
+        extension,
         children,
     }: {
-        initialConfig: Record<string, unknown>;
+        extension: unknown;
         children: React.ReactNode;
     }) => {
-        capturedInitialConfig = initialConfig;
-        if (typeof initialConfig.editorState === "function") {
-            (initialConfig.editorState as () => void)();
-        }
+        capturedExtension = extension;
         return <>{children}</>;
     },
 }));
 
-jest.mock("@lexical/react/LexicalRichTextPlugin", () => ({
-    RichTextPlugin: ({
-        contentEditable,
-        placeholder,
-    }: {
-        contentEditable: React.ReactNode;
-        placeholder: React.ReactNode;
-    }) => (
-        <div>
-            {contentEditable}
-            {placeholder}
-        </div>
-    ),
-}));
-
 jest.mock("@lexical/react/LexicalContentEditable", () => ({
-    ContentEditable: (props: React.HTMLAttributes<HTMLDivElement>) => (
-        <div {...props} />
+    ContentEditable: ({
+        placeholder,
+        "aria-placeholder": _ariaPlaceholder,
+        ...props
+    }: React.HTMLAttributes<HTMLDivElement> & {
+        placeholder?: React.ReactNode;
+        "aria-placeholder"?: string;
+    }) => (
+        <>
+            <div {...props} />
+            {placeholder}
+        </>
     ),
-}));
-
-jest.mock("@lexical/react/LexicalHistoryPlugin", () => ({
-    HistoryPlugin: () => null,
 }));
 
 jest.mock("@lexical/react/LexicalListPlugin", () => ({
     ListPlugin: () => null,
 }));
 
-jest.mock("@lexical/react/LexicalMarkdownShortcutPlugin", () => ({
-    MarkdownShortcutPlugin: () => null,
-}));
-
-jest.mock("@lexical/react/LexicalErrorBoundary", () => ({
-    LexicalErrorBoundary: () => null,
+jest.mock("@lexical/react/LexicalCheckListPlugin", () => ({
+    CheckListPlugin: () => null,
 }));
 
 jest.mock("@lexical/react/LexicalOnChangePlugin", () => ({
-    OnChangePlugin: ({ onChange }: { onChange: (es: unknown) => void }) => {
+    OnChangePlugin: ({
+        onChange,
+    }: {
+        onChange: (es: unknown, editor: unknown) => void;
+    }) => {
         capturedOnChange = onChange;
         return null;
     },
 }));
 
-jest.mock("@lexical/markdown", () => ({
+jest.mock("@lexical/mdast", () => ({
     $convertFromMarkdownString: jest.fn(),
     $convertToMarkdownString: jest.fn().mockReturnValue("# Converted"),
-    TRANSFORMERS: [],
+}));
+
+const mockCreateExtension = jest.fn((options: unknown) => ({
+    kind: "markdown-editor-extension",
+    options,
+}));
+
+jest.mock("@/components/notes/markdown-editor/editorExtension", () => ({
+    createMarkdownEditorExtension: (options: unknown) => mockCreateExtension(options),
 }));
 
 jest.mock("@/components/notes/markdown-editor/MarkdownFormattingToolbar", () => ({
@@ -92,7 +85,7 @@ describe("MarkdownEditor", () => {
     beforeEach(() => {
         jest.clearAllMocks();
         capturedOnChange = null;
-        capturedInitialConfig = {};
+        capturedExtension = null;
         mockEditorCommandPlugin.mockReset();
     });
 
@@ -112,59 +105,72 @@ describe("MarkdownEditor", () => {
         expect(screen.getByText("editor.placeholder")).toBeInTheDocument();
     });
 
+    it("does not render the placeholder when readOnly is true", () => {
+        render(<MarkdownEditor initialContent="" readOnly placeholder="Type here" />);
+        expect(screen.queryByText("Type here")).not.toBeInTheDocument();
+    });
+
     it("renders the content-editable area with aria-label", () => {
         render(<MarkdownEditor initialContent="" onChange={jest.fn()} />);
         expect(screen.getByLabelText("editor.contentAriaLabel")).toBeInTheDocument();
     });
 
-    it("calls $convertFromMarkdownString with initialContent on mount", () => {
+    it("creates a markdown editor extension with initial content", () => {
         render(<MarkdownEditor initialContent="# Hello" onChange={jest.fn()} />);
-        expect($convertFromMarkdownString).toHaveBeenCalledWith("# Hello", []);
+        expect(mockCreateExtension).toHaveBeenCalledWith(
+            expect.objectContaining({
+                initialContent: "# Hello",
+                readOnly: false,
+            }),
+        );
+        expect(capturedExtension).toEqual(
+            expect.objectContaining({ kind: "markdown-editor-extension" }),
+        );
     });
 
     it("calls onChange with converted markdown when OnChangePlugin fires", () => {
         const onChange = jest.fn();
         render(<MarkdownEditor initialContent="" onChange={onChange} />);
 
-        const mockEditorState = { read: (fn: () => void) => fn() };
+        const mockEditor = { read: (fn: () => void) => fn() };
         act(() => {
-            capturedOnChange?.(mockEditorState);
+            capturedOnChange?.({}, mockEditor);
         });
 
-        expect($convertToMarkdownString).toHaveBeenCalledWith([]);
+        expect($convertToMarkdownString).toHaveBeenCalledWith();
         expect(onChange).toHaveBeenCalledWith("# Converted");
     });
 
-    it("calls console.error via onError handler", () => {
+    it("passes readOnly to createMarkdownEditorExtension", () => {
+        render(<MarkdownEditor initialContent="" readOnly />);
+        expect(mockCreateExtension).toHaveBeenCalledWith(
+            expect.objectContaining({ readOnly: true }),
+        );
+    });
+
+    it("calls console.error via the onError handler passed to createMarkdownEditorExtension", () => {
         const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
         render(<MarkdownEditor initialContent="" onChange={jest.fn()} />);
 
+        const capturedOptions = mockCreateExtension.mock.calls[0]?.[0] as {
+            onError: (error: Error) => void;
+        };
         const error = new Error("editor crash");
         act(() => {
-            (capturedInitialConfig.onError as (e: Error) => void)?.(error);
+            capturedOptions.onError(error);
         });
 
         expect(consoleSpy).toHaveBeenCalledWith("[MarkdownEditor]", error);
         consoleSpy.mockRestore();
     });
 
-    it("sets editable to true when readOnly is not provided", () => {
-        render(<MarkdownEditor initialContent="" onChange={jest.fn()} />);
-        expect(capturedInitialConfig.editable).toBe(true);
-    });
-
-    it("sets editable to false when readOnly is true", () => {
-        render(<MarkdownEditor initialContent="" readOnly />);
-        expect(capturedInitialConfig.editable).toBe(false);
-    });
-
     it("does not call onChange when readOnly and OnChangePlugin fires", () => {
         const onChange = jest.fn();
         render(<MarkdownEditor initialContent="" readOnly onChange={onChange} />);
 
-        const mockEditorState = { read: (fn: () => void) => fn() };
+        const mockEditor = { read: (fn: () => void) => fn() };
         act(() => {
-            capturedOnChange?.(mockEditorState);
+            capturedOnChange?.({}, mockEditor);
         });
 
         expect(onChange).not.toHaveBeenCalled();

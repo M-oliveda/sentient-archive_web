@@ -11,6 +11,13 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+    Carousel,
+    CarouselContent,
+    CarouselItem,
+    CarouselNext,
+    CarouselPrevious,
+} from "@/components/ui/carousel";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { RecentNoteCard } from "@/components/dashboard/RecentNoteCard";
@@ -35,6 +42,28 @@ export function ClientDashboardHome() {
     const totalCount = data?.totalCount ?? 0;
     const lastEdited = notes[0]?.title ?? "—";
     const recentNotes = notes.slice(0, 2);
+
+    const statsCards = [
+        {
+            icon: FileText,
+            label: t("client.stats.notes"),
+            value: isLoading ? "—" : totalCount,
+        },
+        {
+            icon: Coins,
+            label: t("client.stats.tokens"),
+            value: user?.tokenBalance ?? 0,
+            action: {
+                label: t("client.stats.requestMore"),
+                onClick: () => void navigate({ to: "/tokens" }),
+            },
+        },
+        {
+            icon: FileText,
+            label: t("client.stats.lastEdited"),
+            value: isLoading ? "—" : lastEdited,
+        },
+    ];
 
     const handleNewNote = useCallback(async () => {
         const id = await createNote.mutateAsync(null);
@@ -92,30 +121,47 @@ export function ClientDashboardHome() {
                 </div>
             </section>
 
-            {/* Stats row */}
-            <section
-                className="flex gap-4 overflow-x-auto pb-2"
-                aria-label={t("client.stats.ariaLabel")}
-            >
-                <StatsCard
-                    icon={FileText}
-                    label={t("client.stats.notes")}
-                    value={isLoading ? "—" : totalCount}
-                />
-                <StatsCard
-                    icon={Coins}
-                    label={t("client.stats.tokens")}
-                    value={user?.tokenBalance ?? 0}
-                    action={{
-                        label: t("client.stats.requestMore"),
-                        onClick: () => void navigate({ to: "/tokens" }),
-                    }}
-                />
-                <StatsCard
-                    icon={FileText}
-                    label={t("client.stats.lastEdited")}
-                    value={isLoading ? "—" : lastEdited}
-                />
+            {/* Stats — carousel on mobile, grid from md up */}
+            <section aria-label={t("client.stats.ariaLabel")}>
+                {/* Mobile carousel */}
+                <div className="md:hidden">
+                    <Carousel opts={{ align: "start", containScroll: "trimSnaps" }}>
+                        <CarouselContent className="-ml-3 items-stretch">
+                            {statsCards.map((card) => (
+                                <CarouselItem
+                                    key={card.label}
+                                    className="basis-[80%] pl-3"
+                                >
+                                    <StatsCard
+                                        icon={card.icon}
+                                        label={card.label}
+                                        value={card.value}
+                                        action={card.action}
+                                        className="h-full"
+                                    />
+                                </CarouselItem>
+                            ))}
+                        </CarouselContent>
+                        <div className="mt-3 flex items-center justify-end gap-2">
+                            <CarouselPrevious className="static size-8 translate-y-0" />
+                            <CarouselNext className="static size-8 translate-y-0" />
+                        </div>
+                    </Carousel>
+                </div>
+
+                {/* Desktop / tablet grid */}
+                <div className="hidden gap-4 md:grid md:grid-cols-3">
+                    {statsCards.map((card) => (
+                        <StatsCard
+                            key={card.label}
+                            icon={card.icon}
+                            label={card.label}
+                            value={card.value}
+                            action={card.action}
+                            className="h-full"
+                        />
+                    ))}
+                </div>
             </section>
 
             {/* Recent notes */}
@@ -124,10 +170,13 @@ export function ClientDashboardHome() {
                     <h2 className="text-foreground text-xl font-bold">
                         {t("client.recentNotes.title")}
                     </h2>
-                    <button className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-sm font-medium">
+                    <Link
+                        to="/notes"
+                        className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-sm font-medium"
+                    >
                         {t("client.recentNotes.showMore")}
                         <ArrowRight className="size-4" />
-                    </button>
+                    </Link>
                 </div>
                 {!isLoading && recentNotes.length === 0 ? (
                     <p className="text-muted-foreground text-sm">

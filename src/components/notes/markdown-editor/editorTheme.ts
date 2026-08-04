@@ -9,10 +9,14 @@ export const editorTheme: EditorThemeClasses = {
         h5: "editor-h5",
         h6: "editor-h6",
     },
+    hr: "editor-hr",
     list: {
         ul: "editor-ul",
         ol: "editor-ol",
         listitem: "editor-listitem",
+        checklist: "editor-checklist",
+        listitemChecked: "editor-listitem-checked",
+        listitemUnchecked: "editor-listitem-unchecked",
         nested: {
             listitem: "editor-nested-listitem",
         },
@@ -20,6 +24,11 @@ export const editorTheme: EditorThemeClasses = {
     quote: "editor-quote",
     code: "editor-code-block",
     link: "editor-link",
+    table: "editor-table",
+    tableCell: "editor-table-cell",
+    tableCellHeader: "editor-table-cell-header",
+    tableRow: "editor-table-row",
+    tableScrollableWrapper: "editor-table-scroll-wrapper",
     text: {
         bold: "editor-text-bold",
         italic: "editor-text-italic",

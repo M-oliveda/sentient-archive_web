@@ -1,6 +1,13 @@
 import { motion } from "framer-motion";
 import { BookOpen, CoinsIcon, FileText, MessageCircle, Tag } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import {
+    Carousel,
+    CarouselContent,
+    CarouselItem,
+    CarouselNext,
+    CarouselPrevious,
+} from "@/components/ui/carousel";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
 
 const TOKEN_COSTS = [
@@ -8,10 +15,72 @@ const TOKEN_COSTS = [
     { id: "summarization", icon: FileText },
     { id: "flashcards", icon: BookOpen },
     { id: "qaChat", icon: MessageCircle },
-];
+] as const;
+
+interface ITokenCostCardProps {
+    id: (typeof TOKEN_COSTS)[number]["id"];
+    icon: (typeof TOKEN_COSTS)[number]["icon"];
+    label: string;
+    cost: string;
+}
+
+function TokenCostCard({ icon: Icon, label, cost }: ITokenCostCardProps) {
+    return (
+        <motion.div
+            variants={fadeInUp}
+            whileHover="hovered"
+            initial="rest"
+            animate="rest"
+            className="bg-muted group relative flex cursor-default flex-col items-center justify-center rounded-2xl p-5 text-center"
+            style={{ willChange: "transform" }}
+        >
+            {/* Hover background overlay */}
+            <motion.div
+                variants={{
+                    rest: { opacity: 0 },
+                    hovered: { opacity: 1 },
+                }}
+                transition={{ duration: 0.2 }}
+                className="bg-brand-300/10 ring-brand-300/30 pointer-events-none absolute inset-0 rounded-2xl ring-1"
+            />
+
+            <motion.div
+                variants={{
+                    rest: { scale: 1 },
+                    hovered: { scale: 1.1 },
+                }}
+                transition={{ duration: 0.2 }}
+                className="bg-brand-300/30 group-hover:bg-brand-300/60 mb-3 flex size-10 items-center justify-center rounded-xl transition-colors duration-200"
+            >
+                <motion.span
+                    variants={{
+                        rest: { rotate: 0 },
+                        hovered: { rotate: -8 },
+                    }}
+                    transition={{ duration: 0.2 }}
+                    className="flex items-center justify-center"
+                >
+                    <Icon className="text-foreground size-5" />
+                </motion.span>
+            </motion.div>
+
+            <p className="text-foreground group-hover:text-brand-800 font-bold transition-colors duration-200">
+                {label}
+            </p>
+            <p className="text-muted-foreground mt-1 text-xs">{cost}</p>
+        </motion.div>
+    );
+}
 
 export function TokenSystemSection() {
     const { t } = useTranslation("landing");
+
+    const costCards = TOKEN_COSTS.map(({ id, icon }) => ({
+        id,
+        icon,
+        label: t(`tokens.costs.${id}.label`),
+        cost: t(`tokens.costs.${id}.cost`),
+    }));
 
     return (
         <section id="token-system" className="px-4 py-20">
@@ -68,60 +137,38 @@ export function TokenSystemSection() {
                         </ul>
                     </motion.div>
 
-                    {/* Cost grid */}
-                    <motion.div
-                        variants={staggerContainer}
-                        className="grid grid-cols-1 gap-4 sm:grid-cols-2"
-                    >
-                        {TOKEN_COSTS.map(({ id, icon: Icon }) => (
-                            <motion.div
-                                key={id}
-                                variants={fadeInUp}
-                                whileHover="hovered"
-                                initial="rest"
-                                animate="rest"
-                                className="bg-muted group relative flex cursor-default flex-col items-center justify-center rounded-2xl p-5 text-center"
-                                style={{ willChange: "transform" }}
+                    {/* Cost cards — carousel on mobile, grid from md up */}
+                    <div>
+                        <div className="md:hidden">
+                            <Carousel
+                                opts={{ align: "start", containScroll: "trimSnaps" }}
                             >
-                                {/* Hover background overlay */}
-                                <motion.div
-                                    variants={{
-                                        rest: { opacity: 0 },
-                                        hovered: { opacity: 1 },
-                                    }}
-                                    transition={{ duration: 0.2 }}
-                                    className="bg-brand-300/10 ring-brand-300/30 pointer-events-none absolute inset-0 rounded-2xl ring-1"
-                                />
+                                <CarouselContent className="-ml-3">
+                                    {costCards.map((card) => (
+                                        <CarouselItem
+                                            key={card.id}
+                                            className="basis-[80%] pl-3"
+                                        >
+                                            <TokenCostCard {...card} />
+                                        </CarouselItem>
+                                    ))}
+                                </CarouselContent>
+                                <div className="mt-3 flex items-center justify-end gap-2">
+                                    <CarouselPrevious className="static size-8 translate-y-0" />
+                                    <CarouselNext className="static size-8 translate-y-0" />
+                                </div>
+                            </Carousel>
+                        </div>
 
-                                <motion.div
-                                    variants={{
-                                        rest: { scale: 1 },
-                                        hovered: { scale: 1.1 },
-                                    }}
-                                    transition={{ duration: 0.2 }}
-                                    className="bg-brand-300/30 group-hover:bg-brand-300/60 mb-3 flex size-10 items-center justify-center rounded-xl transition-colors duration-200"
-                                >
-                                    <motion.span
-                                        variants={{
-                                            rest: { rotate: 0 },
-                                            hovered: { rotate: -8 },
-                                        }}
-                                        transition={{ duration: 0.2 }}
-                                        className="flex items-center justify-center"
-                                    >
-                                        <Icon className="text-foreground size-5" />
-                                    </motion.span>
-                                </motion.div>
-
-                                <p className="text-foreground group-hover:text-brand-300 font-bold transition-colors duration-200">
-                                    {t(`tokens.costs.${id}.label`)}
-                                </p>
-                                <p className="text-muted-foreground mt-1 text-xs">
-                                    {t(`tokens.costs.${id}.cost`)}
-                                </p>
-                            </motion.div>
-                        ))}
-                    </motion.div>
+                        <motion.div
+                            variants={staggerContainer}
+                            className="hidden gap-4 md:grid md:grid-cols-2"
+                        >
+                            {costCards.map((card) => (
+                                <TokenCostCard key={card.id} {...card} />
+                            ))}
+                        </motion.div>
+                    </div>
                 </motion.div>
             </div>
         </section>

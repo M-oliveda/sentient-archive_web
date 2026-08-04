@@ -1,10 +1,6 @@
 import { useEffect } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import {
-    $convertFromMarkdownString,
-    $convertToMarkdownString,
-    TRANSFORMERS,
-} from "@lexical/markdown";
+import { $convertFromMarkdownString, $convertToMarkdownString } from "@lexical/mdast";
 
 export interface IMarkdownEditorHandle {
     prependContent: (markdown: string) => void;
@@ -23,20 +19,14 @@ export function EditorCommandPlugin({ editorRef }: IEditorCommandPluginProps) {
         editorRef.current = {
             prependContent(markdown: string) {
                 editor.update(() => {
-                    const current = $convertToMarkdownString(TRANSFORMERS);
-                    $convertFromMarkdownString(
-                        markdown + "\n\n" + current,
-                        TRANSFORMERS,
-                    );
+                    const current = $convertToMarkdownString();
+                    $convertFromMarkdownString(markdown + "\n\n" + current);
                 });
             },
             appendContent(markdown: string) {
                 editor.update(() => {
-                    const current = $convertToMarkdownString(TRANSFORMERS);
-                    $convertFromMarkdownString(
-                        current + "\n\n" + markdown,
-                        TRANSFORMERS,
-                    );
+                    const current = $convertToMarkdownString();
+                    $convertFromMarkdownString(current + "\n\n" + markdown);
                 });
             },
         };
