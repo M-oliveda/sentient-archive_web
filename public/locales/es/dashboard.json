@@ -1,0 +1,50 @@
+{
+  "client": {
+    "welcome": "Bienvenido de nuevo, {{firstName}}",
+    "welcomeFallback": "ahí",
+    "subtitle": "Tu base de conocimientos está organizada y lista para generar insights.",
+    "lowBalance": {
+      "message": "Tu balance de tokens es bajo.",
+      "link": "Solicitar más tokens",
+      "suffix": "para seguir usando las funciones de IA."
+    },
+    "actions": {
+      "newNote": "Nueva Nota"
+    },
+    "stats": {
+      "ariaLabel": "Resumen de estadísticas",
+      "notes": "Notas",
+      "tokens": "Tokens",
+      "lastEdited": "Última Edición",
+      "requestMore": "Solicitar Más"
+    },
+    "recentNotes": {
+      "title": "Notas Recientes",
+      "showMore": "Mostrar Más",
+      "empty": "No hay notas aún. ¡Crea tu primera nota!",
+      "folderFallback": "Notas"
+    }
+  },
+  "admin": {
+    "title": "Panel de Administración",
+    "subtitle": "Resumen del Sistema y Monitoreo de Salud",
+    "stats": {
+      "ariaLabel": "Estadísticas del sistema",
+      "totalUsers": "Total de Usuarios",
+      "totalNotes": "Total de Notas",
+      "totalTokens": "Total de Tokens",
+      "totalAiOps": "Total de Operaciones de IA"
+    },
+    "health": {
+      "title": "Salud del Sistema",
+      "ariaLabel": "Salud del sistema",
+      "operational": "Operativo",
+      "inDanger": "En Peligro",
+      "down": "Caído"
+    },
+    "activity": {
+      "title": "Actividad Reciente",
+      "ariaLabel": "Actividad reciente"
+    }
+  }
+}

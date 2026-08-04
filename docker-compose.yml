@@ -1,0 +1,33 @@
+name: sentient-archive-web_local
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    container_name: sentient-archive-web_local-frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+      - ./index.html:/app/index.html
+      - ./vite.config.ts:/app/vite.config.ts
+      - ./tsconfig.json:/app/tsconfig.json
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - VITE_FIREBASE_API_KEY=${VITE_FIREBASE_API_KEY}
+      - VITE_FIREBASE_AUTH_DOMAIN=${VITE_FIREBASE_AUTH_DOMAIN}
+      - VITE_FIREBASE_PROJECT_ID=${VITE_FIREBASE_PROJECT_ID}
+      - VITE_FIREBASE_MESSAGING_SENDER_ID=${VITE_FIREBASE_MESSAGING_SENDER_ID}
+      - VITE_FIREBASE_APP_ID=${VITE_FIREBASE_APP_ID}
+      - VITE_USE_EMULATOR=true
+    command: npm run dev -- --host 0.0.0.0
+    networks:
+      - sentient-network
+
+networks:
+  sentient-network:
+    external: true

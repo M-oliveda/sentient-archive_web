@@ -1,0 +1,17 @@
+{
+  "dashboard": "Tablero",
+  "notes": "Notas",
+  "aiFeatures": "Funciones de IA",
+  "tokens": "Tokens",
+  "activity": "Actividad",
+  "settings": "Configuración",
+  "admin": "Administrador",
+  "users": "Usuarios",
+  "tokenRequests": "Solicitudes de Tokens",
+  "analytics": "Analíticas",
+  "systemConfig": "Configuración del Sistema",
+  "activityLogs": "Registros de Actividad",
+  "logout": "Cerrar sesión",
+  "selectLanguage": "Seleccionar idioma",
+  "mainNavigation": "Navegación principal"
+}

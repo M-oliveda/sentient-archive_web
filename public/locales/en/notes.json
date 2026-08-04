@@ -1,0 +1,119 @@
+{
+  "newNote": "New Note",
+  "allNotes": "All Notes",
+  "noNotes": "No notes yet",
+  "untitled": "Untitled Note",
+  "list": {
+    "title": "My Notes",
+    "noteTotal": "{{count}} note total",
+    "notesTotal": "{{count}} notes total",
+    "newNote": "New Note",
+    "searchPlaceholder": "Search notes…",
+    "searchAriaLabel": "Search notes",
+    "empty": "No notes yet.",
+    "emptySearch": "No notes match your search.",
+    "loadError": "Could not load notes. Please try again later.",
+    "showing": "Showing {{start}}–{{end}} of {{total}} notes",
+    "prevPage": "Previous page",
+    "nextPage": "Next page",
+    "sort": {
+      "updatedAt": "Last edited",
+      "createdAt": "Created",
+      "title": "Title"
+    }
+  },
+  "card": {
+    "untitled": "Untitled",
+    "unfiled": "Unfiled",
+    "words": "{{count}} words"
+  },
+  "detail": {
+    "breadcrumb": "Breadcrumb",
+    "home": "Home",
+    "allNotes": "All Notes",
+    "untitled": "Untitled",
+    "edit": "Edit",
+    "words": "{{count}} words",
+    "aiInsight": "AI Insight"
+  },
+  "editor": {
+    "untitled": "Untitled",
+    "titleAriaLabel": "Note title",
+    "back": "Back",
+    "toggleAI": "Toggle AI Tools",
+    "saving": "Saving",
+    "saved": "Saved",
+    "deleteNote": "Delete note",
+    "deleteConfirmTitle": "Delete note?",
+    "deleteConfirmDescription": "This action cannot be undone. The note will be permanently deleted.",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "addTag": "Add tag",
+    "addTagPlaceholder": "Add tag…",
+    "removeTag": "Remove {{tag}} tag",
+    "placeholder": "Start writing… (markdown shortcuts supported)",
+    "contentAriaLabel": "Note content",
+    "enterUrl": "Enter URL:",
+    "format": {
+      "bold": "Bold",
+      "italic": "Italic",
+      "h1": "Heading 1",
+      "h2": "Heading 2",
+      "bulletList": "Bullet list",
+      "numberedList": "Numbered list",
+      "link": "Link",
+      "blockquote": "Blockquote",
+      "codeBlock": "Code block"
+    }
+  },
+  "assistant": {
+    "title": "AI Assistant",
+    "noFeatures": "No AI features are currently available.",
+    "token": "{{count}} token",
+    "tokens": "{{count}} tokens",
+    "notEnoughTokens": "Not enough tokens",
+    "generating": "Generating…",
+    "regenerating": "Regenerating…",
+    "errors": {
+      "unavailable": "AI service is temporarily unavailable. Please try again later.",
+      "generic": "Something went wrong. Please try again."
+    },
+    "summary": {
+      "title": "Summary",
+      "generate": "Generate Summary",
+      "insert": "Insert at top",
+      "markdownHeading": "Summary"
+    },
+    "tags": {
+      "title": "Suggested Tags",
+      "generate": "Generate Tags",
+      "regenerate": "Regenerate Tags"
+    },
+    "flashcards": {
+      "title": "Generate Flashcards",
+      "description": "Create study aids from this note.",
+      "generate": "Generate",
+      "regenerate": "Regenerate",
+      "withCost": "{{label}} ({{count}} tokens)",
+      "markdownHeading": "Flashcards"
+    },
+    "knowledgeQA": {
+      "title": "Knowledge Q&A",
+      "description": "Ask questions and get answers sourced from all your notes.",
+      "ask": "Ask a Question ({{count}} tokens)"
+    }
+  },
+  "extractor": {
+    "button": "Upload Document",
+    "stages": {
+      "uploading": "Uploading…",
+      "parsing": "Parsing content…",
+      "creating": "Creating note…"
+    },
+    "errors": {
+      "unsupportedType": "Only PDF, TXT, and MD files are supported.",
+      "tooLarge": "File must be smaller than 10 MB."
+    },
+    "success": "\"{{title}}\" created from {{filename}}"
+  }
+}

@@ -44,7 +44,14 @@ This frontend works in conjunction with the backend API:
 
 ## Key Features
 
-### 1. Rich Note Management
+### 1. Authentication & Security
+
+- **Email/Password Authentication:** Secure user registration and login
+- **Google OAuth:** Single sign-on with Google accounts
+- **Password Reset:** Complete forgot password flow with email verification
+- **Protected Routes:** Role-based access control (RBAC) for admin features
+
+### 2. Rich Note Management
 
 - **Markdown Editor:** Full-featured editor with live preview
 - **File Content Extraction:** Upload PDF/TXT/MD files to extract text into notes
@@ -52,7 +59,7 @@ This frontend works in conjunction with the backend API:
 - **Smart Search:** Real-time search with filtering and sorting
 - **Tag Management:** Visual tag interface with auto-suggestions
 
-### 2. AI-Powered Tools
+### 3. AI-Powered Tools
 
 | Feature           | Description                                      |
 | ----------------- | ------------------------------------------------ |
@@ -61,13 +68,13 @@ This frontend works in conjunction with the backend API:
 | **Flashcards**    | Create study flashcards from note content        |
 | **Knowledge Q&A** | Chat interface to ask questions about your notes |
 
-### 3. Token Economy
+### 4. Token Economy
 
 - **Balance Widget:** Real-time token balance display
 - **Transaction History:** Track token usage and costs
 - **Usage Visualization:** Charts showing spending patterns
 
-### 4. Admin Dashboard (RBAC Protected)
+### 5. Admin Dashboard (RBAC Protected)
 
 - **User Management:** Manage users, roles, and account status
 - **Analytics:** Usage charts and cost tracking
@@ -194,10 +201,15 @@ docker compose up        # Start Docker dev environment
 # Build
 npm run build            # Production build
 npm run preview          # Preview production build
+npm run analyze          # Build + open bundle visualizer (dist/bundle-stats.html)
 
 # Testing
 npm run test             # Run unit tests
-npm run test:coverage    # Generate coverage report
+npm run test:coverage    # Generate coverage report (100% required)
+npm run test:e2e         # Playwright (local Vite + emulators)
+npm run test:e2e:public  # Public/auth smoke only (CI-friendly)
+npm run test:e2e:staging # Staging smoke (needs E2E_* env)
+npm run test:e2e:ui      # Playwright UI mode
 
 # Code Quality
 npm run lint             # Run ESLint
@@ -216,26 +228,62 @@ This project uses Husky to enforce quality standards:
 
 ## Testing
 
-We aim for **100% test coverage** on critical components.
+The project enforces **100% Jest coverage** (branches/functions/lines/statements) in CI.
 
 ### Tools
 
-- **Jest:** Unit test runner
-- **React Testing Library:** Component testing
-- **MSW:** API mocking
+- **Jest** + **React Testing Library** — unit and component tests
+- **MSW** — API mocking in Jest
+- **Playwright** — browser E2E (local emulators + staging/preview)
+- **@axe-core/playwright** — accessibility checks on public pages
 
-### Running Tests
+### Unit / integration
 
 ```bash
-# Run all tests
 npm run test
-
-# Watch mode
 npm run test:watch
-
-# Coverage report
 npm run test:coverage
 ```
+
+Integration flows live under `tests/integration/` (auth gate, notes cache invalidation,
+admin RBAC).
+
+### Playwright E2E
+
+**Local (Firebase emulators):** Auth `9099`, Firestore `8081`, Storage `9199`, Functions
+`5001`. Start emulators (and the functions API) on the shared `sentient-network`, then:
+
+```bash
+docker compose up -d
+
+npm run test:e2e          # full local suite (auth specs skip if user not seeded)
+npm run test:e2e:public   # landing / login / protected redirects / a11y / i18n
+```
+
+Copy [`e2e/.env.example`](e2e/.env.example) to `e2e/.env.local` for credentials
+(`E2E_LOCAL_*`, or remote `E2E_*`). Playwright loads `e2e/.env.local` automatically;
+shell/CI exports still override file values.
+
+**Staging / preview:** protected by HTTP Basic Auth. `E2E_TARGET`, `E2E_BASE_URL`, and
+`E2E_BASIC_AUTH_*` are required (via `e2e/.env.local` or exports):
+
+```bash
+export E2E_TARGET=staging
+export E2E_BASE_URL=https://your-cloud-run-url
+export E2E_BASIC_AUTH_USER=...
+export E2E_BASIC_AUTH_PASSWORD=...
+export E2E_TEST_EMAIL=...
+export E2E_TEST_PASSWORD=...
+npm run test:e2e:staging
+```
+
+Manual GitHub Actions workflow: **E2E Staging** (`.github/workflows/e2e-staging.yml`).
+
+### Docs
+
+- [User guide](docs/user-guide.md)
+- [Component API](docs/components.md)
+- [Deployment runbook](docs/deployment.md)
 
 ---
 

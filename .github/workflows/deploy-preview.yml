@@ -1,0 +1,163 @@
+# Deploy Preview Workflow
+#
+# Reusable workflow that deploys ephemeral preview environments for Pull Requests.
+# Each PR gets its own Cloud Run service with HTTP Basic Auth.
+# Invoked by CI after the test job succeeds.
+
+name: Deploy to Preview
+
+on:
+  workflow_call:
+
+env:
+  REGION: us-central1
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+  IMAGE_NAME: sentient-archive-web
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: preview
+      url: ${{ steps.deploy.outputs.url }}
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Generate preview service name
+        id: preview-name
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          SERVICE_NAME="sentient-archive-pr-${PR_NUMBER}"
+          echo "service_name=${SERVICE_NAME}" >> $GITHUB_OUTPUT
+          echo "pr_number=${PR_NUMBER}" >> $GITHUB_OUTPUT
+          echo "Preview service: ${SERVICE_NAME}"
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            --target protected \
+            --build-arg AUTH_USERNAME=${{ secrets.AUTH_USERNAME }} \
+            --build-arg AUTH_PASSWORD=${{ secrets.AUTH_PASSWORD }} \
+            --build-arg VITE_FIREBASE_API_KEY=${{ secrets.VITE_FIREBASE_API_KEY }} \
+            --build-arg VITE_FIREBASE_AUTH_DOMAIN=${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }} \
+            --build-arg VITE_FIREBASE_PROJECT_ID=${{ secrets.VITE_FIREBASE_PROJECT_ID }} \
+            --build-arg VITE_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }} \
+            --build-arg VITE_FIREBASE_APP_ID=${{ secrets.VITE_FIREBASE_APP_ID }} \
+            --build-arg VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }} \
+            -t ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:pr-${{ steps.preview-name.outputs.pr_number }} \
+            .
+
+      - name: Push Docker image to Docker Hub
+        run: |
+          docker push ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:pr-${{ steps.preview-name.outputs.pr_number }}
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v3
+
+      - name: Deploy to Cloud Run (Preview)
+        id: deploy
+        run: |
+          gcloud run deploy ${{ steps.preview-name.outputs.service_name }} \
+            --image=docker.io/${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:pr-${{ steps.preview-name.outputs.pr_number }} \
+            --platform=managed \
+            --region=${{ env.REGION }} \
+            --project=${{ secrets.GCP_PROJECT_ID }} \
+            --allow-unauthenticated \
+            --memory=256Mi \
+            --cpu=1 \
+            --min-instances=0 \
+            --max-instances=1 \
+            --port=80 \
+            --timeout=60 \
+            --concurrency=80 \
+            --cpu-throttling \
+            --tag=pr-${{ steps.preview-name.outputs.pr_number }} \
+            --format=json > deploy-output.json
+
+          # Extract the service URL from the deployment output
+          SERVICE_URL=$(jq -r '.status.url' deploy-output.json)
+          echo "url=${SERVICE_URL}" >> $GITHUB_OUTPUT
+          echo "Preview URL: ${SERVICE_URL}"
+
+      - name: Register preview domain in Firebase Auth
+        run: |
+          PREVIEW_HOSTNAME=$(echo "${{ steps.deploy.outputs.url }}" | sed 's|https://||')
+          FIREBASE_PROJECT_ID="${{ secrets.VITE_FIREBASE_PROJECT_ID }}"
+          ACCESS_TOKEN=$(gcloud auth print-access-token)
+
+          # Fetch current authorized domains
+          CURRENT_DOMAINS=$(curl -sSf \
+            "https://identitytoolkit.googleapis.com/admin/v2/projects/${FIREBASE_PROJECT_ID}/config" \
+            -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+            -H "X-Goog-User-Project: ${FIREBASE_PROJECT_ID}" \
+            | jq '[.authorizedDomains[]?]')
+
+          # Append preview hostname (idempotent — skips if already present)
+          NEW_DOMAINS=$(echo "$CURRENT_DOMAINS" \
+            | jq --arg d "$PREVIEW_HOSTNAME" 'if index($d) then . else . + [$d] end')
+
+          curl -sSf -X PATCH \
+            "https://identitytoolkit.googleapis.com/admin/v2/projects/${FIREBASE_PROJECT_ID}/config?updateMask=authorizedDomains" \
+            -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+            -H "X-Goog-User-Project: ${FIREBASE_PROJECT_ID}" \
+            -H "Content-Type: application/json" \
+            -d "{\"authorizedDomains\": $NEW_DOMAINS}"
+
+          echo "Registered ${PREVIEW_HOSTNAME} in Firebase authorized domains"
+
+      - name: Comment PR with preview URL
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const prNumber = ${{ steps.preview-name.outputs.pr_number }};
+            const previewUrl = '${{ steps.deploy.outputs.url }}';
+            const serviceName = '${{ steps.preview-name.outputs.service_name }}';
+            const headSha = '${{ github.sha }}';
+
+            const comment = `## 🚀 Preview Deployment Ready!
+
+            ### 🔗 [**View Preview Deployment →**](${previewUrl})
+
+            | Property | Value |
+            | --- | --- |
+            | **Environment** | Preview (Ephemeral) |
+            | **Service** | \`${serviceName}\` |
+            | **URL** | ${previewUrl} |
+            | **Commit** | \`${headSha.substring(0, 7)}\` |
+
+            ---
+
+            **📋 Environment Details:**
+            - **Purpose:** Test individual PRs in isolated environments
+            - **Data Type:** Synthetic / Fake data
+            - **Security Level:** Medium (HTTP Basic Auth)
+            - **Who Uses It:** Devs, QA, Product
+
+            > 💡 **Note:** This preview environment will be automatically cleaned up when the PR is closed or merged. Credentials are available in the GitHub Environment secrets.
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: prNumber,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });

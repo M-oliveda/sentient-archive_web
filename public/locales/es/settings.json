@@ -1,0 +1,21 @@
+{
+  "page": {
+    "eyebrow": "Cuenta",
+    "title": "Configuración",
+    "subtitle": "Administra la configuración de tu cuenta, preferencias y facturación."
+  },
+  "profile": "Perfil",
+  "preferences": "Preferencias",
+  "card": {
+    "fullName": "Nombre completo",
+    "username": "Nombre de usuario",
+    "save": "Guardar cambios",
+    "saving": "Guardando...",
+    "updateSuccess": "Perfil actualizado",
+    "updateError": "No se pudo actualizar el perfil"
+  },
+  "validation": {
+    "displayNameRequired": "El nombre completo es obligatorio",
+    "displayNameTooLong": "El nombre completo no puede exceder 80 caracteres"
+  }
+}

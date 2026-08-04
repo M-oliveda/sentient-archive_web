@@ -1,0 +1,257 @@
+{
+  "users": {
+    "title": "Gestion des utilisateurs",
+    "totalUsers": "{{formatted}} utilisateurs au total",
+    "totalUsersLoading": "— utilisateurs au total",
+    "showing": "Affichage de {{start}}-{{end}} sur {{total}} utilisateurs",
+    "loadError": "Échec du chargement des utilisateurs. Veuillez réessayer.",
+    "loading": "Chargement des utilisateurs...",
+    "empty": "Aucun utilisateur trouvé.",
+    "prevPage": "Page précédente",
+    "nextPage": "Page suivante",
+    "page": "Page {{page}}",
+    "deactivated": "Utilisateur désactivé",
+    "activated": "Utilisateur activé",
+    "statusUpdateError": "Échec de la mise à jour du statut utilisateur",
+    "adminRevoked": "Rôle administrateur révoqué",
+    "adminGranted": "Rôle administrateur accordé",
+    "roleUpdateError": "Échec de la mise à jour du rôle utilisateur",
+    "updated": "Utilisateur mis à jour avec succès",
+    "updateError": "Échec de la mise à jour de l'utilisateur",
+    "filters": {
+      "search": "Rechercher",
+      "searchPlaceholder": "Rechercher par e-mail ou nom...",
+      "filtersLabel": "Filtres :",
+      "allRoles": "Tous les rôles",
+      "admins": "Administrateurs",
+      "clients": "Clients",
+      "allStatuses": "Tous les statuts",
+      "active": "Actif",
+      "inactive": "Inactif",
+      "clear": "Effacer"
+    },
+    "table": {
+      "user": "Utilisateur",
+      "role": "Rôle",
+      "tokenBalance": "Solde de jetons",
+      "lastActive": "Dernière activité",
+      "status": "Statut",
+      "actions": "Actions",
+      "admin": "Admin",
+      "client": "Client",
+      "edit": "Modifier",
+      "revokeAdmin": "Révoquer admin",
+      "grantAdmin": "Accorder admin",
+      "low": "Bas",
+      "actionsFor": "Actions pour {{name}}",
+      "toggleActive": "Basculer le statut actif de {{name}}"
+    },
+    "edit": {
+      "title": "Modifier l'utilisateur",
+      "description": "Mettre à jour les détails : {{email}}",
+      "role": "Rôle",
+      "status": "Statut",
+      "tokenBalance": "Solde de jetons",
+      "active": "Actif",
+      "inactive": "Inactif",
+      "client": "client",
+      "admin": "admin",
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "saving": "Enregistrement..."
+    }
+  },
+  "tokenRequests": {
+    "title": "Demandes de jetons",
+    "loading": "Chargement des demandes de jetons...",
+    "loadError": "Échec du chargement des demandes de jetons. Veuillez réessayer.",
+    "empty": "Aucune demande de jetons trouvée.",
+    "loadMore": "Charger plus",
+    "showing": "Affichage de {{count}} sur {{total}}",
+    "tabs": {
+      "pending": "En attente",
+      "approved": "Approuvées",
+      "denied": "Refusées",
+      "allHistory": "Tout l'historique"
+    },
+    "urgentCount": "{{count}} urgentes (solde bas)",
+    "approveSuccess": "Demande de jetons approuvée",
+    "approveError": "Échec de l'approbation de la demande",
+    "rejectSuccess": "Demande de jetons rejetée",
+    "rejectError": "Échec du rejet de la demande",
+    "approveModal": {
+      "title": "Approuver la demande de jetons",
+      "from": "De {{name}}",
+      "amount": "Montant",
+      "originalRequest": "Demande originale : {{amount}} jetons",
+      "notes": "Notes (facultatif)",
+      "notesPlaceholder": "Notes d'approbation...",
+      "cancel": "Annuler",
+      "approve": "Approuver",
+      "approving": "Approbation..."
+    },
+    "rejectModal": {
+      "title": "Rejeter la demande de jetons",
+      "from": "De {{name}}",
+      "reason": "Motif (facultatif)",
+      "reasonPlaceholder": "Motif du rejet...",
+      "cancel": "Annuler",
+      "reject": "Rejeter",
+      "rejecting": "Rejet..."
+    },
+    "card": {
+      "urgent": "Urgent !",
+      "current": "Actuel",
+      "requested": "Demandé",
+      "justification": "Justification :",
+      "lastGrant": "Dernière attribution : {{time}}",
+      "approve": "Approuver",
+      "reject": "Rejeter",
+      "denied": "Refusée",
+      "approved": "approuvée",
+      "unknownUser": "Utilisateur inconnu"
+    }
+  },
+  "activityLogs": {
+    "eyebrow": "Activité système",
+    "title": "Journaux d'activité",
+    "subtitle": "Surveillez toutes les activités système de tous les utilisateurs",
+    "tabs": {
+      "all": "Toute l'activité",
+      "ai": "Opérations IA",
+      "tokens": "Jetons",
+      "notes": "Notes",
+      "folders": "Dossiers"
+    },
+    "searchPlaceholder": "Rechercher par e-mail, action ou description...",
+    "clear": "Effacer",
+    "loading": "Chargement des journaux d'activité...",
+    "loadError": "Échec du chargement des journaux d'activité. Veuillez réessayer.",
+    "empty": "Aucun journal d'activité trouvé. Essayez d'ajuster vos filtres.",
+    "showing": "Affichage de {{count}} sur {{total}} activités",
+    "loadMore": "Charger plus"
+  },
+  "analytics": {
+    "title": "Analytiques",
+    "subtitle": "Statistiques d'utilisation et insights système",
+    "loading": "Chargement des analytiques...",
+    "loadError": "Échec du chargement des analytiques. Veuillez réessayer.",
+    "period": "Période :",
+    "ranges": {
+      "7d": "7 jours",
+      "30d": "30 jours",
+      "90d": "90 jours"
+    },
+    "lastDays": {
+      "7d": "7 derniers jours",
+      "30d": "30 derniers jours",
+      "90d": "90 derniers jours"
+    },
+    "cards": {
+      "totalUsers": "Utilisateurs totaux",
+      "activeCount": "{{count}} actifs",
+      "totalNotes": "Notes totales",
+      "notesCreated": "Créées par les utilisateurs",
+      "tokensSpent": "Jetons dépensés",
+      "netBalance": "{{count}} solde net",
+      "aiOperations": "Opérations IA"
+    },
+    "aiBreakdown": {
+      "title": "Répartition des opérations IA",
+      "description": "Utilisation par type d'opération",
+      "summarization": "Résumé",
+      "autoTagging": "Étiquetage automatique",
+      "flashcards": "Flashcards",
+      "qa": "Q&R"
+    },
+    "aiTrend": {
+      "title": "Tendance des opérations IA",
+      "description": "Opérations dans le temps ({{range}})"
+    },
+    "tokenTrend": {
+      "title": "Tendance d'utilisation des jetons",
+      "description": "Accordés vs dépensés ({{range}})",
+      "granted": "Accordés",
+      "spent": "Dépensés"
+    },
+    "userGrowth": {
+      "title": "Croissance des utilisateurs",
+      "description": "Utilisateurs totaux et nouveaux ({{range}})",
+      "totalUsers": "Utilisateurs totaux"
+    },
+    "distribution": {
+      "title": "Répartition des utilisateurs",
+      "description": "Nombre d'utilisateurs par rôle et statut",
+      "clients": "Clients",
+      "admins": "Administrateurs",
+      "active": "Actifs",
+      "inactive": "Inactifs"
+    }
+  },
+  "systemConfig": {
+    "title": "Configuration système",
+    "subtitle": "Gérez les paramètres globaux, les modèles IA et les fonctionnalités.",
+    "loading": "Chargement de la configuration système...",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
+    "saveSuccess": "Configuration mise à jour avec succès",
+    "saveError": "Échec de la mise à jour de la configuration",
+    "ai": {
+      "title": "Configuration IA",
+      "model": "Modèle Gemini par défaut",
+      "modelHint": "Le modèle sélectionné sera utilisé pour toutes les requêtes générales.",
+      "operationalLimits": "Limites opérationnelles",
+      "maxTokens": "Max jetons / op.",
+      "maxOpsHour": "Max ops. / utilisateur / heure",
+      "fileExtractionsDay": "Extractions de fichiers / jour",
+      "temperature": "Température",
+      "temperatureHint": "Recommandé : 1.0 pour Gemini 3+, 0.7 pour les modèles antérieurs",
+      "thinkingLevel": "Niveau de raisonnement (Gemini 3+)",
+      "thinkingLevelHint": "Contrôle la profondeur de raisonnement pour les modèles Gemini 3+",
+      "thinkingMinimal": "Minimal (latence la plus faible)",
+      "thinkingLow": "Bas (réponses rapides)",
+      "thinkingMedium": "Moyen (équilibré)",
+      "thinkingHigh": "Élevé (raisonnement approfondi)",
+      "thinkingBudget": "Budget de raisonnement (Gemini 2.5)",
+      "thinkingBudgetHint": "-1 = Dynamique, 0 = Désactivé, >0 = Nombre de jetons spécifique (Gemini 2.5 uniquement)"
+    },
+    "tokens": {
+      "title": "Économie de jetons",
+      "featureCosts": "Coûts des fonctionnalités (jetons)",
+      "autoTagging": "Étiquetage automatique",
+      "autoTaggingHint": "par élément",
+      "summarization": "Résumé",
+      "summarizationHint": "par 1k mots",
+      "flashcards": "Flashcards",
+      "flashcardsHint": "par ensemble",
+      "ragQuery": "Requête Q&R",
+      "ragQueryHint": "par requête",
+      "newUserGrants": "Attributions nouveaux utilisateurs",
+      "production": "Production",
+      "staging": "Staging",
+      "development": "Développement",
+      "local": "Local"
+    },
+    "features": {
+      "title": "Fonctionnalités",
+      "on": "ON",
+      "off": "OFF",
+      "summarization": "Résumé",
+      "summarizationDesc": "Autoriser la génération de résumés de notes",
+      "autoTagging": "Étiquetage automatique",
+      "autoTaggingDesc": "Autoriser les suggestions automatiques de tags",
+      "flashcards": "Flashcards",
+      "flashcardsDesc": "Autoriser la génération de flashcards à partir des notes",
+      "ragQuery": "Q&R / requête RAG",
+      "ragQueryDesc": "Autoriser les questions sur la base de connaissances",
+      "fileExtraction": "Extraction de fichiers",
+      "fileExtractionDesc": "Autoriser l'extraction de contenu PDF/TXT/MD"
+    },
+    "meta": {
+      "lastModifiedBy": "Dernière modification par",
+      "on": "le",
+      "lastUpdated": "Dernière mise à jour",
+      "version": "Version {{version}}"
+    }
+  }
+}

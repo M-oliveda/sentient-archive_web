@@ -1,0 +1,105 @@
+# Cleanup Preview Workflow
+#
+# Cleans up ephemeral preview environments when PRs are closed
+# Deletes the Cloud Run service and comments on the PR
+
+name: Cleanup Preview Environment
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [develop, main]
+
+env:
+  REGION: us-central1
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: preview
+    permissions:
+      pull-requests: write
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Generate preview service name
+        id: preview-name
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          SERVICE_NAME="sentient-archive-pr-${PR_NUMBER}"
+          echo "service_name=${SERVICE_NAME}" >> $GITHUB_OUTPUT
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v3
+
+      - name: Get preview service URL
+        id: preview-url
+        continue-on-error: true
+        run: |
+          SERVICE_URL=$(gcloud run services describe ${{ steps.preview-name.outputs.service_name }} \
+            --region=${{ env.REGION }} \
+            --project=${{ secrets.GCP_PROJECT_ID }} \
+            --format="value(status.url)" 2>/dev/null || echo "")
+          echo "url=${SERVICE_URL}" >> $GITHUB_OUTPUT
+          echo "Preview URL: ${SERVICE_URL}"
+
+      - name: Deregister preview domain from Firebase Auth
+        if: steps.preview-url.outputs.url != ''
+        run: |
+          PREVIEW_HOSTNAME=$(echo "${{ steps.preview-url.outputs.url }}" | sed 's|https://||')
+          FIREBASE_PROJECT_ID="${{ secrets.VITE_FIREBASE_PROJECT_ID }}"
+          ACCESS_TOKEN=$(gcloud auth print-access-token)
+
+          # Fetch current authorized domains and remove preview hostname
+          UPDATED_DOMAINS=$(curl -sSf \
+            "https://identitytoolkit.googleapis.com/admin/v2/projects/${FIREBASE_PROJECT_ID}/config" \
+            -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+            -H "X-Goog-User-Project: ${FIREBASE_PROJECT_ID}" \
+            | jq --arg d "$PREVIEW_HOSTNAME" '[.authorizedDomains[]? | select(. != $d)]')
+
+          curl -sSf -X PATCH \
+            "https://identitytoolkit.googleapis.com/admin/v2/projects/${FIREBASE_PROJECT_ID}/config?updateMask=authorizedDomains" \
+            -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+            -H "X-Goog-User-Project: ${FIREBASE_PROJECT_ID}" \
+            -H "Content-Type: application/json" \
+            -d "{\"authorizedDomains\": $UPDATED_DOMAINS}"
+
+          echo "Removed ${PREVIEW_HOSTNAME} from Firebase authorized domains"
+
+      - name: Delete Cloud Run service
+        continue-on-error: true
+        run: |
+          gcloud run services delete ${{ steps.preview-name.outputs.service_name }} \
+            --region=${{ env.REGION }} \
+            --project=${{ secrets.GCP_PROJECT_ID }} \
+            --quiet || echo "Service not found or already deleted"
+
+      - name: Comment PR with cleanup status
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const serviceName = '${{ steps.preview-name.outputs.service_name }}';
+
+            const comment = `## 🧹 Preview Environment Cleaned Up
+
+            **Service:** \`${serviceName}\`
+            **Status:** Deleted
+
+            The ephemeral preview environment has been removed.
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: prNumber,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });

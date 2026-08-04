@@ -1,0 +1,257 @@
+{
+  "users": {
+    "title": "Gestão de usuários",
+    "totalUsers": "{{formatted}} usuários no total",
+    "totalUsersLoading": "— usuários no total",
+    "showing": "Mostrando {{start}}-{{end}} de {{total}} usuários",
+    "loadError": "Falha ao carregar usuários. Tente novamente.",
+    "loading": "Carregando usuários...",
+    "empty": "Nenhum usuário encontrado.",
+    "prevPage": "Página anterior",
+    "nextPage": "Próxima página",
+    "page": "Página {{page}}",
+    "deactivated": "Usuário desativado",
+    "activated": "Usuário ativado",
+    "statusUpdateError": "Falha ao atualizar o status do usuário",
+    "adminRevoked": "Função de administrador revogada",
+    "adminGranted": "Função de administrador concedida",
+    "roleUpdateError": "Falha ao atualizar a função do usuário",
+    "updated": "Usuário atualizado com sucesso",
+    "updateError": "Falha ao atualizar o usuário",
+    "filters": {
+      "search": "Pesquisar",
+      "searchPlaceholder": "Pesquisar por e-mail ou nome...",
+      "filtersLabel": "Filtros:",
+      "allRoles": "Todas as funções",
+      "admins": "Administradores",
+      "clients": "Clientes",
+      "allStatuses": "Todos os status",
+      "active": "Ativo",
+      "inactive": "Inativo",
+      "clear": "Limpar"
+    },
+    "table": {
+      "user": "Usuário",
+      "role": "Função",
+      "tokenBalance": "Saldo de tokens",
+      "lastActive": "Última atividade",
+      "status": "Status",
+      "actions": "Ações",
+      "admin": "Admin",
+      "client": "Cliente",
+      "edit": "Editar",
+      "revokeAdmin": "Revogar admin",
+      "grantAdmin": "Conceder admin",
+      "low": "Baixo",
+      "actionsFor": "Ações para {{name}}",
+      "toggleActive": "Alternar status ativo de {{name}}"
+    },
+    "edit": {
+      "title": "Editar usuário",
+      "description": "Atualizar detalhes do usuário: {{email}}",
+      "role": "Função",
+      "status": "Status",
+      "tokenBalance": "Saldo de tokens",
+      "active": "Ativo",
+      "inactive": "Inativo",
+      "client": "cliente",
+      "admin": "admin",
+      "cancel": "Cancelar",
+      "save": "Salvar alterações",
+      "saving": "Salvando..."
+    }
+  },
+  "tokenRequests": {
+    "title": "Solicitações de tokens",
+    "loading": "Carregando solicitações de tokens...",
+    "loadError": "Falha ao carregar solicitações de tokens. Tente novamente.",
+    "empty": "Nenhuma solicitação de tokens encontrada.",
+    "loadMore": "Carregar mais",
+    "showing": "Mostrando {{count}} de {{total}}",
+    "tabs": {
+      "pending": "Pendentes",
+      "approved": "Aprovadas",
+      "denied": "Negadas",
+      "allHistory": "Todo o histórico"
+    },
+    "urgentCount": "{{count}} urgentes (saldo baixo)",
+    "approveSuccess": "Solicitação de tokens aprovada",
+    "approveError": "Falha ao aprovar a solicitação",
+    "rejectSuccess": "Solicitação de tokens rejeitada",
+    "rejectError": "Falha ao rejeitar a solicitação",
+    "approveModal": {
+      "title": "Aprovar solicitação de tokens",
+      "from": "De {{name}}",
+      "amount": "Quantidade",
+      "originalRequest": "Solicitação original: {{amount}} tokens",
+      "notes": "Notas (opcional)",
+      "notesPlaceholder": "Notas de aprovação...",
+      "cancel": "Cancelar",
+      "approve": "Aprovar",
+      "approving": "Aprovando..."
+    },
+    "rejectModal": {
+      "title": "Rejeitar solicitação de tokens",
+      "from": "De {{name}}",
+      "reason": "Motivo (opcional)",
+      "reasonPlaceholder": "Motivo da rejeição...",
+      "cancel": "Cancelar",
+      "reject": "Rejeitar",
+      "rejecting": "Rejeitando..."
+    },
+    "card": {
+      "urgent": "Urgente!",
+      "current": "Atual",
+      "requested": "Solicitado",
+      "justification": "Justificativa:",
+      "lastGrant": "Última concessão: {{time}}",
+      "approve": "Aprovar",
+      "reject": "Rejeitar",
+      "denied": "Negada",
+      "approved": "aprovada",
+      "unknownUser": "Usuário desconhecido"
+    }
+  },
+  "activityLogs": {
+    "eyebrow": "Atividade do sistema",
+    "title": "Registros de atividade",
+    "subtitle": "Monitore todas as atividades do sistema de todos os usuários",
+    "tabs": {
+      "all": "Toda a atividade",
+      "ai": "Operações de IA",
+      "tokens": "Tokens",
+      "notes": "Notas",
+      "folders": "Pastas"
+    },
+    "searchPlaceholder": "Pesquisar por e-mail, ação ou descrição...",
+    "clear": "Limpar",
+    "loading": "Carregando registros de atividade...",
+    "loadError": "Falha ao carregar registros de atividade. Tente novamente.",
+    "empty": "Nenhum registro de atividade encontrado. Tente ajustar os filtros.",
+    "showing": "Mostrando {{count}} de {{total}} atividades",
+    "loadMore": "Carregar mais"
+  },
+  "analytics": {
+    "title": "Analíticos",
+    "subtitle": "Estatísticas de uso e insights do sistema",
+    "loading": "Carregando analíticos...",
+    "loadError": "Falha ao carregar analíticos. Tente novamente.",
+    "period": "Período:",
+    "ranges": {
+      "7d": "7 dias",
+      "30d": "30 dias",
+      "90d": "90 dias"
+    },
+    "lastDays": {
+      "7d": "Últimos 7 dias",
+      "30d": "Últimos 30 dias",
+      "90d": "Últimos 90 dias"
+    },
+    "cards": {
+      "totalUsers": "Total de usuários",
+      "activeCount": "{{count}} ativos",
+      "totalNotes": "Total de notas",
+      "notesCreated": "Criadas pelos usuários",
+      "tokensSpent": "Tokens gastos",
+      "netBalance": "{{count}} saldo líquido",
+      "aiOperations": "Operações de IA"
+    },
+    "aiBreakdown": {
+      "title": "Detalhamento de operações de IA",
+      "description": "Uso por tipo de operação",
+      "summarization": "Resumo",
+      "autoTagging": "Marcação automática",
+      "flashcards": "Flashcards",
+      "qa": "P&R"
+    },
+    "aiTrend": {
+      "title": "Tendência de operações de IA",
+      "description": "Operações ao longo do tempo ({{range}})"
+    },
+    "tokenTrend": {
+      "title": "Tendência de uso de tokens",
+      "description": "Concedidos vs gastos ({{range}})",
+      "granted": "Concedidos",
+      "spent": "Gastos"
+    },
+    "userGrowth": {
+      "title": "Crescimento de usuários",
+      "description": "Usuários totais e novos ({{range}})",
+      "totalUsers": "Total de usuários"
+    },
+    "distribution": {
+      "title": "Distribuição de usuários",
+      "description": "Contagem de usuários por função e status",
+      "clients": "Clientes",
+      "admins": "Administradores",
+      "active": "Ativos",
+      "inactive": "Inativos"
+    }
+  },
+  "systemConfig": {
+    "title": "Configuração do sistema",
+    "subtitle": "Gerencie configurações globais, modelos de IA e recursos.",
+    "loading": "Carregando configuração do sistema...",
+    "save": "Salvar alterações",
+    "saving": "Salvando...",
+    "saveSuccess": "Configuração atualizada com sucesso",
+    "saveError": "Falha ao atualizar a configuração",
+    "ai": {
+      "title": "Configuração de IA",
+      "model": "Modelo Gemini padrão",
+      "modelHint": "O modelo selecionado será usado para todas as consultas gerais.",
+      "operationalLimits": "Limites operacionais",
+      "maxTokens": "Máx. tokens / op.",
+      "maxOpsHour": "Máx. ops. / usuário / hora",
+      "fileExtractionsDay": "Extrações de arquivo / dia",
+      "temperature": "Temperatura",
+      "temperatureHint": "Recomendado: 1.0 para Gemini 3+, 0.7 para modelos anteriores",
+      "thinkingLevel": "Nível de raciocínio (Gemini 3+)",
+      "thinkingLevelHint": "Controla a profundidade de raciocínio para modelos Gemini 3+",
+      "thinkingMinimal": "Mínimo (menor latência)",
+      "thinkingLow": "Baixo (respostas rápidas)",
+      "thinkingMedium": "Médio (equilibrado)",
+      "thinkingHigh": "Alto (raciocínio profundo)",
+      "thinkingBudget": "Orçamento de raciocínio (Gemini 2.5)",
+      "thinkingBudgetHint": "-1 = Dinâmico, 0 = Desativado, >0 = Contagem específica de tokens (somente Gemini 2.5)"
+    },
+    "tokens": {
+      "title": "Economia de tokens",
+      "featureCosts": "Custos de recursos (tokens)",
+      "autoTagging": "Marcação automática",
+      "autoTaggingHint": "por item",
+      "summarization": "Resumo",
+      "summarizationHint": "por 1k palavras",
+      "flashcards": "Flashcards",
+      "flashcardsHint": "por conjunto",
+      "ragQuery": "Consulta P&R",
+      "ragQueryHint": "por consulta",
+      "newUserGrants": "Concessões a novos usuários",
+      "production": "Produção",
+      "staging": "Staging",
+      "development": "Desenvolvimento",
+      "local": "Local"
+    },
+    "features": {
+      "title": "Recursos",
+      "on": "ON",
+      "off": "OFF",
+      "summarization": "Resumo",
+      "summarizationDesc": "Permitir que usuários gerem resumos de notas",
+      "autoTagging": "Marcação automática",
+      "autoTaggingDesc": "Permitir sugestões automáticas de tags",
+      "flashcards": "Flashcards",
+      "flashcardsDesc": "Permitir geração de flashcards a partir de notas",
+      "ragQuery": "P&R / consulta RAG",
+      "ragQueryDesc": "Permitir perguntas à base de conhecimento",
+      "fileExtraction": "Extração de arquivos",
+      "fileExtractionDesc": "Permitir extração de conteúdo PDF/TXT/MD"
+    },
+    "meta": {
+      "lastModifiedBy": "Última modificação por",
+      "on": "em",
+      "lastUpdated": "Última atualização",
+      "version": "Versão {{version}}"
+    }
+  }
+}

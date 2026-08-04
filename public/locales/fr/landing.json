@@ -1,0 +1,130 @@
+{
+  "nav": {
+    "features": "Fonctionnalités",
+    "howItWorks": "Comment ça Marche",
+    "tokenSystem": "Système de Jetons",
+    "logIn": "Se Connecter",
+    "getStarted": "Commencer",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu",
+    "navigationMenu": "Menu de navigation",
+    "newVersionTitle": "Nouvelle Version 1.0",
+    "newVersionDescription": "Découvrez la prochaine évolution de la gestion des connaissances."
+  },
+  "hero": {
+    "badge": "v1.0 est maintenant disponible",
+    "title": "Débloquez la sagesse de",
+    "titleAccent": "votre archive numérique.",
+    "description": "SentientArchive transforme vos documents éparpillés en une base de connaissances conversationnelle. Arrêtez de chercher, commencez à demander.",
+    "cta": "Commencer Gratuitement"
+  },
+  "why": {
+    "title": "Pourquoi SentientArchive?",
+    "subtitle": "Conçu pour les chercheurs, écrivains et travailleurs du savoir qui ont besoin de plus qu'un simple stockage.",
+    "items": {
+      "cognitiveSearch": {
+        "title": "Recherche Cognitive",
+        "description": "Ne vous contentez pas de faire correspondre des mots-clés. Notre IA comprend l'intention derrière votre requête et présente des concepts pertinents."
+      },
+      "autoLinking": {
+        "title": "Liaison Automatique",
+        "description": "Les nouvelles entrées sont automatiquement connectées aux nœuds de connaissances existants, créant un réseau de connaissances sans effort manuel."
+      },
+      "privateByDesign": {
+        "title": "Privé par Conception",
+        "description": "Votre base de connaissances est cryptée localement. Même nos modèles d'IA ne s'entraînent pas sur vos données personnelles sans consentement."
+      }
+    }
+  },
+  "features": {
+    "title": "Tout ce dont Vous Avez Besoin pour Construire Votre Empire du Savoir",
+    "subtitle": "Fonctionnalités d'IA puissantes pour vous aider à capturer, organiser et apprendre de vos notes sans friction.",
+    "tokenCost": "{{count}} jetons",
+    "items": {
+      "realTimeSearch": {
+        "title": "Recherche en Temps Réel",
+        "description": "Trouvez exactement ce que vous cherchez en quelques millisecondes avec des capacités de recherche sémantique."
+      },
+      "activityTracking": {
+        "title": "Suivi d'Activité",
+        "description": "Visualisez vos habitudes d'apprentissage et suivez votre productivité avec une croissance au fil du temps."
+      },
+      "smartNoteTaking": {
+        "title": "Prise de Notes Intelligente",
+        "description": "Capturez des idées instantanément avec notre éditeur sans distraction conçu pour la vitesse et la clarté."
+      },
+      "hierarchicalFolders": {
+        "title": "Dossiers Hiérarchiques",
+        "description": "Organisez vos pensées avec des dossiers infiniment imbriqués et des catégories intelligentes."
+      },
+      "aiSummarization": {
+        "title": "Résumé par IA",
+        "description": "Condensez automatiquement de longs articles et documents en résumés concis."
+      },
+      "flashcardGeneration": {
+        "title": "Génération de Cartes Mémoire",
+        "description": "Générez automatiquement des cartes d'étude à partir de vos notes pour renforcer l'apprentissage et la rétention."
+      },
+      "autoTagging": {
+        "title": "Étiquetage Automatique",
+        "description": "Laissez l'IA organiser votre bibliothèque en attribuant automatiquement des étiquettes et catégories pertinentes."
+      },
+      "knowledgeQa": {
+        "title": "Questions-Réponses",
+        "description": "Posez des questions à votre base de connaissances et obtenez des réponses basées sur vos notes."
+      }
+    }
+  },
+  "howItWorks": {
+    "title": "Comment ça Marche",
+    "subtitle": "Commencez à construire votre second cerveau en trois étapes simples",
+    "stepLabel": "Étape {{number}}",
+    "cta": "Commencer Gratuitement",
+    "steps": {
+      "createAccount": {
+        "title": "Créez Votre Compte",
+        "description": "Inscrivez-vous et recevez 20 jetons gratuits pour explorer toutes les fonctionnalités d'IA. Aucune carte de crédit requise."
+      },
+      "captureKnowledge": {
+        "title": "Capturez Vos Connaissances",
+        "description": "Rédigez des notes en Markdown, téléchargez des documents ou importez du contenu existant dans des dossiers organisés."
+      },
+      "unlockInsights": {
+        "title": "Débloquez des Perspectives IA",
+        "description": "Laissez l'IA résumer, étiqueter, générer des cartes mémoire et discuter avec vos notes."
+      }
+    }
+  },
+  "tokens": {
+    "title": "Système Simple Basé sur les Jetons",
+    "freeStartBefore": "Chaque nouvel utilisateur commence avec",
+    "freeStartHighlight": "20 gratuits",
+    "freeStartAfter": "jetons pour explorer toutes les fonctionnalités d'IA.",
+    "operationCost": "Chaque opération d'IA coûte un petit nombre de jetons en fonction de la complexité.",
+    "requestMore": "Besoin de plus? Demandez simplement des jetons supplémentaires depuis votre tableau de bord.",
+    "costs": {
+      "autoTagging": {
+        "label": "Étiquetage Automatique",
+        "cost": "1 jeton"
+      },
+      "summarization": {
+        "label": "Résumé",
+        "cost": "2 jetons"
+      },
+      "flashcards": {
+        "label": "Cartes Mémoire",
+        "cost": "3 jetons"
+      },
+      "qaChat": {
+        "label": "Questions-Réponses",
+        "cost": "4 jetons par requête"
+      }
+    }
+  },
+  "footer": {
+    "tagline": "Système d'exploitation de connaissances propulsé par l'IA. Capturer des connaissances pour l'avenir de l'intelligence.",
+    "copyrightBefore": "© {{year}} SentientArchive. Tous droits réservés. Un projet de",
+    "author": "M-Oliveda",
+    "copyrightAfter": "."
+  }
+}

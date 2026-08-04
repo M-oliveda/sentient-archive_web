@@ -1,0 +1,115 @@
+# CI Workflow
+#
+# Runs only on pull requests targeting develop, release/**, or main.
+# Does not run on push (e.g. merges into develop) — those use deploy-dev / other deploy workflows.
+# After tests pass, deploys a PR preview via the reusable Deploy to Preview workflow.
+
+name: CI
+
+on:
+  pull_request:
+    branches: [develop, "release/**", main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Format Check
+        run: npm run format:check
+
+      - name: Type Check
+        run: npm run type-check
+
+      - name: Build
+        run: npm run build
+
+      - name: Run tests with coverage
+        run: npm run test:coverage
+
+      - name: Check coverage is 100%
+        run: |
+          # Extract coverage percentages from Jest output
+          COVERAGE_OUTPUT=$(npm run test:coverage 2>&1 | grep "All files" | head -1)
+
+          # Check if all coverage metrics are 100%
+          if echo "$COVERAGE_OUTPUT" | grep -E "100\s*\|\s*100\s*\|\s*100\s*\|\s*100" > /dev/null; then
+            echo "Coverage check passed - 100% coverage achieved"
+          else
+            echo "Coverage check failed - coverage is not at 100%"
+            echo "$COVERAGE_OUTPUT"
+            exit 1
+          fi
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-report
+          path: coverage/
+          if-no-files-found: error
+          retention-days: 7
+
+  e2e-public:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run public Playwright suite
+        env:
+          E2E_SKIP_AUTH: "1"
+          VITE_USE_EMULATOR: "true"
+          VITE_FIREBASE_API_KEY: demo-api-key
+          VITE_FIREBASE_AUTH_DOMAIN: localhost
+          VITE_FIREBASE_PROJECT_ID: demo-sentient-archive
+          VITE_FIREBASE_MESSAGING_SENDER_ID: "123456789"
+          VITE_FIREBASE_APP_ID: "1:123456789:web:abcdef"
+        run: npm run test:e2e:public
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-public-report
+          path: playwright-report/
+          retention-days: 7
+
+  deploy-preview:
+    needs: [test, e2e-public]
+    uses: ./.github/workflows/deploy-preview.yml
+    secrets: inherit
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write

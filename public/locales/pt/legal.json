@@ -1,0 +1,53 @@
+{
+  "terms": "Termos de Serviço",
+  "privacy": "Política de Privacidade",
+  "page": {
+    "eyebrow": "Documentação Legal",
+    "title": "Termos de Serviço e Política de Privacidade",
+    "version": "Versão 1",
+    "lastUpdated": "Última atualização: 2026/06/22",
+    "scrollToTop": "Voltar ao topo",
+    "introduction": {
+      "title": "1. Introdução",
+      "p1": "Bem-vindo ao SentientArchive. Estes Termos de Serviço (\"Termos\") regem o seu acesso e uso do Knowledge OS com IA do SentientArchive (o \"Serviço\"). Ao acessar ou usar o nosso Serviço, você concorda em ficar vinculado a estes Termos e à nossa Política de Privacidade.",
+      "p2": "O SentientArchive foi projetado para ser o seu parceiro cognitivo, organizando informações por meio de processamento neural avançado. Nossa missão é garantir que o seu conhecimento pessoal permaneça seguro, privado e eternamente acessível."
+    },
+    "dataCollection": {
+      "title": "2. Coleta de Dados",
+      "intro": "Para oferecer a experiência do SentientArchive, coletamos informações específicas sobre as suas interações com o OS. Isso inclui:",
+      "items": {
+        "semanticInput": {
+          "label": "Entrada semântica:",
+          "description": "Texto, documentos e arquivos que você envia para o seu arquivo privado."
+        },
+        "metadata": {
+          "label": "Metadados:",
+          "description": "Informações técnicas sobre como a IA processa as suas consultas para otimização."
+        },
+        "deviceIdentity": {
+          "label": "Identidade do dispositivo:",
+          "description": "Identificadores mínimos necessários para sincronização segura entre vários dispositivos."
+        }
+      },
+      "quote": "\"Não vendemos os dados do seu arquivo pessoal a terceiros. O seu conhecimento é só seu.\""
+    },
+    "userObligations": {
+      "title": "3. Obrigações do Usuário",
+      "p1": "Como usuário do SentientArchive, você concorda em manter a segurança das suas chaves de criptografia e credenciais de conta. Você é responsável por toda atividade que ocorra sob o seu identificador único.",
+      "p2": "Você concorda em não usar o SentientArchive para armazenar:",
+      "items": {
+        "illegal": "Conteúdo ilegal ou materiais que violem a legislação internacional.",
+        "malicious": "Código malicioso, vírus ou agentes de IA disruptivos.",
+        "ip": "Conteúdo que infrinja a propriedade intelectual de terceiros."
+      }
+    },
+    "termination": {
+      "title": "4. Encerramento",
+      "p1": "Você pode encerrar a sua conta do SentientArchive a qualquer momento. Após o encerramento, terá um prazo de 30 dias para exportar os seus dados em um formato JSON-LD portátil. Depois desse período, todos os dados criptografados serão permanentemente removidos dos nossos nós distribuídos."
+    },
+    "contact": {
+      "title": "5. Informações de Contato",
+      "p1": "Dúvidas sobre os Termos ou a Política de Privacidade devem ser enviadas para mim:"
+    }
+  }
+}

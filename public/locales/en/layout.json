@@ -1,0 +1,17 @@
+{
+  "dashboard": "Dashboard",
+  "notes": "Notes",
+  "aiFeatures": "AI Features",
+  "tokens": "Tokens",
+  "activity": "Activity",
+  "settings": "Settings",
+  "admin": "Admin",
+  "users": "Users",
+  "tokenRequests": "Token Requests",
+  "analytics": "Analytics",
+  "systemConfig": "System Config",
+  "activityLogs": "Activity Logs",
+  "logout": "Log Out",
+  "selectLanguage": "Select language",
+  "mainNavigation": "Main navigation"
+}

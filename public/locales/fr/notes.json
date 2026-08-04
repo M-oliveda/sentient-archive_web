@@ -1,0 +1,119 @@
+{
+  "newNote": "Nouvelle note",
+  "allNotes": "Toutes les notes",
+  "noNotes": "Pas encore de notes",
+  "untitled": "Note sans titre",
+  "list": {
+    "title": "Mes notes",
+    "noteTotal": "{{count}} note au total",
+    "notesTotal": "{{count}} notes au total",
+    "newNote": "Nouvelle note",
+    "searchPlaceholder": "Rechercher des notes…",
+    "searchAriaLabel": "Rechercher des notes",
+    "empty": "Pas encore de notes.",
+    "emptySearch": "Aucune note ne correspond à votre recherche.",
+    "loadError": "Impossible de charger les notes. Veuillez réessayer plus tard.",
+    "showing": "Affichage de {{start}}–{{end}} sur {{total}} notes",
+    "prevPage": "Page précédente",
+    "nextPage": "Page suivante",
+    "sort": {
+      "updatedAt": "Dernière modification",
+      "createdAt": "Création",
+      "title": "Titre"
+    }
+  },
+  "card": {
+    "untitled": "Sans titre",
+    "unfiled": "Non classé",
+    "words": "{{count}} mots"
+  },
+  "detail": {
+    "breadcrumb": "Fil d'Ariane",
+    "home": "Accueil",
+    "allNotes": "Toutes les notes",
+    "untitled": "Sans titre",
+    "edit": "Modifier",
+    "words": "{{count}} mots",
+    "aiInsight": "Insight IA"
+  },
+  "editor": {
+    "untitled": "Sans titre",
+    "titleAriaLabel": "Titre de la note",
+    "back": "Retour",
+    "toggleAI": "Basculer les outils IA",
+    "saving": "Enregistrement",
+    "saved": "Enregistré",
+    "deleteNote": "Supprimer la note",
+    "deleteConfirmTitle": "Supprimer la note ?",
+    "deleteConfirmDescription": "Cette action est irréversible. La note sera définitivement supprimée.",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "addTag": "Ajouter une étiquette",
+    "addTagPlaceholder": "Ajouter une étiquette…",
+    "removeTag": "Supprimer l'étiquette {{tag}}",
+    "placeholder": "Commencez à écrire… (raccourcis markdown pris en charge)",
+    "contentAriaLabel": "Contenu de la note",
+    "enterUrl": "Entrez l'URL :",
+    "format": {
+      "bold": "Gras",
+      "italic": "Italique",
+      "h1": "Titre 1",
+      "h2": "Titre 2",
+      "bulletList": "Liste à puces",
+      "numberedList": "Liste numérotée",
+      "link": "Lien",
+      "blockquote": "Citation",
+      "codeBlock": "Bloc de code"
+    }
+  },
+  "assistant": {
+    "title": "Assistant IA",
+    "noFeatures": "Aucune fonctionnalité IA n'est actuellement disponible.",
+    "token": "{{count}} jeton",
+    "tokens": "{{count}} jetons",
+    "notEnoughTokens": "Jetons insuffisants",
+    "generating": "Génération…",
+    "regenerating": "Régénération…",
+    "errors": {
+      "unavailable": "Le service IA est temporairement indisponible. Veuillez réessayer plus tard.",
+      "generic": "Une erreur s'est produite. Veuillez réessayer."
+    },
+    "summary": {
+      "title": "Résumé",
+      "generate": "Générer un résumé",
+      "insert": "Insérer en haut",
+      "markdownHeading": "Résumé"
+    },
+    "tags": {
+      "title": "Étiquettes suggérées",
+      "generate": "Générer des étiquettes",
+      "regenerate": "Régénérer les étiquettes"
+    },
+    "flashcards": {
+      "title": "Générer des flashcards",
+      "description": "Créez des aides d'étude à partir de cette note.",
+      "generate": "Générer",
+      "regenerate": "Régénérer",
+      "withCost": "{{label}} ({{count}} jetons)",
+      "markdownHeading": "Flashcards"
+    },
+    "knowledgeQA": {
+      "title": "Q&R sur les connaissances",
+      "description": "Posez des questions et obtenez des réponses issues de toutes vos notes.",
+      "ask": "Poser une question ({{count}} jetons)"
+    }
+  },
+  "extractor": {
+    "button": "Télécharger un Document",
+    "stages": {
+      "uploading": "Téléchargement…",
+      "parsing": "Analyse du contenu…",
+      "creating": "Création de la note…"
+    },
+    "errors": {
+      "unsupportedType": "Seuls les fichiers PDF, TXT et MD sont pris en charge.",
+      "tooLarge": "Le fichier doit être inférieur à 10 Mo."
+    },
+    "success": "\"{{title}}\" créé à partir de {{filename}}"
+  }
+}

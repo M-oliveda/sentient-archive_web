@@ -1,0 +1,53 @@
+{
+  "terms": "Conditions d'utilisation",
+  "privacy": "Politique de confidentialité",
+  "page": {
+    "eyebrow": "Documentation juridique",
+    "title": "Conditions d'utilisation et Politique de confidentialité",
+    "version": "Version 1",
+    "lastUpdated": "Dernière mise à jour : 2026/06/22",
+    "scrollToTop": "Retour en haut",
+    "introduction": {
+      "title": "1. Introduction",
+      "p1": "Bienvenue sur SentientArchive. Ces Conditions d'utilisation (« Conditions ») régissent votre accès et votre utilisation du Knowledge OS alimenté par l'IA de SentientArchive (le « Service »). En accédant ou en utilisant notre Service, vous acceptez d'être lié par ces Conditions et notre Politique de confidentialité.",
+      "p2": "SentientArchive est conçu pour être votre partenaire cognitif, organisant l'information grâce à un traitement neuronal avancé. Notre mission est de garantir que vos connaissances personnelles restent sécurisées, privées et éternellement accessibles."
+    },
+    "dataCollection": {
+      "title": "2. Collecte des données",
+      "intro": "Pour fournir l'expérience SentientArchive, nous collectons des informations spécifiques concernant vos interactions avec l'OS. Cela comprend :",
+      "items": {
+        "semanticInput": {
+          "label": "Entrée sémantique :",
+          "description": "Texte, documents et fichiers que vous téléversez dans votre archive privée."
+        },
+        "metadata": {
+          "label": "Métadonnées :",
+          "description": "Informations techniques sur la façon dont l'IA traite vos requêtes à des fins d'optimisation."
+        },
+        "deviceIdentity": {
+          "label": "Identité de l'appareil :",
+          "description": "Identifiants minimaux nécessaires à une synchronisation sécurisée multi-appareils."
+        }
+      },
+      "quote": "« Nous ne vendons pas les données de votre archive personnelle à des tiers. Vos connaissances vous appartiennent. »"
+    },
+    "userObligations": {
+      "title": "3. Obligations de l'utilisateur",
+      "p1": "En tant qu'utilisateur de SentientArchive, vous acceptez de maintenir la sécurité de vos clés de chiffrement et identifiants de compte. Vous êtes responsable de toute activité effectuée sous votre identifiant unique.",
+      "p2": "Vous acceptez de ne pas utiliser SentientArchive pour stocker :",
+      "items": {
+        "illegal": "Du contenu illégal ou des matériaux qui violent le droit international.",
+        "malicious": "Du code malveillant, des virus ou des agents d'IA disruptifs.",
+        "ip": "Du contenu qui porte atteinte à la propriété intellectuelle d'autrui."
+      }
+    },
+    "termination": {
+      "title": "4. Résiliation",
+      "p1": "Vous pouvez résilier votre compte SentientArchive à tout moment. Après la résiliation, vous disposerez d'un délai de 30 jours pour exporter vos données dans un format JSON-LD portable. Passé ce délai, toutes les données chiffrées seront définitivement purgées de nos nœuds distribués."
+    },
+    "contact": {
+      "title": "5. Coordonnées",
+      "p1": "Les questions concernant les Conditions ou la Politique de confidentialité doivent m'être adressées :"
+    }
+  }
+}

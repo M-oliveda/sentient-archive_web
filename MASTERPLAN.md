@@ -96,6 +96,16 @@ features.
    - Threshold warnings
    - Request tokens modal
 
+5. **Activity Log**
+   - Summary stats (actions today, AI ops this week, total actions)
+   - Filter chips and search over activity entries
+   - Date-grouped timeline of AI, token, note, and folder actions
+
+6. **Settings**
+   - Profile card with avatar and editable display name
+   - Email shown as username (read-only)
+   - Save profile changes via Cloud Functions API
+
 #### For Admins
 
 1. **User Management**
@@ -258,10 +268,19 @@ sentient-archive_web/
 │   │   │   ├── ActivityLogs.tsx
 │   │   │   └── SystemConfigForm.tsx
 │   │   │
-│   │   └── tokens/
-│   │       ├── TokenBalance.tsx
-│   │       ├── TransactionHistory.tsx
-│   │       └── RequestTokensModal.tsx
+│   │   ├── tokens/
+│   │   │   ├── TokenBalance.tsx
+│   │   │   ├── TransactionHistory.tsx
+│   │   │   └── RequestTokensModal.tsx
+│   │   │
+│   │   ├── activity/
+│   │   │   ├── ActivityStatsCards.tsx
+│   │   │   ├── ActivityFilterBar.tsx
+│   │   │   ├── ActivityTimeline.tsx
+│   │   │   └── ActivityTimelineItem.tsx
+│   │   │
+│   │   └── settings/
+│   │       └── ProfileSettingsCard.tsx
 │   │
 │   ├── pages/
 │   │   ├── auth/
@@ -271,6 +290,8 @@ sentient-archive_web/
 │   │   ├── dashboard/
 │   │   │   ├── DashboardHome.tsx
 │   │   │   ├── NotesPage.tsx
+│   │   │   ├── ActivityPage.tsx
+│   │   │   ├── SettingsPage.tsx
 │   │   │   └── AdminPage.tsx
 │   │   │
 │   │   └── 404.tsx
@@ -284,7 +305,9 @@ sentient-archive_web/
 │   │   ├── useAuth.ts
 │   │   ├── useNotes.ts
 │   │   ├── useTokens.ts
-│   │   └── useAI.ts
+│   │   ├── useAI.ts
+│   │   ├── useActivity.ts
+│   │   └── useUpdateProfile.ts
 │   │
 │   ├── stores/
 │   │   ├── authStore.ts             # Zustand store
@@ -294,16 +317,20 @@ sentient-archive_web/
 │   │   ├── note.ts
 │   │   ├── user.ts
 │   │   ├── transaction.ts
+│   │   ├── activity.ts
 │   │   └── api.ts
 │   │
-│   ├── locales/
-│   │   ├── en/
-│   │   │   └── translation.json
-│   │   └── es/
-│   │       └── translation.json
+│   ├── public/
+│   │   └── locales/
+│   │       ├── en/ (common.json, auth.json, layout.json, dashboard.json, notes.json, ai.json, tokens.json, activity.json, settings.json, admin.json, landing.json, legal.json)
+│   │       ├── es/ (Spanish translations)
+│   │       ├── fr/ (French translations)
+│   │       └── pt/ (Portuguese translations)
 │   │
 │   ├── routes/
-│   │   └── __root.tsx               # TanStack Router root
+│   │   ├── __root.tsx               # TanStack Router root
+│   │   ├── activity.tsx
+│   │   └── settings.tsx
 │   │
 │   ├── App.tsx
 │   ├── main.tsx
@@ -404,7 +431,12 @@ App.tsx
 ├── Router (TanStack Router)
 │   ├── AuthLayout
 │   │   ├── LoginPage
-│   │   └── SignupPage
+│   │   ├── SignupPage
+│   │   ├── ForgotPasswordPage
+│   │   │   ├── ForgotPasswordRequestCard
+│   │   │   └── ForgotPasswordConfirmationCard
+│   │   └── ResetPasswordPage
+│   │       └── ResetPasswordCard
 │   │
 │   ├── DashboardLayout
 │   │   ├── Navbar
@@ -466,6 +498,67 @@ App.tsx
 ```
 
 ### 5.2 Key Components
+
+#### Password Reset Flow Components
+
+The password reset feature consists of three main card components that guide users
+through the password recovery process:
+
+**ForgotPasswordRequestCard** - Initial password reset request
+
+```typescript
+// src/pages/auth/ForgotPasswordRequestCard.tsx
+interface IForgotPasswordRequestCardProps {
+  onSubmit: (email: string) => Promise<void>;
+  isLoading: boolean;
+}
+
+// Features:
+// - Email input with validation
+// - "Send Reset Link" button
+// - "Remember your password? Sign in" link
+// - Error handling for invalid emails
+```
+
+**ForgotPasswordConfirmationCard** - Email sent confirmation
+
+```typescript
+// src/pages/auth/ForgotPasswordConfirmationCard.tsx
+interface IForgotPasswordConfirmationCardProps {
+  email: string;
+  onResend: () => Promise<void>;
+  isResending: boolean;
+}
+
+// Features:
+// - Success checkmark icon
+// - Displays email where link was sent
+// - "Back to Login" button
+// - "Click to resend" functionality
+```
+
+**ResetPasswordCard** - New password form
+
+```typescript
+// src/pages/auth/ResetPasswordCard.tsx
+interface IResetPasswordCardProps {
+  onSubmit: (password: string) => Promise<void>;
+  isLoading: boolean;
+}
+
+// Features:
+// - Password input with live validation rules
+// - Confirm password input
+// - Password strength indicator
+// - Validates passwords match
+// - Verifies oobCode from Firebase
+```
+
+**Password Reset Routes:**
+
+- `/forgot-password` - Shows ForgotPasswordRequestCard and
+  ForgotPasswordConfirmationCard
+- `/reset-password?oobCode=XXX` - Shows ResetPasswordCard after verifying reset code
 
 #### NoteEditor Component
 
@@ -889,12 +982,13 @@ function App() {
 import { initializeApp } from "firebase/app";
 import { getAuth, connectAuthEmulator } from "firebase/auth";
 import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
+import { getStorage, connectStorageEmulator } from "firebase/storage";
+import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
@@ -902,14 +996,18 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
+const functions = getFunctions(app);
 
-// Connect to emulators in development
+// Connect to emulators in development (enabled by default for local development)
 if (import.meta.env.VITE_USE_EMULATOR === "true") {
   connectAuthEmulator(auth, "http://localhost:9099");
-  connectFirestoreEmulator(db, "localhost", 8080);
+  connectFirestoreEmulator(db, "localhost", 8081);
+  connectStorageEmulator(storage, "localhost", 9199);
+  connectFunctionsEmulator(functions, "localhost", 5001);
 }
 
-export { auth, db };
+export { app, auth, db, storage, functions };
 ```
 
 ### 8.2 Protected Routes
@@ -1138,10 +1236,10 @@ module.exports = {
   ],
   coverageThreshold: {
     global: {
-      branches: 80,
-      functions: 80,
-      lines: 80,
-      statements: 80,
+      branches: 100,
+      functions: 100,
+      lines: 100,
+      statements: 100,
     },
   },
   transform: {
@@ -1307,6 +1405,8 @@ echo "✅ All pre-commit checks passed!"
 - **Jest:** Unit test runner with React support
 - **React Testing Library:** Component testing
 - **MSW (Mock Service Worker):** API mocking
+- **Playwright:** Browser E2E (local Firebase emulators + staging/preview)
+- **@axe-core/playwright:** Accessibility checks in E2E
 - **@firebase/rules-unit-testing:** Firebase mocking
 
 ### 10.3 Test Structure
@@ -1419,7 +1519,7 @@ describe("useSummarize", () => {
 .github/workflows/
 ├── ci.yml                    # Run on all PRs
 ├── deploy-dev.yml            # Auto-deploy on develop
-├── deploy-staging.yml        # Auto-deploy on release/*
+├── deploy-stg.yml        # Auto-deploy on release/*
 ├── deploy-prod.yml           # Manual deploy on main
 ├── deploy-preview.yml        # Deploy PR preview environments
 └── cleanup-preview.yml       # Cleanup PR preview on close
@@ -1456,19 +1556,26 @@ keys.
 ### 11.3 CI Workflow
 
 ```yaml
-# .github/workflows/ci.yml
+# .github/works/ci.yml
+# CI Workflow
+#
+# Runs on all pull requests to develop, release/** and main branches
+# Validates code quality, runs tests, and checks coverage
+
 name: CI
 
 on:
   pull_request:
-    branches: [develop, main, "release/**"]
+    branches: [develop, "release/**", main]
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -1482,24 +1589,31 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Type check
+      - name: Format Check
+        run: npm run format:check
+
+      - name: Type Check
         run: npm run type-check
 
-      - name: Test (with coverage)
+      - name: Build
+        run: npm run build
+
+      - name: Run tests with coverage
         run: npm run test:coverage
 
       - name: Check coverage is 100%
         run: |
-          if npx --yes nyc@latest report --reporter=text-summary | grep -q '100%'; then
-            echo "100% coverage detected!"
+          # Extract coverage percentages from Jest output
+          COVERAGE_OUTPUT=$(npm run test:coverage 2>&1 | grep "All files" | head -1)
+
+          # Check if all coverage metrics are 100%
+          if echo "$COVERAGE_OUTPUT" | grep -E "100\s*\|\s*100\s*\|\s*100\s*\|\s*100" > /dev/null; then
+            echo "Coverage check passed - 100% coverage achieved"
           else
-            echo "::error::Test coverage is not 100%. Please increase test coverage to 100%."
-            npx nyc report --reporter=text-summary
+            echo "Coverage check failed - coverage is not at 100%"
+            echo "$COVERAGE_OUTPUT"
             exit 1
           fi
-
-      - name: Build
-        run: npm run build
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
@@ -1513,7 +1627,6 @@ name: Deploy to Production
 
 on:
   workflow_dispatch:
-    branches: [main]
 
 env:
   SERVICE_NAME: sentient-archive-web
@@ -1523,7 +1636,7 @@ env:
 
 permissions:
   contents: read
-  id-token: write # Required for Workload Identity Federation
+  id-token: write
 
 jobs:
   deploy:
@@ -1554,11 +1667,10 @@ jobs:
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
           VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
-          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
           VITE_FIREBASE_MESSAGING_SENDER_ID:
             ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
-          VITE_USE_EMULATOR: false
+          VITE_USE_EMULATOR: "false"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -1596,11 +1708,11 @@ jobs:
 
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy ${{ env.SERVICE_NAME }} \
-            --image=docker.io/${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+          gcloud run deploy "${{ env.SERVICE_NAME }}" \
+            --image="docker.io/${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}" \
             --platform=managed \
-            --region=${{ env.REGION }} \
-            --project=${{ secrets.GCP_PROJECT_ID }} \
+            --region="${{ env.REGION }}" \
+            --project="${{ secrets.GCP_PROJECT_ID }}" \
             --allow-unauthenticated \
             --memory=512Mi \
             --cpu=1 \
@@ -1612,21 +1724,23 @@ jobs:
       - name: Get Cloud Run URL
         id: deploy-url
         run: |
-          URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
-            --region=${{ env.REGION }} \
-            --project=${{ secrets.GCP_PROJECT_ID }} \
+          URL=$(gcloud run services describe "${{ env.SERVICE_NAME }}" \
+            --region="${{ env.REGION }}" \
+            --project="${{ secrets.GCP_PROJECT_ID }}" \
             --format='value(status.url)')
-          echo "url=$URL" >> $GITHUB_OUTPUT
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
 
       - name: Deployment Summary
         run: |
-          echo "### 🚀 Production Deployment Successful!" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Service URL:** ${{ steps.deploy-url.outputs.url }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Image:** docker.io/${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Project:** ${{ secrets.GCP_PROJECT_ID }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Region:** ${{ env.REGION }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Access:** Public (No authentication)" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "### 🚀 Production Deployment Successful!"
+            echo ""
+            echo "**Service URL:** ${{ steps.deploy-url.outputs.url }}"
+            echo "**Image:** docker.io/${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+            echo "**Project:** ${{ secrets.GCP_PROJECT_ID }}"
+            echo "**Region:** ${{ env.REGION }}"
+            echo "**Access:** Public (No authentication)"
+          } >> "$GITHUB_STEP_SUMMARY"
 ```
 
 ### 11.5 Deployment Workflow (Development)
@@ -1647,7 +1761,7 @@ env:
 
 permissions:
   contents: read
-  id-token: write # Required for Workload Identity Federation
+  id-token: write
 
 jobs:
   deploy:
@@ -1675,11 +1789,10 @@ jobs:
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
           VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
-          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
           VITE_FIREBASE_MESSAGING_SENDER_ID:
             ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
-          VITE_USE_EMULATOR: false
+          VITE_USE_EMULATOR: "false"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -1720,11 +1833,11 @@ jobs:
 
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy ${{ env.SERVICE_NAME }} \
-            --image=docker.io/${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:dev-${{ github.sha }} \
+          gcloud run deploy "${{ env.SERVICE_NAME }}" \
+            --image="docker.io/${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:dev-${{ github.sha }}" \
             --platform=managed \
-            --region=${{ env.REGION }} \
-            --project=${{ secrets.GCP_PROJECT_ID }} \
+            --region="${{ env.REGION }}" \
+            --project="${{ secrets.GCP_PROJECT_ID }}" \
             --allow-unauthenticated \
             --memory=512Mi \
             --cpu=1 \
@@ -1736,29 +1849,29 @@ jobs:
       - name: Get Cloud Run URL
         id: deploy-url
         run: |
-          URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
-            --region=${{ env.REGION }} \
-            --project=${{ secrets.GCP_PROJECT_ID }} \
+          URL=$(gcloud run services describe "${{ env.SERVICE_NAME }}" \
+            --region="${{ env.REGION }}" \
+            --project="${{ secrets.GCP_PROJECT_ID }}" \
             --format='value(status.url)')
-          echo "url=$URL" >> $GITHUB_OUTPUT
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
 
       - name: Deployment Summary
         run: |
-          echo "### 🚀 Development Deployment Successful!" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Service URL:** ${{ steps.deploy-url.outputs.url }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Image:** docker.io/${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:dev-${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Project:** ${{ secrets.GCP_PROJECT_ID }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Region:** ${{ env.REGION }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Access:** Protected (HTTP Basic Auth)" >> $GITHUB_STEP_SUMMARY
-          echo "**Username:** \`${{ secrets.AUTH_USERNAME }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "**Password:** \`${{ secrets.AUTH_PASSWORD }}\`" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "### 🚀 Development Deployment Successful!"
+            echo ""
+            echo "**Service URL:** ${{ steps.deploy-url.outputs.url }}"
+            echo "**Image:** docker.io/${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:dev-${{ github.sha }}"
+            echo "**Project:** ${{ secrets.GCP_PROJECT_ID }}"
+            echo "**Region:** ${{ env.REGION }}"
+            echo "**Access:** Protected (HTTP Basic Auth)"
+          } >> "$GITHUB_STEP_SUMMARY"
 ```
 
 ### 11.6 Deployment Workflow (Staging)
 
 ```yaml
-# .github/workflows/deploy-staging.yml
+# .github/workflows/deploy-stg.yml
 name: Deploy to Staging
 
 on:
@@ -1773,7 +1886,7 @@ env:
 
 permissions:
   contents: read
-  id-token: write # Required for Workload Identity Federation
+  id-token: write
 
 jobs:
   deploy:
@@ -1804,11 +1917,10 @@ jobs:
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
           VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
-          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
           VITE_FIREBASE_MESSAGING_SENDER_ID:
             ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
-          VITE_USE_EMULATOR: false
+          VITE_USE_EMULATOR: "false"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -1849,11 +1961,11 @@ jobs:
 
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy ${{ env.SERVICE_NAME }} \
-            --image=docker.io/${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:staging-${{ github.sha }} \
+          gcloud run deploy "${{ env.SERVICE_NAME }}" \
+            --image="docker.io/${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:staging-${{ github.sha }}" \
             --platform=managed \
-            --region=${{ env.REGION }} \
-            --project=${{ secrets.GCP_PROJECT_ID }} \
+            --region="${{ env.REGION }}" \
+            --project="${{ secrets.GCP_PROJECT_ID }}" \
             --allow-unauthenticated \
             --memory=512Mi \
             --cpu=1 \
@@ -1865,29 +1977,34 @@ jobs:
       - name: Get Cloud Run URL
         id: deploy-url
         run: |
-          URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
-            --region=${{ env.REGION }} \
-            --project=${{ secrets.GCP_PROJECT_ID }} \
+          URL=$(gcloud run services describe "${{ env.SERVICE_NAME }}" \
+            --region="${{ env.REGION }}" \
+            --project="${{ secrets.GCP_PROJECT_ID }}" \
             --format='value(status.url)')
-          echo "url=$URL" >> $GITHUB_OUTPUT
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
 
       - name: Deployment Summary
         run: |
-          echo "### 🚀 Staging Deployment Successful!" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Service URL:** ${{ steps.deploy-url.outputs.url }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Image:** docker.io/${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:staging-${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Project:** ${{ secrets.GCP_PROJECT_ID }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Region:** ${{ env.REGION }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Access:** Protected (HTTP Basic Auth)" >> $GITHUB_STEP_SUMMARY
-          echo "**Username:** \`${{ secrets.AUTH_USERNAME }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "**Password:** \`${{ secrets.AUTH_PASSWORD }}\`" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "### 🚀 Staging Deployment Successful!"
+            echo ""
+            echo "**Service URL:** ${{ steps.deploy-url.outputs.url }}"
+            echo "**Image:** docker.io/${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:staging-${{ github.sha }}"
+            echo "**Project:** ${{ secrets.GCP_PROJECT_ID }}"
+            echo "**Region:** ${{ env.REGION }}"
+            echo "**Access:** Protected (HTTP Basic Auth)"
+          } >> "$GITHUB_STEP_SUMMARY"
 ```
 
 ### 11.7 Deployment Workflow (Preview - PR Environments)
 
 ```yaml
 # .github/workflows/deploy-preview.yml
+# Deploy Preview Workflow
+#
+# Deploys ephemeral preview environments for Pull Requests
+# Each PR gets its own Cloud Run service with HTTP Basic Auth
+
 name: Deploy to Preview
 
 on:
@@ -1900,11 +2017,6 @@ env:
   DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
   IMAGE_NAME: sentient-archive-web
 
-permissions:
-  contents: read
-  id-token: write # Required for Workload Identity Federation
-  pull-requests: write
-
 jobs:
   deploy-preview:
     runs-on: ubuntu-latest
@@ -1912,6 +2024,10 @@ jobs:
     environment:
       name: preview
       url: ${{ steps.preview-url.outputs.url }}
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
 
     steps:
       - name: Checkout code
@@ -1992,32 +2108,12 @@ jobs:
 
             ### 🔗 [**View Preview Deployment →**](${previewUrl})
 
-            <table>
-              <tr>
-                <td><strong>Environment</strong></td>
-                <td>Preview (Ephemeral)</td>
-              </tr>
-              <tr>
-                <td><strong>Service</strong></td>
-                <td><code>${serviceName}</code></td>
-              </tr>
-              <tr>
-                <td><strong>URL</strong></td>
-                <td><a href="${previewUrl}">${previewUrl}</a></td>
-              </tr>
-              <tr>
-                <td><strong>Commit</strong></td>
-                <td><code>${context.sha.substring(0, 7)}</code></td>
-              </tr>
-              <tr>
-                <td><strong>🔒 Username</strong></td>
-                <td><code>${{ secrets.AUTH_USERNAME }}</code></td>
-              </tr>
-              <tr>
-                <td><strong>🔒 Password</strong></td>
-                <td><code>${{ secrets.AUTH_PASSWORD }}</code></td>
-              </tr>
-            </table>
+            | Property | Value |
+            | --- | --- |
+            | **Environment** | Preview (Ephemeral) |
+            | **Service** | \`${serviceName}\` |
+            | **URL** | ${previewUrl} |
+            | **Commit** | \`${context.sha.substring(0, 7)}\` |
 
             ---
 
@@ -2027,7 +2123,7 @@ jobs:
             - **Security Level:** Medium (HTTP Basic Auth)
             - **Who Uses It:** Devs, QA, Product
 
-            > 💡 **Note:** This preview environment will be automatically cleaned up when the PR is closed or merged.
+            > 💡 **Note:** This preview environment will be automatically cleaned up when the PR is closed or merged. Credentials are available in the GitHub Environment secrets.
             `;
 
             github.rest.issues.createComment({
@@ -2042,6 +2138,11 @@ jobs:
 
 ```yaml
 # .github/workflows/cleanup-preview.yml
+# Cleanup Preview Workflow
+#
+# Cleans up ephemeral preview environments when PRs are closed
+# Deletes the Cloud Run service and comments on the PR
+
 name: Cleanup Preview Environment
 
 on:
@@ -2052,16 +2153,15 @@ on:
 env:
   REGION: us-central1
 
-permissions:
-  contents: read
-  id-token: write # Required for Workload Identity Federation
-  pull-requests: write
-
 jobs:
   cleanup:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: preview
+    permissions:
+      pull-requests: write
+      contents: read
+      id-token: write
 
     steps:
       - name: Generate preview service name
@@ -2275,13 +2375,15 @@ server {
 
 ```yaml
 # docker-compose.yml
+name: sentient-archive-web_local
+
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
       target: builder
-    container_name: sentient-archive-web-dev
+    container_name: frontend
     ports:
       - "5173:5173"
     volumes:
@@ -2296,7 +2398,6 @@ services:
       - VITE_FIREBASE_API_KEY=${VITE_FIREBASE_API_KEY}
       - VITE_FIREBASE_AUTH_DOMAIN=${VITE_FIREBASE_AUTH_DOMAIN}
       - VITE_FIREBASE_PROJECT_ID=${VITE_FIREBASE_PROJECT_ID}
-      - VITE_FIREBASE_STORAGE_BUCKET=${VITE_FIREBASE_STORAGE_BUCKET}
       - VITE_FIREBASE_MESSAGING_SENDER_ID=${VITE_FIREBASE_MESSAGING_SENDER_ID}
       - VITE_FIREBASE_APP_ID=${VITE_FIREBASE_APP_ID}
       - VITE_USE_EMULATOR=true
@@ -2351,131 +2452,225 @@ secrets.
 
 ### Phase 1: Project Initialization (Week 1)
 
-- [ ] Create GitHub repository
-- [ ] Set up GitFlow branching
-- [ ] Configure Vite + React 19 + TypeScript
-- [ ] Install and configure TailwindCSS + ShadCN
-- [ ] Set up ESLint + Prettier
-- [ ] Install and configure Husky (pre-commit + commit-msg hooks)
-- [ ] Set up Gitmoji commit message validation
-- [ ] Create Dockerfile with multi-stage build (production + protected targets)
-- [ ] Create docker-compose.yml for local development
-- [ ] Create nginx.conf for production (public)
-- [ ] Create nginx.protected.conf for dev/staging/preview (with auth)
-- [ ] Create .dockerignore
-- [ ] Configure GitHub Actions workflows (CI, deploy-dev, deploy-staging, deploy-prod,
+- [x] Create GitHub repository
+- [x] Set up GitFlow branching
+- [x] Configure Vite + React 19 + TypeScript
+- [x] Install and configure TailwindCSS + ShadCN
+- [x] Set up ESLint + Prettier
+- [x] Install and configure Husky (pre-commit + commit-msg hooks)
+- [x] Set up Gitmoji commit message validation
+- [x] Create Dockerfile with multi-stage build (production + protected targets)
+- [x] Create docker-compose.yml for local development
+- [x] Create nginx.conf for production (public)
+- [x] Create nginx.protected.conf for dev/staging/preview (with auth)
+- [x] Create .dockerignore
+- [x] Configure GitHub Actions workflows (CI, deploy-dev, deploy-staging, deploy-prod,
       deploy-preview, cleanup-preview)
-- [ ] Create initial folder structure (.husky directory)
-- [ ] Set up Firebase SDK
-- [ ] Configure Jest for testing
+- [x] Create initial folder structure (.husky directory)
+- [x] Set up Firebase SDK
+- [x] Configure Jest for testing
 
 ### Phase 2: Authentication UI (Week 2)
 
-- [ ] Create LoginPage component
-- [ ] Create SignupPage component
-- [ ] Implement Google OAuth button
-- [ ] Implement Email/Password forms
-- [ ] Set up Firebase Auth integration
-- [ ] Create auth hooks (useAuth)
-- [ ] Set up auth store (Zustand)
-- [ ] Implement protected routes
-- [ ] Test authentication flows
+- [x] Create LoginPage component
+- [x] Create SignupPage component
+- [x] Implement Google OAuth button
+- [x] Implement Email/Password forms
+- [x] Set up Firebase Auth integration
+- [x] Create auth hooks (useAuth)
+- [x] Set up auth store (Zustand)
+- [x] Implement protected routes
+- [x] Test authentication flows
+- [x] Create ForgotPasswordRequestCard component
+- [x] Create ForgotPasswordConfirmationCard component
+- [x] Create ResetPasswordCard component
+- [x] Create ForgotPasswordPage
+- [x] Create ResetPasswordPage
+- [x] Implement password reset functionality
+- [x] Add forgot password link to LoginPage
 
-### Phase 3: Dashboard Layout (Week 2)
+### Phase 3: Dashboard Layout & Landing Page (Week 2)
 
-- [ ] Create DashboardLayout component
-- [ ] Build Navbar with user menu
-- [ ] Build Sidebar with navigation
-- [ ] Implement responsive design
-- [ ] Create DashboardHome page
-- [ ] Build WelcomeCard
-- [ ] Build TokenBalanceCard
-- [ ] Build RecentNotesCard
-- [ ] Test layout on mobile/tablet/desktop
+#### Landing Page (public home page at `/`)
+
+- [x] Create `src/pages/landing/LandingPage.tsx` as the root page container
+- [x] Build `LandingNavbar` component — logo left, anchor nav links (Features, How It
+      Works, Token System) center, "Get Started" button right; collapses to hamburger on
+      mobile
+- [x] Build `HeroSection` component — "v1.0 is now live" badge, headline "Unlock the
+      wisdom in your digital archive.", subtitle, "Start for Free" CTA button, app
+      screenshot/mockup
+- [x] Build `WhySentientArchiveSection` component — section heading "Why
+      SentientArchive?", 3 feature highlight cards: Cognitive Search, Auto-Linking,
+      Private by Design
+- [x] Build `FeaturesSection` component — section heading "Everything You Need to Build
+      Your Knowledge Empire", 8 feature cards in a responsive grid: Real-Time Search,
+      Activity Tracking, Smart Note-Taking, Hierarchical Folders, AI Summarization (2
+      tokens), Flashcard Generation (3 tokens), Auto-Tagging (3 tokens), Knowledge Q&A
+      (4 tokens/query); token-cost badge on AI cards
+- [x] Build `HowItWorksSection` component — section heading "How It Works", 3-step
+      horizontal flow: Create Your Account → Capture Your Knowledge → Unlock AI
+      Insights, each with icon and description; "Start For Free" CTA button below
+- [x] Build `TokenSystemSection` component — section heading "Simple Token-Based
+      System", left-side explanatory text (20 free tokens, cost-per-operation, request
+      more), right-side 2×2 token cost grid: Auto-Tagging (1), Summarization (2),
+      Flashcards (2), Q&A Chat (4/query)
+- [x] Build `LandingFooter` component — logo left, copyright and tagline right
+- [x] Wire smooth-scroll anchor navigation (`#features`, `#how-it-works`,
+      `#token-system`) from `LandingNavbar` links
+- [x] Test landing page responsiveness on mobile / tablet / desktop
+
+#### Dashboard Layout
+
+- [x] Create DashboardLayout component
+- [x] Build Navbar with user menu
+- [x] Build Sidebar with navigation
+- [x] Implement responsive design
+- [x] Create DashboardHome page
+- [x] Build WelcomeCard
+- [x] Build TokenBalanceCard
+- [x] Build RecentNotesCard
+- [x] Test layout on mobile/tablet/desktop
 
 ### Phase 4: Note Management UI (Week 3)
 
-- [ ] Create NotesPage layout
-- [ ] Build NotesList component
-- [ ] Build NoteCard component
-- [ ] Implement FolderTree component
-- [ ] Build MarkdownEditor
-- [ ] Implement live preview
-- [ ] Build FileExtractor component (PDF/TXT/MD content extraction)
-- [ ] Implement file upload with validation (type, size)
-- [ ] Integrate file extraction API endpoint
-- [ ] Create tag management UI
-- [ ] Implement search functionality
-- [ ] Test note CRUD operations
-- [ ] Test file content extraction flow
+- [x] Create NotesPage layout
+- [x] Build NotesList component
+- [x] Build NoteCard component
+- [x] Implement FolderTree component
+- [x] Build MarkdownEditor
+- [x] Implement live preview
+- [x] Build FileExtractor component (PDF/TXT/MD content extraction)
+- [x] Implement file upload with validation (type, size)
+- [x] Integrate file extraction API endpoint
+- [x] Create tag management UI
+- [x] Implement search functionality
+- [x] Test note CRUD operations
+- [x] Test file content extraction flow
 
 ### Phase 5: AI Features UI (Week 4)
 
-- [ ] Create AIToolbar component
-- [ ] Build SummarizeButton with modal
-- [ ] Build AutoTagButton
-- [ ] Build FlashcardsButton
-- [ ] Build AskQuestionButton with chat UI
-- [ ] Implement FlashcardViewer
-- [ ] Add loading states
-- [ ] Add error handling
-- [ ] Test AI feature flows
+- [x] Create AIToolbar component
+- [x] Build SummarizeButton with modal
+- [x] Build AutoTagButton
+- [x] Build FlashcardsButton
+- [x] Build AskQuestionButton with chat UI
+- [x] Implement FlashcardViewer
+- [x] Add loading states
+- [x] Add error handling
+- [x] Test AI feature flows
 
 ### Phase 6: Token Management UI (Week 5)
 
-- [ ] Create TokenBalance component
-- [ ] Build TransactionHistory table
-- [ ] Implement RequestTokensModal
-- [ ] Add threshold warnings
-- [ ] Create token-related hooks
-- [ ] Test token displays and updates
+- [x] Create TokenBalance component
+- [x] Build TransactionHistory table
+- [x] Implement RequestTokensModal
+- [x] Add threshold warnings
+- [x] Create token-related hooks
+- [x] Test token displays and updates
 
-### Phase 7: Admin Dashboard (Week 6)
+### Phase 7: Client Activity and Settings Page (Week 6)
 
-- [ ] Create AdminPage layout
-- [ ] Build UserManagementTable
-- [ ] Implement user filters and search
-- [ ] Create EditUserModal
-- [ ] Build AnalyticsChart components
-- [ ] Create ActivityLogs viewer
-- [ ] Build SystemConfigForm
-- [ ] Implement RBAC protection
-- [ ] Test admin features
+Build the client Activity Log (`/activity`) and Settings (`/settings`) pages to match
+the Figma designs (mobile + desktop).
 
-### Phase 8: Internationalization (Week 7)
+**Out of scope for Phase 7:** billing UI; theme / language / notifications preferences
+UI (Phase 9 / later); admin system-wide ActivityLogs viewer (Phase 8).
 
-- [ ] Set up i18next
-- [ ] Create translation files (en, es)
-- [ ] Implement LanguageSwitcher component
-- [ ] Translate all UI strings
-- [ ] Test language switching
-- [ ] Verify RTL support (if needed)
+**Backend (functions repo):** `PUT /v1/users/me`, `GET /v1/activity`, and
+`GET /v1/activity/stats` implemented on branch
+`feature/phase7-activity-and-settings-api`.
 
-### Phase 9: Testing & Polish (Week 8)
+#### Activity Log page (`/activity`)
 
-- [ ] Write unit tests (100% coverage)
-- [ ] Write integration tests
-- [ ] Add E2E tests (optional)
-- [ ] Fix all linting errors
-- [ ] Optimize bundle size
-- [ ] Add loading skeletons
-- [ ] Improve accessibility (a11y)
-- [ ] Test on multiple browsers
+- [x] Create `src/routes/activity.tsx` (ProtectedRoute + DashboardLayout)
+- [x] Create `src/pages/dashboard/ActivityPage.tsx` — title “Activity Log”, subtitle:
+      “Track all your actions, AI operations, and token usage history.”
+- [x] Build `ActivityStatsCards` — Actions today (+% delta), AI Ops This Week (+%
+      delta), Total Actions (responsive: 2+1 mobile, 3-col desktop)
+- [x] Build `ActivityFilterBar` — chips: All / AI Ops / Tokens / Notes / Folders +
+      “Search logs...” input
+- [x] Build `ActivityTimeline` — date group headers (`TODAY, OCT 24` style) + vertical
+      timeline
+- [x] Build `ActivityTimelineItem` — type icon + title + description card
+- [x] Add activity types / icons mapping (AI / tokens / notes / folders)
+- [x] Create `src/types/activity.ts`
+- [x] Create `src/hooks/useActivity.ts` (TanStack Query) against client activity API
+- [x] Wire filters + search (prefer URL search params if notes pattern fits)
+- [x] Coordinate / consume functions endpoint(s) for feed + stats (expected contract:
+      category filter, search, pagination, percentage deltas for today / this week)
+- [x] Add loading / empty / error states
+- [x] Write tests for ActivityPage, ActivityStatsCards, ActivityFilterBar, and timeline
+      items
+- [x] Verify mobile / desktop layout against Figma
 
-### Phase 10: Documentation & Deployment (Week 9)
+#### Settings page (`/settings`)
 
-- [ ] Complete README.md
-- [ ] Document component API
-- [ ] Create user guide
-- [ ] Set up Docker Hub repository
-- [ ] Configure GCP service accounts
-- [ ] Deploy to development (Cloud Run)
-- [ ] Deploy to staging (Cloud Run)
-- [ ] Final QA testing
-- [ ] Deploy to production (Cloud Run)
-- [ ] Configure custom domain (if applicable)
-- [ ] Set up monitoring and logging
-- [ ] Monitor production
+- [x] Create `src/routes/settings.tsx` (ProtectedRoute + DashboardLayout)
+- [x] Create `src/pages/dashboard/SettingsPage.tsx` — title “Settings”, subtitle:
+      “Manage your account settings, preferences, and billing.”
+- [x] Build `ProfileSettingsCard` — avatar, Full Name (`displayName`), Username field
+      showing email (read-only), Save Changes button
+- [x] Form validation with Zod + React Hook Form (`displayName` required / min length)
+- [x] Create `src/hooks/useUpdateProfile.ts` mutation via `apiRequest`
+- [x] Coordinate / consume functions `PUT /v1/users/me` (or equivalent) to update
+      `displayName` and sync Firebase Auth profile
+- [x] Extend frontend `IUser` if needed once API returns updated profile fields
+- [x] Add success / error toasts or inline feedback after save
+- [x] Write tests for SettingsPage and ProfileSettingsCard
+- [x] Verify mobile / desktop layout against Figma
+
+### Phase 8: Admin Dashboard (Week 7)
+
+- [x] Create AdminPage layout
+- [x] Build UserManagementTable
+- [x] Implement user filters and search
+- [x] Create EditUserModal
+- [x] Build AnalyticsChart components
+- [x] Create ActivityLogs viewer
+- [x] Build SystemConfigForm
+- [x] Implement RBAC protection
+- [x] Test admin features
+
+### Phase 9: Internationalization (Week 8)
+
+- [x] Set up i18next with HttpBackend and LanguageDetector
+- [x] Create translation files (en, es, fr, pt) with namespaced JSON structure
+- [x] Implement LanguageSwitcher component in PublicNavbar and DashboardSidebar
+- [x] Wire i18n infrastructure (src/lib/i18n.ts, Suspense in main.tsx)
+- [x] Create useLanguage and useUpdateLanguage hooks
+- [x] Update backend to support language preference (en/es/fr/pt)
+- [x] Sync language preference on login via useAuth
+- [x] Update IUser type to include preferences
+- [x] Translate all UI strings (dashboard, notes, AI, tokens, activity, settings, admin,
+      auth, landing, legal, layout — en/es/fr/pt; FolderTree unused/skipped; API-sourced
+      activity titles remain backend-owned)
+- [x] Test language switching (LanguageSwitcher QA complete; locale keys verified
+      en/es/fr/pt)
+- [x] Verify RTL support (N/A - all supported languages are LTR)
+
+### Phase 10: Testing & Polish (Week 9)
+
+- [x] Write unit tests (100% coverage)
+- [x] Write integration tests
+- [x] Add E2E tests (Playwright — local emulators + staging/preview)
+- [x] Fix all linting errors
+- [x] Optimize bundle size
+- [x] Add loading skeletons
+- [x] Improve accessibility (a11y)
+- [x] Test on multiple browsers
+
+### Phase 11: Documentation & Deployment (Week 10)
+
+- [x] Complete README.md
+- [x] Document component API
+- [x] Create user guide
+- [x] Set up Docker Hub repository
+- [x] Configure GCP service accounts
+- [x] Deploy to development (Cloud Run)
+- [x] Deploy to staging (Cloud Run)
+- [x] Final QA testing
+- [x] Set up monitoring and logging
 
 ## Appendix A: Environment Variables
 
@@ -2485,13 +2680,12 @@ secrets.
 # Firebase Configuration
 VITE_FIREBASE_API_KEY=your-api-key
 VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=your-project-id
-VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+VITE_FIREBASE_PROJECT_ID=demo-sentient-archive
 VITE_FIREBASE_MESSAGING_SENDER_ID=123456789
 VITE_FIREBASE_APP_ID=1:123456789:web:abcdef
 
 # Development Settings (only for local Docker)
-VITE_USE_EMULATOR=false
+VITE_USE_EMULATOR=true
 VITE_FUNCTIONS_EMULATOR_URL=http://localhost:5001
 ```
 
@@ -2504,7 +2698,6 @@ For local development with Docker Compose, create a `.env` file:
 VITE_FIREBASE_PROJECT_ID=sentient-archive-dev
 VITE_FIREBASE_API_KEY=your-dev-api-key
 VITE_FIREBASE_AUTH_DOMAIN=sentient-archive-dev.firebaseapp.com
-VITE_FIREBASE_STORAGE_BUCKET=sentient-archive-dev.appspot.com
 VITE_FIREBASE_MESSAGING_SENDER_ID=123456789
 VITE_FIREBASE_APP_ID=1:123456789:web:abcdef
 
@@ -2536,7 +2729,6 @@ Each GitHub Environment contains the following secrets:
 | `VITE_FIREBASE_API_KEY`             | Firebase API key                               |
 | `VITE_FIREBASE_AUTH_DOMAIN`         | Firebase auth domain                           |
 | `VITE_FIREBASE_PROJECT_ID`          | Firebase project ID                            |
-| `VITE_FIREBASE_STORAGE_BUCKET`      | Firebase storage bucket                        |
 | `VITE_FIREBASE_MESSAGING_SENDER_ID` | Firebase messaging sender ID                   |
 | `VITE_FIREBASE_APP_ID`              | Firebase app ID                                |
 | `AUTH_USERNAME`                     | HTTP Basic Auth username (dev/staging/preview) |
